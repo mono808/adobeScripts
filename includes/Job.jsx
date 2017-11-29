@@ -2,7 +2,7 @@
 	this.nfo = {
 		c2b : null,
 		client : null,
-		design : null,
+		jobName : null,
 		doc : null,
 		file : null,
 		folder : null,
@@ -38,7 +38,7 @@ Job.prototype.get_nfo_from_filename = function (target) {
             tag             = rE.doc.exec(dN)[0];
             splitArray      = tag.split('_');
             nfo.jobNr       = splitArray[0];
-            nfo.design      = splitArray[1];
+            nfo.jobName      = splitArray[1];
             nfo.doc         = splitArray[2];
         }
         return nfo;
@@ -48,23 +48,24 @@ Job.prototype.get_nfo_from_filepath = function (fldr) {
     function check_folder_for_nfo(f, nfo) 
     {
         var fName = f.displayName,                
-            jobNr = rE.jobNr.exec(fName),
-            designNew = rE.job_design.exec(fName),
-            designOld = rE.jobDesignOld.exec(fName);
+            jobMatch = fName.match(rE.jobNr);
         
-        if(jobNr) {
+        if (jobMatch) {
+            var folderNewRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_([a-z0-9äüöß-]+)/i);
+            var folderOldRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)\s\(([a-z0-9äüöß-]+)\)/i);
+            var match = fName.match(folderNewRegExp);
+            
+            match = match ? match : fName.match(folderOldRegExp);
+            
             Folder.current = f;
-            nfo.refNr  = jobNr[0];
+            nfo.refNr  = jobMatch[0];
             nfo.folder = f;
             nfo.client = f.parent.displayName;
             nfo.c2b    = f.parent.parent.displayName;
-            /WME24/.test(jobNr) ? nfo.shop = 'wme' : nfo.shop = 'cs';
-            if(!nfo.design) {
-                if(designNew) {
-                    nfo.design = fName.substring(fName.indexOf("_")+1, fName.length);
-                } else if (designOld) {
-                    nfo.design = fName.substring(fName.indexOf(" (")+2, fName.length-1);
-                }
+            nfo.shop   = jobMatch[2] == 'wme' ? 'wme' : 'cs';
+            
+            if(!nfo.jobName && match) {
+                nfo.jobName = match[3];
             }
         } else {
             if(f.parent != null) check_folder_for_nfo(f.parent, nfo);
@@ -79,6 +80,30 @@ Job.prototype.get_nfo_from_filepath = function (fldr) {
     }
     
     return nfo;
+};
+
+Job.prototype.get_jobNames = function (jobfolder) {
+    var jobfolders = jobfolder.parent.getFiles(rE.jobNr),
+        jobNames = [],
+        jobName;
+        
+    var folderNewRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_([a-z0-9äüöß-]+)/i);
+    var folderOldRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)\s\(([a-z0-9äüöß-]+)\)/i);        
+
+    for (var i = 0, maxI = jobfolders.length; i < maxI; i += 1) 
+    {
+        var afolder = jobfolders[i];
+        if(afolder instanceof Folder) {
+            var fName = afolder.displayName;
+            var match = fName.match(folderNewRegExp);            
+            match = match ? match : fName.match(folderOldRegExp);
+            
+            if (match && match.length > 3) {                    
+                jobNames.push(match[3]);
+            }
+        }
+    }
+    return jobNames;
 };
 
 Job.prototype.get_nfo_from_user = function () {
@@ -275,32 +300,7 @@ Job.prototype.get_jobNr_from_user = function () {
     return result.jobNr;
 };
 
-Job.prototype.get_jobNames = function (jobfolder) {
-    var jobfolders = jobfolder.parent.getFiles(rE.jobNr),
-        designs = [],
-        i,
-        maxI,
-        afolder,
-        fName,
-        result,
-        design;
 
-    for (i = 0, maxI = jobfolders.length; i < maxI; i += 1) 
-    {
-        afolder = jobfolders[i];
-        if(afolder instanceof Folder)
-        {
-            fName = afolder.displayName;
-            result = rE.job_design.exec(fName);
-            if (result) 
-            {                    
-                design = fName.substring(fName.indexOf("_")+1, fName.length);
-                designs.push(design);
-            }
-        }
-    }
-    return designs
-};
 
 Job.prototype.get_wxh = function () {
     var w = null,
@@ -647,7 +647,7 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich) {
 
     // if full infos are needed and some are still missing,
     // let the user choose manually
-    if(fullExtract && (!this.nfo.printId || !this.nfo.tech || !this.nfo.design)) {
+    if(fullExtract && (!this.nfo.printId || !this.nfo.tech || !this.nfo.jobName)) {
         tempNfo = this.get_nfo_from_user();
         this.add_to_nfo(tempNfo);
     }            
