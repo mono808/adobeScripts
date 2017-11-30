@@ -4,13 +4,13 @@ function main() {
 
     #include '/c/capri-links/scripts/includes/augment_objects.jsx'
     #include '/c/capri-links/scripts/includes/f_all.jsx'
-    #include '/c/capri-links/scripts/includes/job_related.jsx'
+    #include '/c/capri-links/scripts/includes/Job.jsx'
     #include '/c/capri-links/scripts/includes/save_Options.jsx'
     #include '/c/capri-links/scripts/includes/MonoNamer.jsx'
     #include '/c/capri-links/scripts/includes/f_id.jsx'
 
     var monoNamer = new MonoNamer();
-    job.set_nfo(null, true);
+    var job = new Job(null, true);
 
     var iDoc = app.activeDocument,
         sepRef = iDoc.allGraphics[0];

@@ -6,7 +6,7 @@ function main () {
     #include '/c/capri-links/scripts/includes/f_all.jsx'
     #include '/c/capri-links/scripts/includes/f_id.jsx'
     #include '/c/capri-links/scripts/includes/f_id_mock.jsx'    
-    #include '/c/capri-links/scripts/includes/job_related.jsx'
+    #include '/c/capri-links/scripts/includes/Job.jsx'
     #include '/c/capri-links/scripts/includes/save_Options.jsx'
 
     //job.set_nfo(null, false);

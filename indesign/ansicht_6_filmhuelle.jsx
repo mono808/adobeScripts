@@ -133,7 +133,7 @@ function create_aufkleber () {
             return [myY1, myX1, myY2, myX2];
         }
 
-        var tableTempString = "Client1\tClient 2\tJobNr\tDesign\rPos1\tPos2\tPos3\tPos4\rColors1\tColors2\tColors3\tColors4\rimage1\timage2\timage3\timage4";
+        var tableTempString = "Client1\tClient 2\tJobNr\tJobName\rPos1\tPos2\tPos3\tPos4\rColors1\tColors2\tColors3\tColors4\rimage1\timage2\timage3\timage4";
         
         var myTF = createTextFrame();        
         myTF.contents = tableTempString;
@@ -318,7 +318,7 @@ function main (doc) {
     {
         var jobRow,clCell1,clCell2,clCell,
             jobNrCell,
-            designCell;
+            jobNameCell;
 
         jobRow = table2Fill.rows.item(0);
         clCell1 = jobRow.cells.item(0);
@@ -331,9 +331,9 @@ function main (doc) {
         jobNrCell.contents = job.nfo.jobNr;
         jobNrCell.appliedCellStyle = 'jobCStyle';
 
-        designCell = jobRow.cells.item(2);
-        designCell.contents = job.nfo.design;
-        designCell.appliedCellStyle = 'jobCStyle';        
+        jobNameCell = jobRow.cells.item(2);
+        jobNameCell.contents = job.nfo.jobName;
+        jobNameCell.appliedCellStyle = 'jobCStyle';        
     }
 
     var doc = app.activeDocument,

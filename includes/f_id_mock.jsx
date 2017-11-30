@@ -101,8 +101,8 @@
         } else {
             tempStr += '---';
         }           
-        tempStr += '\rDesign:\r';
-        tempStr += nfo.design;
+        tempStr += '\rAuftragsname:\r';
+        tempStr += nfo.jobName;
 
         tf.contents = tempStr;
         var j, maxJ = tf.parentStory.paragraphs.length, pg;

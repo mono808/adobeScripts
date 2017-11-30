@@ -141,7 +141,7 @@ function main() {
         var printId = mN.name('printId', job.nfo.printId);
         
         var infoString1 = job.nfo.client + ' - ' + job.nfo.jobNr + '\n';
-        var infoString2 = 'JobName: ' + job.nfo.design + ' - DruckID: ' + printId + '\n';
+        var infoString2 = 'JobName: ' + job.nfo.jobName + ' - DruckID: ' + printId + '\n';
         var infoString3 = 'BxH: ' + f_id.get_width(sepRef) + 'x' + f_id.get_height(sepRef) + 'mm - ' + f_all.get_kuerzel();
         infoTF.contents = infoString1;
         infoTF.contents += infoString2;
@@ -197,13 +197,13 @@ function main() {
 
     #include '/c/capri-links/scripts/includes/augment_objects.jsx'
     #include '/c/capri-links/scripts/includes/f_all.jsx'    
-    #include '/c/capri-links/scripts/includes/job_related.jsx'
+    #include '/c/capri-links/scripts/includes/Job.jsx'
     #include '/c/capri-links/scripts/includes/save_Options.jsx'
     #include '/c/capri-links/scripts/includes/f_id.jsx'
     #include '/c/capri-links/scripts/includes/MonoNamer.jsx'
     #include '/c/capri-links/scripts/includes/InteractSwitch.jsx'
 
-    job.set_nfo();
+    var job = new Job(null, false, false);
 
     var iASwitch = new InteractSwitch();
     iASwitch.set('none');
