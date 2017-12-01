@@ -1,6 +1,6 @@
 ﻿if(typeof Object.prototype.create !== 'function') {
 	Object.prototype.create = function(o) {
-		var F = function () {}
+		var F = function () {};
 		F.prototype = o;
 		return new F();		
 	};

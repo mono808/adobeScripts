@@ -132,7 +132,7 @@ function main() {
         // Ansichten ausdrucken
         var i, maxI, doc, rowConts;
         for(i=0, maxI = docs.ansichten.length; i<maxI; i+=1){
-            doc = app.open(docs.ansichten[i],false);
+            doc = app.open(docs.ansichten[i],true);
 
             if(!check_sizes(doc)) {
                 doc.close(SaveOptions.YES);

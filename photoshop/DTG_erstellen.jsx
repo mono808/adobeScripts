@@ -7,6 +7,25 @@
 //~ #include 'statics.jsx'
 //~ #include 'variables.jsx'
 
+function get_spot_channels(myDoc) 
+{
+    var spotChans = [];
+    var i = myDoc.channels.length-1;
+    
+    do {
+        var chan = myDoc.channels[i];
+        if (chan.kind == ChannelType.SPOTCOLOR) {
+            spotChans.push(chan);
+        };
+    } while (i--)
+    
+    if(spotChans.length > 0) {
+        return spotChans.reverse();
+    } else {
+        return false;
+    }
+}
+
 function main() {
        
     var 

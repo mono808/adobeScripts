@@ -403,8 +403,10 @@ Job.prototype.get_ref_from_active_doc = function () {
 
     //check adobe apps for open documents and try to get a reference file
     if(ref) {
+        this.jobSafe.get_set(ref);
         return ref;        
-    } else {   //if no docs are open, check the global job_safe Object in ESTK
+    //if no docs are open, check the global job_safe Object in ESTK
+    } else {   
         return this.jobSafe.get_set();
     }
 };
@@ -441,8 +443,8 @@ Job.prototype.jobSafe = {
                             return storedFolder;
                         }
                     }
-                };
-            };
+                }
+            }
         }
         
         var input = serialInput ? eval(serialInput) : null;
@@ -562,8 +564,9 @@ Job.prototype.jobSafe = {
         if(new_ref) {
             switch(new_ref.constructor.name) {
                 // if user specifies a folder, set the jobsafe accordingly
-                case 'File' :
-                case 'Document' : this.send_via_BT(this.bridgeTalkScript, new_ref.path.parent);
+                case 'File' : this.send_via_BT(this.bridgeTalkScript, new_ref.path.parent);
+                break;
+                case 'Document' : this.send_via_BT(this.bridgeTalkScript, new_ref.fullName);
                 break;
                 case 'Folder' : this.send_via_BT(this.bridgeTalkScript, new_ref);
             }
