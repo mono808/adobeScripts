@@ -1,4 +1,7 @@
-﻿function Job (ref, fullExtract, nachdruckMoeglich) {
+﻿#include '/c/capri-links/scripts/includes/mofo.jsx'
+#include '/c/capri-links/scripts/includes/rE.jsx'
+
+function Job (ref, fullExtract, nachdruckMoeglich) {
 	this.nfo = {
 		c2b : null,
 		client : null,
@@ -14,7 +17,8 @@
 		wxh : null,
 	};
 
-    this.constructor.prototype.get_nfo.call(this, ref, fullExtract, nachdruckMoeglich);
+    //this.constructor.prototype.get_nfo.call(this, ref, fullExtract, nachdruckMoeglich);
+    this.get_nfo(ref, fullExtract, nachdruckMoeglich);
 };
 
 Job.prototype.get_nfo_from_filename = function (target) {
@@ -24,24 +28,31 @@ Job.prototype.get_nfo_from_filename = function (target) {
             nfo.file = target;
         }
     
-        var dN = target.displayName,
-            tag = null,
-            splitArray = null;
+        var fileName = target.displayName;
+        var match;
             
-        if(rE.printTag.test(dN)) {
-            tag             = rE.printTag.exec(dN)[0];
-            splitArray      = tag.split('_');
-            nfo.printId     = splitArray[0];
-            nfo.wxh         = splitArray[1];
-            nfo.tech        = splitArray[2];
-        } else if (rE.doc.test(dN)) {
-            tag             = rE.doc.exec(dN)[0];
-            splitArray      = tag.split('_');
-            nfo.jobNr       = splitArray[0];
-            nfo.jobName      = splitArray[1];
-            nfo.doc         = splitArray[2];
+        match = fileName.match(rE.printTag)
+        if(match) {
+            nfo.printId     = match[1];
+            nfo.wxh         = match[2];
+            nfo.tech        = match[3];
+            return nfo;
         }
-        return nfo;
+
+        match = fileName.match(rE.printTag2)
+        if (match) {
+            nfo.printId     = match[1];
+            nfo.tech        = match[2];
+            return nfo;
+        }
+
+        match = fileName.match(rE.doc)
+        if (match) {
+            nfo.jobNr       = match[1];
+            nfo.jobName     = match[2];
+            nfo.doc         = match[3];
+            return nfo
+        }
 };
 
 Job.prototype.get_nfo_from_filepath = function (fldr) {
@@ -53,9 +64,9 @@ Job.prototype.get_nfo_from_filepath = function (fldr) {
         if (jobMatch) {
             var folderNewRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_([a-z0-9äüöß-]+)/i);
             var folderOldRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)\s\(([a-z0-9äüöß-]+)\)/i);
-            var match = fName.match(folderNewRegExp);
+            var match = fName.match(rE.jobNameNew);
             
-            match = match ? match : fName.match(folderOldRegExp);
+            match = match ? match : fName.match(rE.jobNameOld);
             
             Folder.current = f;
             nfo.refNr  = jobMatch[0];
@@ -86,17 +97,14 @@ Job.prototype.get_jobNames = function (jobfolder) {
     var jobfolders = jobfolder.parent.getFiles(rE.jobNr),
         jobNames = [],
         jobName;
-        
-    var folderNewRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_([a-z0-9äüöß-]+)/i);
-    var folderOldRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)\s\(([a-z0-9äüöß-]+)\)/i);        
 
     for (var i = 0, maxI = jobfolders.length; i < maxI; i += 1) 
     {
         var afolder = jobfolders[i];
         if(afolder instanceof Folder) {
             var fName = afolder.displayName;
-            var match = fName.match(folderNewRegExp);            
-            match = match ? match : fName.match(folderOldRegExp);
+            var match = fName.match(rE.jobNameNew);
+            match = match ? match : fName.match(rE.jobNameOld);
             
             if (match && match.length > 3) {                    
                 jobNames.push(match[3]);
@@ -337,9 +345,8 @@ Job.prototype.get_ref_from_active_doc = function () {
                 
                 //if not, check if placedGraphic has a jobStyle FileName (only if its on Motiv-Layer)
                 } else if (doc.placedItems.length > 0) {
-                    var i = null, pI = null;
-                    for(i=0; i < doc.placedItems.length; i++) {
-                        pI = doc.placedItems[i];
+                    for(var i=0; i < doc.placedItems.length; i++) {
+                        var pI = doc.placedItems[i];
                         if(pI.layer == doc.layers.getByName('Motiv')) {
                             ref = doc.placedItems[0].file;
                         }
@@ -430,7 +437,7 @@ Job.prototype.jobSafe = {
         {
             var jobSafe2Maker = function (initFolder) 
             {
-                var storedFolder = initFolder ? Folder(initFolder) : null;
+                var storedFolder = initFolder ? new Folder(initFolder) : null;
                 return {
                     getset : function (args) {
                         if(args) {
@@ -454,12 +461,15 @@ Job.prototype.jobSafe = {
             /* if there is, update the jobSafe with the provided folder*/
             if(typeof jobSafe2 != "undefined") {
                 jobSafe2.getset(input);
-                $.writeln('jobSafe updated');
+                
+                $.writeln('jobSafe updated to: ' + input.name);
+                return 'jobSafe updated to: ' + input.name;
 
             /* if there is no jobSafe, init it with the provided folder*/
             } else {                
                 jobSafe2 = jobSafe2Maker(input);
-                $.writeln('jobSafe initialized');
+                $.writeln('jobSafe initialized to: ' + input.name);
+                return 'jobSafe initialized to: ' + input.name;
             }
         
         /*if no input is provided, check for a jobSafe*/
@@ -564,9 +574,9 @@ Job.prototype.jobSafe = {
         if(new_ref) {
             switch(new_ref.constructor.name) {
                 // if user specifies a folder, set the jobsafe accordingly
-                case 'File' : this.send_via_BT(this.bridgeTalkScript, new_ref.path.parent);
+                case 'File' : this.send_via_BT(this.bridgeTalkScript, new_ref.parent);
                 break;
-                case 'Document' : this.send_via_BT(this.bridgeTalkScript, new_ref.fullName);
+                case 'Document' : this.send_via_BT(this.bridgeTalkScript, new_ref.fullName.parent);
                 break;
                 case 'Folder' : this.send_via_BT(this.bridgeTalkScript, new_ref);
             }
@@ -656,7 +666,4 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich) {
     }            
     return this.nfo;
 };
-
-#include '/c/capri-links/scripts/includes/mofo.jsx'
-#include '/c/capri-links/scripts/includes/rE.jsx'
 

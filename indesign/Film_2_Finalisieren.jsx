@@ -90,7 +90,7 @@ function main() {
             tfBounds[0] = gLV1.geometricBounds[0];
             tfBounds[1] = x+pS.stroke2/2;
             tfBounds[2] = y-pS.stroke2/2;
-            // weil das wort "beutel" länger ist als "shirt", muss der rahmen breiter sein
+            /* weil das wort "beutel" länger ist als "shirt", muss der rahmen breiter sein */
             tfBounds[3] = istTasche ? x+myPointSize*1.25 : x+myPointSize;
             
             myTF = myPage.textFrames.add({geometricBounds:tfBounds, fillColor: paper});
@@ -130,22 +130,23 @@ function main() {
     };
     create_jobInfos_textFrame = function (job) 
     {
-        var doc = app.activeDocument,
-            infoSpot = doc.colors.item('Registration'),                      
-            infoTF = create_text_frame('infoEbene', 'infoTextFrame'),
-            infoText = infoTF.paragraphs[0],
-            mN = new MonoNamer();
+        var doc = app.activeDocument;
+        var infoSpot = doc.colors.item('Registration');
+        var infoTF = create_text_frame('infoEbene', 'infoTextFrame');
+        var infoText = infoTF.paragraphs[0];
+        var mN = new MonoNamer();
             
         infoText.fillColor = infoSpot;
 
-        var printId = mN.name('printId', job.nfo.printId);
+        var infoArray = []
+        infoArray.push(job.nfo.client);
+        infoArray.push(job.nfo.jobNr);
+        infoArray.push('JobName: ' + job.nfo.jobName);
+        infoArray.push('DruckID: ' + mN.name('printId', job.nfo.printId));
+        infoArray.push('BxH: ' + f_id.get_width(sepRef) + 'x' + f_id.get_height(sepRef) + 'mm');
+        infoArray.push(f_all.get_kuerzel());
         
-        var infoString1 = job.nfo.client + ' - ' + job.nfo.jobNr + '\n';
-        var infoString2 = 'JobName: ' + job.nfo.jobName + ' - DruckID: ' + printId + '\n';
-        var infoString3 = 'BxH: ' + f_id.get_width(sepRef) + 'x' + f_id.get_height(sepRef) + 'mm - ' + f_all.get_kuerzel();
-        infoTF.contents = infoString1;
-        infoTF.contents += infoString2;
-        infoTF.contents += infoString3;
+        infoTF.contents = infoArray.join(' | ');
         
         f_id.fitFrameToText(infoTF);
         return infoTF;
@@ -162,7 +163,7 @@ function main() {
             maxI      = doc.swatches.length,
             colStory  = doc.stories[doc.stories.length-1],
             colIndex  = 1,
-            colMax    = maxI-5, //swatches minus defaults like noColor, regColor ...
+            colMax    = maxI-5, /*swatches minus defaults like noColor, regColor ...*/
             charIndex = 0,
             spot,
             spotName,
@@ -183,10 +184,10 @@ function main() {
                 spotChars.fillColor = spot;
                 charIndex += spotName.length;
                 
-                if(colIndex > 3 && colIndex == ((colMax/2).toFixed(0)) ) {
+                /*if(colIndex > 3 && colIndex == ((colMax/2).toFixed(0)) ) {
                    colorTF.contents += '\n';
                 }
-                colIndex += 1;
+                colIndex += 1;*/
             }
         }
 
@@ -227,18 +228,18 @@ function main() {
         return beutelRegExp.test(job.nfo.printId);
     })();
 
-    // create Passer    
+    /* create Passer  */  
     var pOben = create_passer(true, istTasche);
     pOben.name = 'passerOben';
 
     var pUnten = create_passer(false);
     pUnten.name = 'passerUnten';
 
-    // create Textframes containing jobInfos and used SpotColors
+    /* create Textframes containing jobInfos and used SpotColors*/
     var colorTF = create_spotColors_textFrame();
     var infoTF = create_jobInfos_textFrame(job);
 
-    // position textFrames above/below separation
+    /* position textFrames above/below separation*/
     if(istTasche) {
         f_id.move_item1_below_item2(colorTF, pUnten, 1);
         f_id.move_item1_below_item2(infoTF, colorTF, 1);
@@ -246,7 +247,7 @@ function main() {
         f_id.move_item1_above_item2(colorTF, pOben, 1);
         f_id.move_item1_above_item2(infoTF, colorTF, 1);
     }
-
+    /*
     // add left/right passer if separation is very wide
     // if((f.calculate_item_aspect_ratio(sepRef) > 1.75) || (job.nfo.printPos === 'lBrust') || (job.printPos === 'rBrust') ) {
     //     var pLeftXY = f.get_passer_coordinates(rPS, 'left');
@@ -257,7 +258,7 @@ function main() {
     //     var pRight = f.createRasterPasser(pRightXY, rPS);
     //     pRight.name = 'passerRight';
     // }
-    
+    */
     f_id.fitPage2Art();
 
     try {mLayer.visible = true;} catch (e) {}
@@ -266,7 +267,7 @@ function main() {
     
     f_id.save_doc (mofi.file('film'), undefined, false);
     
-    //f_all.copy_file_via_bridgeTalk(mofi.file('filmPdf'), mofo.folder('filmdaten'), false);
+    /*f_all.copy_file_via_bridgeTalk(mofi.file('filmPdf'), mofo.folder('filmdaten'), false);*/
 
     f_id.viewPrefSwitch.set('normal');
 

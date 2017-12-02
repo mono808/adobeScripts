@@ -109,7 +109,8 @@ var mofi = {
 
             // Filetags
             this.printTag        = n.printId + '_' + (n.wxh || '00x00') + '_' + n.tech;
-            this.docTag          = n.jobNr + '_' + n.jobName;            
+            this.printTag2       = n.printId + '_' + n.tech;
+            this.docTag          = n.jobNr + '_' + n.jobName;
             
             // workingfiles
             this.workingAi         = f.working  + this.printTag + '_Working.ai';

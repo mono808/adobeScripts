@@ -31,7 +31,7 @@ function main (report)
 
     try {
         var sepPos = f_ai_sep.get_sep_coordinates();
-        $.writeln(sepPos.toSource());
+        //$.writeln('AI: Sep.x: ' + sepPos.x + ' | Sep.y: ' + sepPos.y);
     } catch(e) {
         alert('Konnte keine Position bestimmen, Separation bitte manuell in Indesign positioniern!');
         var sepPos = 'keinePositionsAngaben';

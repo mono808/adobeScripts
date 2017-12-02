@@ -48,7 +48,7 @@ function main() {
         }
     }
 
-    if(fName.search(rE.job_design) == -1) {
+    if(fName.search(rE.jobNameNew) == -1) {
         fName += '_' + job.nfo.jobName;
         reReadInfos = true;
     }

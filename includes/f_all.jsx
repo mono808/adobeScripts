@@ -24,52 +24,44 @@
     {
 
         function script2Send (serializedmyArgs) {            
-            var f = {
-                centerOnPage : function (itemRef)
-                {
-                    var iWidth = itemRef.geometricBounds[3] - itemRef.geometricBounds[1],
-                        iHeight = itemRef.geometricBounds[2] - itemRef.geometricBounds[0],
-                        myDoc = app.activeDocument,
-                        pWidth = myDoc.documentPreferences.pageWidth,
-                        pHeight = myDoc.documentPreferences.pageHeight;
-                    
-                    var centerCoor = {};
-                    centerCoor.x = pWidth/2 - iWidth /2;
-                    centerCoor.y = pHeight/2 - iHeight /2;
-                    itemRef.parent.move( [centerCoor.x, centerCoor.y] );
-                },
-                positionSep : function (pos)
-                {
-                    var doc = app.activeDocument,
-                        vLine = doc.pages[0].guides.item('vLine'),
-                        hLine = doc.pages[0].guides.item('hLine');
-                    
-                    var sepCoor = {};
-                    sepCoor.x = vLine.location + pos.x;
-                    sepCoor.y = hLine.location + pos.y;
-                    
-                    mySep.parent.move( [sepCoor.x, sepCoor.y] );
-                }
-            };
+
+            function centerOnPage (itemRef)
+            {
+                var iWidth = itemRef.geometricBounds[3] - itemRef.geometricBounds[1];
+                var iHeight = itemRef.geometricBounds[2] - itemRef.geometricBounds[0];
+                var myDoc = app.activeDocument;
+                var pWidth = myDoc.documentPreferences.pageWidth;
+                var pHeight = myDoc.documentPreferences.pageHeight;
+                
+                var centerCoor = {};
+                centerCoor.x = pWidth/2 - iWidth /2;
+                centerCoor.y = pHeight/2 - iHeight /2;
+                itemRef.parent.move( [centerCoor.x, centerCoor.y] );
+            }
+        
+            function positionSep (x,y)
+            {
+                var doc = app.activeDocument;
+                var vLine = doc.pages[0].guides.item('vLine');
+                var hLine = doc.pages[0].guides.item('hLine');                    
+                mySep.parent.move( [vLine.location + x, hLine.location + y] );
+            }
 
             var myArgs = eval(serializedmyArgs);
-            
-            app.doScript(myArgs.templateScript);
-            
-            var iDoc = app.activeDocument,
-                myPage = iDoc.pages[0],
-                sepLayer = iDoc.layers.item('motivEbene'),
-                sepRef = myPage.place(myArgs.sep),
-                mySep = iDoc.layers.item('motivEbene').allGraphics[0];
+            var iDoc = app.activeDocument;
+            var myPage = iDoc.pages[0];
+            var sepLayer = iDoc.layers.item('motivEbene');
+            var sepRef = myPage.place(myArgs.sep);
+            var mySep = iDoc.layers.item('motivEbene').allGraphics[0];
             
             iDoc.activeLayer = sepLayer;
             
-            if (myArgs.pos.x && myArgs.pos.y) {
-                f.positionSep(myArgs.pos);
-                app.doScript(myArgs.filmScript);
+            if (myArgs.x != null && myArgs.y != null) {
+                positionSep(myArgs.x, myArgs.y);
+                /*app.doScript(myArgs.finalizeScript);*/
                 return 'Sep placed according to PlacementInfos';
             } else {
-                f.centerOnPage(mySep);
+                centerOnPage(mySep);
                 return 'Sep centered on Page';
             }
         }
@@ -82,30 +74,37 @@
             }
         }
 
-        var myArgs = {
-            sep : sepFile,
-            pos : {
-                x : (pos && pos.x ? pos.x.as('mm') : null),
-                y : (pos && pos.y ? pos.y.as('mm') : null),
-            },
-            templateScript : new File('/c/capri-links/scripts/indesign/Film_1_Blanko.jsx'),
-            filmScript :     new File('/c/capri-links/scripts/indesign/Film_2_Finalisieren.jsx')
-        };
+        
+        //var jsFilmBlanko = this.read_file(File('/c/capri-links/scripts/indesign/Film_1_Blanko.jsx'));      
+        indesign.executeScriptFile(File('/c/capri-links/scripts/indesign/Film_1_Blanko.jsx'));
+
+        var myArgs = {};
+        myArgs.sep = sepFile;
+        myArgs.x = pos && pos.x ? pos.x.as('mm') : null;
+        myArgs.y = pos && pos.y ? pos.y.as('mm') : null;
 
         var bt = new BridgeTalk;
-        bt.target = 'Indesign';
-        
-        bt.body = script2Send.toSource() + "(" + myArgs.toSource() + ");";
-      
-        bt.onResult = function( inBT ) { myCallback( null, inBT.body );  };
-        
+        bt.target = 'Indesign';        
+        bt.body = script2Send.toSource() + "(" + myArgs.toSource() + ");";      
+        bt.onResult = function( inBT ) { myCallback( null, inBT.body );  };        
         bt.onError = function( inBT ) { myCallback( 1, inBT.body );  };
-
         bt.send(0);
-      
+
+        //var jsFilmFinalize = this.read_file(File('/c/capri-links/scripts/indesign/Film_2_Finalisieren.jsx'));      
+        indesign.executeScriptFile(File('/c/capri-links/scripts/indesign/Film_2_Finalisieren.jsx'));
+
         return;
     },
-    
+
+    read_file : function (aFile) {     
+        if(aFile && aFile instanceof File) {
+            aFile.open('r', undefined, undefined);
+            aFile.encoding = "UTF-8";      
+            aFile.lineFeed = "Windows";
+            return aFile.read();
+        }
+    },
+
     typeOf : function (v) 
     {
         var ret=typeof(v);

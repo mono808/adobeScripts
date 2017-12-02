@@ -532,5 +532,19 @@
             for(myProperty in myObject.properties){
             }
         }            
+    },
+    get_layer : function(/*...*/) {
+        if(arguments && arguments.length > 0) {
+            var doc = arguments[0];
+            for(var i=1; i < arguments.length; i ++) {
+                var name = arguments[i];
+                try {
+                    var l = doc.layers.itemByName(name);
+                    $.writeln(l.name);
+                    return l;
+                } catch (e) {}
+            }
+        }
+        return null;
     }
 }

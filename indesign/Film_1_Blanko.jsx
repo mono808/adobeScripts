@@ -117,7 +117,7 @@ function main () {
 		hyphenation = false;
 	}
 
-	// remove default Swatches
+	/* remove default Swatches */
 	for (var i = myDoc.swatches.length-1; i >= 0; i -= 1) {
 		var swatch = myDoc.swatches[i];
 		if(swatch.name != 'Registration' && swatch.name != 'None' && swatch.name != 'Paper' && swatch.name != 'Black') {
@@ -126,7 +126,7 @@ function main () {
 	}
 
 
-	// create layers
+	/* create layers */
 	var hilfsLayer = myDoc.layers.item(myDoc.layers.item.length-1)
 	with (hilfsLayer) {
 		name = 'hilfsLayer';
@@ -150,7 +150,7 @@ function main () {
 
 
 	myDoc.activeLayer = motivEbene;
-
+    /*
 	// create Guides	
 	// var vGuide = myDoc.guides.add(undefined, {
 	// 		orientation:HorizontalOrVertical.vertical,
@@ -163,7 +163,7 @@ function main () {
 	// 		location:pageGB[0],
 	// 		name:'hLine',
 	// 		fitToPage:false});
-
+    */
 	createGuideLines(guideLines);
 
 	for (var i = 0, maxI = guideRecs.length; i < maxI; i += 1) {

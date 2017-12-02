@@ -141,7 +141,7 @@
             var l = app.activeDocument.layers.getByName(layer_name);
             recursive_delete_layer(l);
         } catch (e) {
-            $.writeln('no layer named ' + layer_name + ' found!');
+            $.writeln('AI: no layer named ' + layer_name + ' found!');
             return;
         }
     },
@@ -156,8 +156,8 @@
                 var btMessage = new BridgeTalk;
                 btMessage.target = target;
                 btMessage.body = script2send;
-                btMessage.onResult = function(bto) {$.writeln(bto.body);};
-                btMessage.onError = function(bto) {$.writeln(bto.body);};
+                btMessage.onResult = function(bto) {$.writeln('AI: ' + bto.body);};
+                btMessage.onError = function(bto) {$.writeln('AI: ' + bto.body);};
                 btMessage.send();
             }
 
@@ -182,8 +182,8 @@
         var btMessage = new BridgeTalk;
         btMessage.target = 'estoolkit';
         btMessage.body = restart_func.toSource() + "()";
-        btMessage.onResult = function(bto) {$.writeln(bto.body);};
-        btMessage.onError = function(bto) {$.writeln(bto.body);};
+        btMessage.onResult = function(bto) {$.writeln('AI: ' + bto.body);};
+        btMessage.onError = function(bto) {$.writeln('AI: ' + bto.body);};
         btMessage.send();        
     },
 }
