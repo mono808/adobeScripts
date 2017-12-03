@@ -1,0 +1,1 @@
+[new Folder ("/c/capri-links/distiller/ansicht"), new Folder ("/c/capri-links/kundendaten/B2B/Criminals"), new Folder ("/c/capri-links/kundendaten/B2B/Criminals/0546A17-014_Mausi-Shirts"), new Folder ("/c/capri-links/kundendaten/B2C/Pan%20Peter/0053A17-014_BongoShirts"), new Folder ("/c/capri-links/kundendaten")]

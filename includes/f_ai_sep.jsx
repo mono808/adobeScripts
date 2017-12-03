@@ -141,7 +141,7 @@
         appendStr += '=';
         appendStr += color;
 
-        var out; 
+        var out;
         if (append_file !== '') {
             out = append_file.open('a', undefined, undefined);
             append_file.encoding = "UTF-8";

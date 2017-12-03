@@ -1,0 +1,219 @@
+﻿
+
+function main () {
+
+    var lastFolder = new LastFolder();
+    lastFolder.import_txt();
+
+    var tempfd;
+
+//~     tempfd = lF.select_dialog('/c/capri-links/kundendaten');
+//~     lF.add_folder(tempfd);
+    
+//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Criminals/546A17-014_Mausi-Shirts/Druckdaten-SD');
+//~     lastFolder.add_folder(tempfd);
+
+//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Spacken Corp. 96/0053A17-014_BongoShirts/Kundendaten/');
+//~     lastFolder.add_folder(tempfd);
+
+//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/rebekka ruetz/0921A17-014_3Lines/');
+//~     lastFolder.add_folder(tempfd);
+//~     
+//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Schmockies/1235A16-013_SackLaus/');
+//~     lastFolder.add_folder(tempfd);
+//~     
+//~     tempfd = new Folder('/e/monofiles/Musik/Albums/');
+//~     lastFolder.add_folder(tempfd);
+    
+//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
+//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
+//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
+
+    var retval = lastFolder.show_dialog ();
+
+//~     lastFolder.export_txt();
+
+}
+
+function LastFolder () {
+    var folders = [];
+    var txt = new File('/c/repos/adobeScripts1/beta/lastFolders.txt');
+    return {
+        select_dialog : function (path) {
+        	var fd = new Folder(path).selectDlg();
+            if(fd.constructor.name == 'Folder') {
+                this.add_folder(fd);
+            }
+        },
+
+        add_folder : function (fd) {
+        	if(this.check_for_inclusion(fd)) return;
+            folders.unshift(fd);
+            if(folders.length > 10) {
+                folders.pop();
+            }
+            this.export_txt();
+        },
+
+        check_for_inclusion : function (fd) {
+            for (var i = 0; i < folders.length; i++) {
+                if(encodeURI(fd.fullName == folders[i].fullName)) {
+                    return i;
+                }
+            }
+        	return false;
+        },
+
+        set_folder_to_top : function (idx) {
+            if(idx > 0 && idx < folders.length) {
+                var fds = folders;
+                var tmp = fds.splice(idx,1);
+                fds.unshift(tmp[0]);
+            }
+            this.export_txt();
+        },
+
+        export_txt : function () {
+            var str = folders.toSource();
+            var success = this.write_file(txt, str);
+            return success;
+        },
+
+        import_txt : function () {
+            var str = this.read_file(txt);
+            var ev = eval(str);
+            if(ev instanceof Array && ev.length > 0) {
+                folders = ev;
+            }
+        },
+
+        read_file : function (aFile) {     
+            if(aFile && aFile instanceof File) {
+                aFile.open('r', undefined, undefined);
+                aFile.encoding = "UTF-8";      
+                aFile.lineFeed = "Windows";
+                var success = aFile.read();
+                aFile.close();
+                return success;
+            }
+        },
+   
+        write_file : function (aFile, str) {
+            aFile.close();
+            var out = aFile.open('w', undefined, undefined);            
+            aFile.encoding = "UTF-8";
+            aFile.lineFeed = "Windows";
+            var success = aFile.write(str);
+            aFile.close();
+            return success;
+        },
+
+        show_dialog : function() {
+            var retIdx;
+            var fds = folders;
+                
+            function get_subfolders (fd) {
+                var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
+                return subs;
+            }
+            
+            function update_dropdown(drp, fd) {
+                drp.removeAll();
+                var subFds = get_subfolders (fd);
+                for (var j = 0; j < subFds.length; j++) {
+                    drp.add("item",subFds[j].displayName);
+                }
+                drp.selection = 0;
+            }
+
+            function update_group(grpIdx, fd) {
+                if(fd.parent) {
+                    fds[grpIdx] = fd;
+                    var fdGrp = fdPnl.grps[grpIdx];
+                    var upTxt = fdGrp['uptxt'];
+                    var upBtn = fdGrp['upbtn'];
+                    var btn = fdGrp['btn'];
+                    var drp = fdGrp['drp'];
+                
+                    upTxt.text = fd.parent.displayName;
+                    upBtn.onClick = up_helper(grpIdx,fd.parent);
+                
+                    btn.text = fd.displayName;
+                    btn.onClick = select_helper(grpIdx);
+
+                    update_dropdown(drp, fd);
+                }
+            }
+
+            var win = new Window("dialog", "Extracted Infos",undefined);  // bounds = [left, top, right, bottom]
+            this.windowRef = win;
+
+                var fdPnl = win[fdPnl] = win.add("panel", undefined);
+                fdPnl.alignChildren = 'left';
+                var grps = fdPnl.grps = [];
+
+                var select_helper = function (i) {
+                    return function (e) {
+                        retIdx = i;
+                        win.close();
+                    }
+                };
+
+                var up_helper = function (i, fd) {
+                	return function (e) {
+                		update_group(i, fd);
+                	}
+                }
+
+                var down_helper = function (grpIdx) {
+                	return function (e) {
+                		var drp = grps[grpIdx]['drp'];
+                		var subs = get_subfolders(fds[grpIdx]);
+                        var item = drp.selection;
+                        
+                        for (var i = 0; i < subs.length; i++) {
+                        	if(subs[i].displayName == item.text) {
+                        		update_group(grpIdx, subs[i]);
+                                break;
+                        	}
+                        }
+                	}
+                }
+
+                var fd, fdGrp, upTxt, upBtn, btn, drp, dnBtn;
+                for (var i = 0; i < fds.length; i++) {
+                    fdGrp = grps[i] = fdPnl.add('group');
+                    fd = fds[i];
+                   
+                    upTxt = fdGrp['uptxt'] = fdGrp.add('statictext {justify:"right"}');
+                    upTxt.preferredSize.width = 150;
+                    upTxt.text = fd.parent.displayName;
+                    upTxt.alignment = 'center';
+
+                    upBtn = fdGrp['upbtn'] = fdGrp.add("button", undefined,'>>');
+                    upBtn.preferredSize.width = 40;
+                    upBtn.onClick = up_helper(i, fd.parent);
+
+                    btn = fdGrp['btn'] = fdGrp.add("button", undefined,fd.displayName);
+                    btn.preferredSize.width = 250;
+                    btn.onClick = select_helper (i);
+                    
+                    dnBtn = fdGrp['dnBtn'] = fdGrp.add("button", undefined,'<<');
+                    dnBtn.preferredSize.width = 40;
+                    dnBtn.onClick = down_helper(i);
+                    
+                    drp = fdGrp['drp'] = fdGrp.add("dropdownlist");
+                    drp.preferredSize.width = 170;
+                    update_dropdown (drp, fd);
+                    //drp.onChange = down_helper(i);
+                }
+            
+            win.show();
+            this.set_folder_to_top (retIdx);
+            //if(fds[retIdx] && fds[retIdx] instanceof Folder) this.add_folder(fds[retIdx]);
+            return fds[retIdx];
+        }
+    }
+}
+
+main ();
