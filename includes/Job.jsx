@@ -1,5 +1,6 @@
 ﻿#include '/c/capri-links/scripts/includes/mofo.jsx'
 #include '/c/capri-links/scripts/includes/rE.jsx'
+#include '/c/capri-links/scripts/includes/LastFolders.jsxinc'
 
 function Job (ref, fullExtract, nachdruckMoeglich) {
 	this.nfo = {
@@ -16,6 +17,9 @@ function Job (ref, fullExtract, nachdruckMoeglich) {
 		tech : null,
 		wxh : null,
 	};
+
+    this.lastFolder = new LastFolder();
+    this.lastFolder.import_txt();
 
     //this.constructor.prototype.get_nfo.call(this, ref, fullExtract, nachdruckMoeglich);
     this.get_nfo(ref, fullExtract, nachdruckMoeglich);
@@ -410,8 +414,9 @@ Job.prototype.get_ref_from_active_doc = function () {
 
     //check adobe apps for open documents and try to get a reference file
     if(ref) {
-        this.jobSafe.get_set(ref);
-        return ref;        
+        $.writeln('update jobSafe from fileref: ' + ref);
+        this.jobSafe.get_set(ref.parent);
+        return ref;
     //if no docs are open, check the global job_safe Object in ESTK
     } else {   
         return this.jobSafe.get_set();

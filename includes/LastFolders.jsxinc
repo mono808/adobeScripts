@@ -1,41 +1,4 @@
-﻿
-
-function main () {
-
-    var lastFolder = new LastFolder();
-    lastFolder.import_txt();
-
-    var tempfd;
-
-//~     tempfd = lF.select_dialog('/c/capri-links/kundendaten');
-//~     lF.add_folder(tempfd);
-    
-//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Criminals/546A17-014_Mausi-Shirts/Druckdaten-SD');
-//~     lastFolder.add_folder(tempfd);
-
-//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Spacken Corp. 96/0053A17-014_BongoShirts/Kundendaten/');
-//~     lastFolder.add_folder(tempfd);
-
-//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/rebekka ruetz/0921A17-014_3Lines/');
-//~     lastFolder.add_folder(tempfd);
-//~     
-//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Schmockies/1235A16-013_SackLaus/');
-//~     lastFolder.add_folder(tempfd);
-//~     
-//~     tempfd = new Folder('/e/monofiles/Musik/Albums/');
-//~     lastFolder.add_folder(tempfd);
-    
-//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
-//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
-//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
-
-    var retval = lastFolder.show_dialog ();
-
-//~     lastFolder.export_txt();
-
-}
-
-function LastFolder () {
+﻿function LastFolder () {
     var folders = [];
     var txt = new File('/c/repos/adobeScripts1/beta/lastFolders.txt');
     return {
@@ -81,19 +44,10 @@ function LastFolder () {
 
         import_txt : function () {
             var str = this.read_file(txt);
-            var existingFolders = [];
-            var importedFolders = eval(str);
-            if(importedFolders instanceof Array && importedFolders.length > 0) {
-                for (var i = 0; i < importedFolders.length; i++) {
-                    var impFld = importedFolders[i];
-                    if(impFld.exists) {
-                        existingFolders.push(impFld);
-                    } else {
-                        $.writeln('removed missing folder ' + impFld.displayName);
-                    }
-                }                
+            var ev = eval(str);
+            if(ev instanceof Array && ev.length > 0) {
+                folders = ev;
             }
-            return existingFolders;
         },
 
         read_file : function (aFile) {     
@@ -120,7 +74,6 @@ function LastFolder () {
         show_dialog : function() {
             var retIdx;
             var fds = folders;
-            if(fds.length < 1) return null;
                 
             function get_subfolders (fd) {
                 var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
@@ -225,5 +178,3 @@ function LastFolder () {
         }
     }
 }
-
-main ();
