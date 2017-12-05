@@ -1,26 +1,71 @@
 ﻿function LastFolders () {
     var folders = [];
     var txt = new File('/c/repos/adobeScripts1/beta/lastFolders.txt');
+    var jobRE = new RegExp(/\d{1,5}(wme|ang|cs|a)\d\d-0\d\d/i);
+    
     return {
+        
+        add : function (ref) {
+            // get the folder from these possible inputs (file|document|folder)
+            var fd = this.get_folder_from_ref(ref);
+            
+            // from a folder, get to the upstream jobFolder (the one with a jobNr)
+            var jobFolder = this.get_jobFolder(fd);
+            
+            // if no jobFolder found, stick to the input
+            fd = jobFolder ? jobFolder : fd;
+            
+            // check if this folder is already in the lastFolder
+        	var idx = this.check_for_inclusion(fd);
+            if(idx) {                
+                this.set_folder_to_top(idx);
+            } else {            
+                // if not included, add to the front of the array
+                folders.unshift(fd);
+                
+                // remove the oldest folder if more the 10 are stored
+                if(folders.length > 10) {
+                    folders.pop();
+                }
+            }
+        
+            // write the new lastFolders to hdd
+            this.export_txt();
+        },
+    
         select_dialog : function (path) {
         	var fd = new Folder(path).selectDlg();
             if(fd.constructor.name == 'Folder') {
-                this.add_folder(fd);
+                this.add(fd);
+            }
+            return fd;
+        },
+
+        get_jobFolder : function (fld) {
+            if(fld.displayName.match(jobRE)) {
+                return fld;
+            } else if (fld.parent) {
+                return this.get_jobFolder(fld.parent);
+            } else {
+                return null;
             }
         },
 
-        add_folder : function (fd) {
-        	if(this.check_for_inclusion(fd)) return;
-            folders.unshift(fd);
-            if(folders.length > 10) {
-                folders.pop();
+        get_folder_from_ref : function (ref) {
+            var fd;
+            switch(ref.constructor.name) {
+                case 'File' : fd = ref.parent;
+                break;
+                case 'Document' : fd = ref.fullName.parent;
+                break;
+                case 'Folder' : fd = ref;
             }
-            this.export_txt();
+            return fd;            
         },
 
         check_for_inclusion : function (fd) {
             for (var i = 0; i < folders.length; i++) {
-                if(encodeURI(fd.fullName == folders[i].fullName)) {
+                if(encodeURI(fd.fullName) == encodeURI(folders[i].fullName)) {
                     return i;
                 }
             }
@@ -71,10 +116,21 @@
             return success;
         },
 
+        get_existing_folders : function (flds) {
+            var existingFlds = [];
+            for (var i = 0; i < flds.length; i++) {
+                if(flds[i] instanceof Folder && flds[i].exists) {
+                    existingFlds.push(flds[i]);
+                }
+            }
+            return existingFlds;
+        },
+
         show_dialog : function() {
-            var retIdx;
-            var fds = folders;
-                
+            var retval;
+            // only show folders that exist on the local setup
+            var fds = this.get_existing_folders(folders);
+           
             function get_subfolders (fd) {
                 var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
                 return subs;
@@ -103,8 +159,11 @@
                 
                     btn.text = fd.displayName;
                     btn.onClick = select_helper(grpIdx);
-
+                    
+                    var tmp = drp.onChange;
+                    drp.onChange = function () {};
                     update_dropdown(drp, fd);
+                    drp.onChange = tmp;
                 }
             }
 
@@ -112,12 +171,13 @@
             this.windowRef = win;
 
                 var fdPnl = win[fdPnl] = win.add("panel", undefined);
+                var manualGrp = win[manualGrp] = win.add("group", undefined);
                 fdPnl.alignChildren = 'left';
                 var grps = fdPnl.grps = [];
 
                 var select_helper = function (i) {
                     return function (e) {
-                        retIdx = i;
+                        retval = fds[i];
                         win.close();
                     }
                 };
@@ -168,13 +228,23 @@
                     drp = fdGrp['drp'] = fdGrp.add("dropdownlist");
                     drp.preferredSize.width = 170;
                     update_dropdown (drp, fd);
-                    //drp.onChange = down_helper(i);
+                    drp.onChange = down_helper(i);
                 }
-            
-            win.show();
-            this.set_folder_to_top (retIdx);
-            //if(fds[retIdx] && fds[retIdx] instanceof Folder) this.add_folder(fds[retIdx]);
-            return fds[retIdx];
+                
+                var selectBtn = manualGrp.add("button", undefined, 'Select manually');
+                selectBtn.onClick = function () {
+                    retval = Folder('/c/capri-links/kundendaten/').selectDlg('Select Job-Folder:');
+                    win.close();
+                }
+                var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
+                
+            if(win.show() != 2 && retval && retval instanceof Folder) {               
+                this.add(retval);
+                return retval;
+                
+            } else {
+                return null;
+            }
         }
     }
 }
