@@ -10,10 +10,10 @@ function main (report)
     #include '/c/capri-links/scripts/includes/f_all.jsx'
     #include '/c/capri-links/scripts/includes/f_ai.jsx'
     #include '/c/capri-links/scripts/includes/f_ai_sep.jsx'
-    #include '/c/capri-links/scripts/includes/job_related.jsx'
+    #include '/c/capri-links/scripts/includes/Job.jsx'
     #include '/c/capri-links/scripts/includes/save_Options.jsx'  
 
-    job.set_nfo(null, true);
+    var job = new Job(null, true, false);
 
     //-------------------------------------------------------
 
@@ -22,7 +22,7 @@ function main (report)
 
     f_ai.fit_artboard_to_art('Motiv');
 
-    job.nfo.wxh = job.extract.wxh();
+    job.get_wxh();
 
     f_ai.delete_layer('BG');
 

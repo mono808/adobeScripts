@@ -1,4 +1,4 @@
-﻿function LastFolder () {
+﻿function LastFolders () {
     var folders = [];
     var txt = new File('/c/repos/adobeScripts1/beta/lastFolders.txt');
     return {

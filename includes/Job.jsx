@@ -18,8 +18,8 @@ function Job (ref, fullExtract, nachdruckMoeglich) {
 		wxh : null,
 	};
 
-    this.lastFolder = new LastFolder();
-    this.lastFolder.import_txt();
+    this.lastFolders = new LastFolders();
+    this.lastFolders.import_txt();
 
     //this.constructor.prototype.get_nfo.call(this, ref, fullExtract, nachdruckMoeglich);
     this.get_nfo(ref, fullExtract, nachdruckMoeglich);
@@ -414,14 +414,27 @@ Job.prototype.get_ref_from_active_doc = function () {
 
     //check adobe apps for open documents and try to get a reference file
     if(ref) {
-        $.writeln('update jobSafe from fileref: ' + ref);
-        this.jobSafe.get_set(ref.parent);
+        this.save_folder(ref);
         return ref;
-    //if no docs are open, check the global job_safe Object in ESTK
     } else {   
         return this.jobSafe.get_set();
     }
 };
+
+Job.prototype.save_folder = function (input) {
+    var fd;
+    switch(input.constructor.name) {
+        case 'File' : fd = input.parent;
+        break;
+        case 'Document' : fd = input.fullName.parent;
+        break;
+        case 'Folder' : fd = input;
+    }
+
+    $.writeln('update jobSafe & lastFolders to: ' + fd.displayName);        
+    this.jobSafe.get_set(fd);
+    this.lastFolders.add_folder(fd);
+}
 
 Job.prototype.add_to_nfo = function (newNfo) {
 	if(newNfo) {
