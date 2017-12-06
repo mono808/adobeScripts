@@ -17,7 +17,7 @@
             
             // check if this folder is already in the lastFolder
         	var idx = this.check_for_inclusion(fd);
-            if(idx) {                
+            if(idx !== false) {                
                 this.set_folder_to_top(idx);
             } else {            
                 // if not included, add to the front of the array
@@ -65,7 +65,8 @@
 
         check_for_inclusion : function (fd) {
             for (var i = 0; i < folders.length; i++) {
-                if(encodeURI(fd.fullName) == encodeURI(folders[i].fullName)) {
+                var storedFolder = folders[i];
+                if(encodeURI(fd.fullName) == encodeURI(storedFolder.fullName)) {
                     return i;
                 }
             }
@@ -73,7 +74,7 @@
         },
 
         set_folder_to_top : function (idx) {
-            if(idx > 0 && idx < folders.length) {
+            if(idx >= 0 && idx < folders.length) {
                 var fds = folders;
                 var tmp = fds.splice(idx,1);
                 fds.unshift(tmp[0]);
