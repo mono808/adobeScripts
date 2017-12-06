@@ -1,44 +1,8 @@
-﻿
-
-function main () {
-
-    var lastFolder = new LastFolders();
-    lastFolder.import_txt();
-
-    var tempfd;
-
-//~     tempfd = lF.select_dialog('/c/capri-links/kundendaten');
-//~     lF.add_folder(tempfd);
-    
-//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Criminals/546A17-014_Mausi-Shirts/Druckdaten-SD');
-//~     lastFolder.add_folder(tempfd);
-
-//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Spacken Corp. 96/0053A17-014_BongoShirts/Kundendaten/');
-//~     lastFolder.add_folder(tempfd);
-
-//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/rebekka ruetz/0921A17-014_3Lines/');
-//~     lastFolder.add_folder(tempfd);
-//~     
-//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Schmockies/1235A16-013_SackLaus/');
-//~     lastFolder.add_folder(tempfd);
-//~     
-//~     tempfd = new Folder('/e/monofiles/Musik/Albums/');
-//~     lastFolder.add_folder(tempfd);
-    
-//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
-//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
-//~     lastFolder.select_dialog('/c/capri-links/kundendaten/');
-
-    var retval = lastFolder.show_dialog ();
-    $.writeln(retval);
-
-//~     lastFolder.export_txt();
-
-}
-
-function LastFolders () {
+﻿function LastFolders () {
     var folders = [];
-    var txt = new File('/c/repos/adobeScripts1/beta/lastFolders.txt');
+    var txt = new File('~/lastFolders.txt');
+    var fallback = $.getenv("computername") == "MONOTOWER" ? '/c/capri-stuff/' : '//caprishare/';
+    var csroot = $.getenv("csroot") ? $.getenv("csroot") : fallback;
     var jobRE = new RegExp(/\d{1,5}(wme|ang|cs|a)\d\d-0\d\d/i);
     
     return {
@@ -55,7 +19,7 @@ function LastFolders () {
             
             // check if this folder is already in the lastFolder
         	var idx = this.check_for_inclusion(fd);
-            if(idx) {                
+            if(idx !== false) {                
                 this.set_folder_to_top(idx);
             } else {            
                 // if not included, add to the front of the array
@@ -103,7 +67,8 @@ function LastFolders () {
 
         check_for_inclusion : function (fd) {
             for (var i = 0; i < folders.length; i++) {
-                if(encodeURI(fd.fullName) == encodeURI(folders[i].fullName)) {
+                var storedFolder = folders[i];
+                if(encodeURI(fd.fullName) == encodeURI(storedFolder.fullName)) {
                     return i;
                 }
             }
@@ -111,7 +76,7 @@ function LastFolders () {
         },
 
         set_folder_to_top : function (idx) {
-            if(idx > 0 && idx < folders.length) {
+            if(idx >= 0 && idx < folders.length) {
                 var fds = folders;
                 var tmp = fds.splice(idx,1);
                 fds.unshift(tmp[0]);
@@ -166,6 +131,7 @@ function LastFolders () {
 
         show_dialog : function() {
             var retval;
+
             // only show folders that exist on the local setup
             var fds = this.get_existing_folders(folders);
            
@@ -269,14 +235,27 @@ function LastFolders () {
                     drp.onChange = down_helper(i);
                 }
                 
-                var selectBtn = manualGrp.add("button", undefined, 'Select manually');
-                selectBtn.onClick = function () {
-                    retval = Folder('/c/capri-links/kundendaten/').selectDlg('Select Job-Folder:');
+                var b2bBtn = manualGrp.add("button", undefined, 'B2B');
+                b2bBtn.preferredSize.width = 50;                
+                b2bBtn.onClick = function () {                    
+                    retval = Folder(csroot + '/kundendaten/b2b').selectDlg('Select Job-Folder:');
+                    win.close();
+                }
+                var b2cBtn = manualGrp.add("button", undefined, 'B2C');
+                b2cBtn.preferredSize.width = 50;
+                b2cBtn.onClick = function () {                    
+                    retval = Folder(csroot + '/kundendaten/b2c').selectDlg('Select Job-Folder:');
+                    win.close();
+                }
+                var angBtn = manualGrp.add("button", undefined, 'ANG');
+                angBtn.preferredSize.width = 50;
+                angBtn.onClick = function () {
+                    retval = Folder(csroot + '/angebotedaten').selectDlg('Select Job-Folder:');
                     win.close();
                 }
                 var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
                 
-            if(win.show() != 2 && retval && retval instanceof Folder) {               
+            if(win.show() != 2 && retval && retval instanceof Folder) {
                 this.add(retval);
                 return retval;
                 
@@ -285,6 +264,31 @@ function LastFolders () {
             }
         }
     }
+}
+
+function main () {
+
+    var lastFolders = new LastFolders();
+    lastFolders.import_txt();
+
+    var tempfd;
+
+//~     tempfd = lF.select_dialog('/c/capri-links/kundendaten');
+//~     lF.add_folder(tempfd);
+    
+//~     tempfd = new Folder('/c/capri-links/kundendaten/B2B/Criminals/546A17-014_Mausi-Shirts/Druckdaten-SD');
+//~     lastFolders.add_folder(tempfd);
+
+   
+//~     lastFolders.select_dialog('/c/capri-links/kundendaten/');
+//~     lastFolders.select_dialog('/c/capri-links/kundendaten/');
+//~     lastFolders.select_dialog('/c/capri-links/kundendaten/');
+
+    var retval = lastFolders.show_dialog ();
+    $.writeln(retval);
+
+//~     lastFolders.export_txt();
+
 }
 
 main ();

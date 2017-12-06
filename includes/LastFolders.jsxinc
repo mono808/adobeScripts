@@ -1,6 +1,8 @@
 ﻿function LastFolders () {
     var folders = [];
-    var txt = new File('/c/repos/adobeScripts1/beta/lastFolders.txt');
+    var txt = new File('~/lastFolders.txt');
+    var fallback = $.getenv("computername") == "MONOTOWER" ? '/c/capri-stuff/' : '//caprishare/';
+    var csroot = $.getenv("csroot") ? $.getenv("csroot") : fallback;
     var jobRE = new RegExp(/\d{1,5}(wme|ang|cs|a)\d\d-0\d\d/i);
     
     return {
@@ -129,6 +131,7 @@
 
         show_dialog : function() {
             var retval;
+
             // only show folders that exist on the local setup
             var fds = this.get_existing_folders(folders);
            
@@ -232,14 +235,27 @@
                     drp.onChange = down_helper(i);
                 }
                 
-                var selectBtn = manualGrp.add("button", undefined, 'Select manually');
-                selectBtn.onClick = function () {
-                    retval = Folder('/c/capri-links/kundendaten/').selectDlg('Select Job-Folder:');
+                var b2bBtn = manualGrp.add("button", undefined, 'B2B');
+                b2bBtn.preferredSize.width = 50;                
+                b2bBtn.onClick = function () {                    
+                    retval = Folder(csroot + '/kundendaten/b2b').selectDlg('Select Job-Folder:');
+                    win.close();
+                }
+                var b2cBtn = manualGrp.add("button", undefined, 'B2C');
+                b2cBtn.preferredSize.width = 50;
+                b2cBtn.onClick = function () {                    
+                    retval = Folder(csroot + '/kundendaten/b2c').selectDlg('Select Job-Folder:');
+                    win.close();
+                }
+                var angBtn = manualGrp.add("button", undefined, 'ANG');
+                angBtn.preferredSize.width = 50;
+                angBtn.onClick = function () {
+                    retval = Folder(csroot + '/angebotedaten').selectDlg('Select Job-Folder:');
                     win.close();
                 }
                 var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
                 
-            if(win.show() != 2 && retval && retval instanceof Folder) {               
+            if(win.show() != 2 && retval && retval instanceof Folder) {
                 this.add(retval);
                 return retval;
                 
