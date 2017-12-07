@@ -10,8 +10,8 @@ var rE = {
     jobNr:          /\d{1,5}(wme|ang|cs|a)\d\d-0\d\d/i,
     jobNrShort :    /\d{1,5}(wme|ang|cs|a)\d\d/i,
     jobNrVeryShort: /\d{1,5}(W|A|C)/i,
-    jobNameNew:     /(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_([a-z0-9äüöß-]+)/i,
-    jobNameOld :    /(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)\s\(([a-z0-9äüöß-]+)\)/i,
+    jobNameNew:     /(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_(.*)/i,
+    jobNameOld :    /(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)\s\((.*)\)/i,
     job_:           /\d{1,5}(wme|ang|cs|a)\d\d-0\d\d_/i,
     doc :           /(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_([a-z0-9äüö-]+)_(ansicht|filmhuelle|film)/i,
 

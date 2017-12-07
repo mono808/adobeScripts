@@ -106,8 +106,8 @@ function get_working_file (myDoc, saveOps)
 {
     try {
         var check = myDoc.fullName;    
-    } catch(e) {
-        var saveFolder = new Folder().selectDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');
+    } catch(e) {       
+        var saveFolder = new Folder($.getenv("csroot")+"\\kundendaten").selectDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');
         var docName = myDoc.name;        
         var saveFile = new File(saveFolder + '/Working/' + docName);
         if(!saveFile.parent.exists) {

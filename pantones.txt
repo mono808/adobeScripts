@@ -147,3 +147,7 @@
 7458=Blaugrau
 1805=Rot
 342=Grün
+288=Dunkelblau
+2915=Hellblau
+656=GrauBlau
+377=Grün
