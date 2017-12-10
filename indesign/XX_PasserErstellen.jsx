@@ -3,7 +3,7 @@
 
 function addPasser() {
 
-    #include '/c/monoScripts/included.jsx'
+    #includepath '/c/repos/adobeScripts1/includes/'
 
     function getSettings() {
 

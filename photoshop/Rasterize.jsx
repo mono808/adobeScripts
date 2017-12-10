@@ -2,9 +2,9 @@
 
 function rastern() {
    
-    #includepath '/c/capri-links/scripts/includes'   
-    #include f_ps.jsx
-    #include f_all.jsx
+    #includepath '/c/repos/adobeScripts1/includes/' 
+    #include 'f_ps.jsx'
+    #include 'f_all.jsx'
 
     var settings = get_raster_settings();
     if(!settings) {

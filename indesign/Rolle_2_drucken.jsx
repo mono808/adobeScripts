@@ -2,7 +2,7 @@
 
 function main() {
 
-    #includepath '/c/capri-links/scripts/includes'
+    #includepath '/c/repos/adobeScripts1/includes/'
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
     #include 'f_id.jsx'

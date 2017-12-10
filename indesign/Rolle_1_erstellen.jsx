@@ -2,8 +2,9 @@
 
 function main() {
 
-	#include '/c/capri-links/scripts/includes/f_all.jsx'
-	#include '/c/capri-links/scripts/includes/mofo.jsx'
+    #includepath '/c/repos/adobeScripts1/includes/'
+	#include 'f_all.jsx'
+	#include 'mofo.jsx'
 
 	var f = {
         load_place_gun_multipage_pdf : function (pdfs) 

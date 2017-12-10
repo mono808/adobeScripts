@@ -26,24 +26,24 @@ function MonoNamer () {
     };
 
     this.side = {
-        lBrust      : 1,
-        rBrust      : 1,
-        Brust       : 1,
-        Front       : 1,
-        Vorderseite : 1,
-        Ruecken     : 2,
-        Rücken      : 2,
-        Rückseite   : 2,
-        Rueckseite  : 2,            
-        Nacken      : 2,
-        Schulter    : 2,
-        Back        : 2,
-        lArm        : 3,
-        rArm        : 3,            
-        Beutel      : 1,
-        BeutelAA    : 1,
-        BeutelA     : 1,
-        BeutelB     : 2
+        lBrust      : 'Front',
+        rBrust      : 'Front',
+        Brust       : 'Front',
+        Front       : 'Front',
+        Vorderseite : 'Front',
+        lArm        : 'Front',
+        rArm        : 'Back',
+        Ruecken     : 'Back',
+        Rücken      : 'Back',
+        Rückseite   : 'Back',
+        Rueckseite  : 'Back',            
+        Nacken      : 'Back',
+        Schulter    : 'Back',
+        Back        : 'Back',
+        Beutel      : 'Front',
+        BeutelAA    : 'Front',
+        BeutelA     : 'Front',
+        BeutelB     : 'Back'
     };
 
     this.beutel = {
@@ -105,7 +105,7 @@ MonoNamer.prototype.name_side = function (myString) {
     if (this.side.hasOwnProperty(myString)) {
         return this.side[myString];
     } else {
-        return 3
+        return 'Front';
     }
 };
 

@@ -1,11 +1,12 @@
-﻿function TexAdder () {
+﻿function MonoTextil () {
     var csroot = $.getenv("csroot");
     var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
-    var doc = app.activeDocument;
+    var doc;
     var fixedLayers = /(Shirt|Front|Back|Naht|Tasche|Beutel)$/i;
         
     return {
-        add_tex : function () {
+        add_tex : function (targetDoc) {
+            doc = targetDoc ? targetDoc : app.activeDocument;
             var texFolders = [];
             var allTexs = [];
             texFolders = this.get_tex_folder();
@@ -15,8 +16,7 @@
             }
             var selectedTex = this.show_type_ahead(allTexs, 'displayName');
             var images = this.place_files_on_page(selectedTex);
-            this.choose_graphicLayers(images);
-            
+            this.choose_graphicLayers(images);            
         },
     
         get_tex_folder : function () {
@@ -93,6 +93,24 @@
             }
         },
 
+        get_active_layer : function (myImage) {
+            var layers = myImage.graphicLayerOptions.graphicLayers;
+            
+            var i = layers.length-1;
+            if(layers.length > 0) {
+                do {
+                    var l = layers[i];
+                    var fixed = l.name.match(fixedLayers);
+                    if(l.currentVisibility && !fixed) {
+                        return l.name;
+                    }
+                } while(i--)
+
+            } else {
+                return ('XXX');
+            }
+        },
+
         filter_graphicLayers : function (gLayers) {
             var filteredLayers = [];
             for (var i = 0; i < gLayers.length; i++) {
@@ -161,10 +179,10 @@
     };
 }
 
-#target indesign
-function main () {
-    var texAdder = new TexAdder();
-    texAdder.add_tex();
-    
-}
-main();
+//~ #target indesign
+//~ function main () {
+//~     var texAdder = new TexAdder();
+//~     texAdder.add_tex();
+//~     
+//~ }
+//~ main();

@@ -2,15 +2,16 @@
 
 function main() {
 
-    #include '/c/capri-links/scripts/includes/augment_objects.jsx'
-    #include '/c/capri-links/scripts/includes/f_all.jsx'
-    #include '/c/capri-links/scripts/includes/Job.jsx'
-    #include '/c/capri-links/scripts/includes/save_Options.jsx'
-    #include '/c/capri-links/scripts/includes/MonoNamer.jsx'
-    #include '/c/capri-links/scripts/includes/f_id.jsx'
+    #includepath '/c/repos/adobeScripts1/includes/'
+    #include 'augment_objects.jsx'
+    #include 'f_all.jsx'
+    #include 'f_id.jsx'
+    #include 'Job.jsx'
+    #include 'save_Options.jsx'
+    #include 'Pathmaker.jsx'
 
-    var monoNamer = new MonoNamer();
     var job = new Job(null, true);
+    var pm = new Pathmaker(job.nfo);
 
     var iDoc = app.activeDocument,
         sepRef = iDoc.allGraphics[0];
@@ -21,10 +22,10 @@ function main() {
         f_id.fitPage2Art();
     }
 
-    if(Window.confirm('Film als PDF speichern?')) {
-        mofi.file('filmPdf').remove();
-        f_id.print2PS(mofi.file('filmPs'), 'monoFilms');
-        f_all.saveFile (mofi.file('film'), undefined, false);
+    if(Window.confirm('Film als PDF speichern?')) {        
+        pm.file('filmPdf').remove();
+        f_id.print2PS(pm.file('filmPs'), 'monoFilms');
+        f_all.saveFile (pm.file('film'), undefined, false);
         //f_all.copy_file_via_bridgeTalk(mofi.file('filmPdf'), mofo.folder('filmdaten'), false);
     } 
 

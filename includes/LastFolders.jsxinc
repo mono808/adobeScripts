@@ -10,7 +10,7 @@
         add : function (ref) {
             // get the folder from these possible inputs (file|document|folder)
             var fd = this.get_folder_from_ref(ref);
-            
+            if(!fd) return null;
             // from a folder, get to the upstream jobFolder (the one with a jobNr)
             var jobFolder = this.get_jobFolder(fd);
             
@@ -58,7 +58,12 @@
             switch(ref.constructor.name) {
                 case 'File' : fd = ref.parent;
                 break;
-                case 'Document' : fd = ref.fullName.parent;
+                case 'Document' : 
+                    if(ref.saved) {
+                        fd = ref.fullName.parent;
+                    } else {
+                        return null;
+                    }
                 break;
                 case 'Folder' : fd = ref;
             }

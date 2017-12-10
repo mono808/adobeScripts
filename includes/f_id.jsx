@@ -476,7 +476,8 @@
                 //         break;
                 // }
                 myDialog.destroy();
-                mySplitFrames(myObjectList, myNumberOfRows, myNumberOfColumns, mrgPrf.top, mrgPrf.top, ContentType.graphicType, true, true);
+                //mySplitFrames(myObjectList, myNumberOfRows, myNumberOfColumns, mrgPrf.top, mrgPrf.top, ContentType.graphicType, true, true);
+                mySplitFrames(myObjectList, myNumberOfRows, myNumberOfColumns, 0, 0, ContentType.graphicType, true, true);
             }
             else{
                 myDialog.destroy();

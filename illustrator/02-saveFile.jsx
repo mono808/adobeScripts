@@ -6,56 +6,30 @@ $.strict = true;
 
 function main (report) 
 {
-    #include '/c/capri-links/scripts/includes/augment_objects.jsx'
-    #include '/c/capri-links/scripts/includes/f_all.jsx'
-    #include '/c/capri-links/scripts/includes/f_ai.jsx'
-    #include '/c/capri-links/scripts/includes/f_ai_sep.jsx'
-    #include '/c/capri-links/scripts/includes/Job.jsx'
-    #include '/c/capri-links/scripts/includes/save_Options.jsx'  
+    
+    #includepath '/c/capri-links/scripts/includes'
+    #include 'f_all.jsx'
+    #include 'SepAI.jsx'
+    #include 'Job.jsx'
+    #include 'Pathmaker.jsx'
+    #include 'save_Options.jsx'
 
     var job = new Job(null, true, false);
+    var pathmaker = new Pathmaker();
 
     //-------------------------------------------------------
+    var sep = new SepAI(app.activeDocument);
 
-    var iDoc = app.activeDocument,
-        sr = report;
+    sep.fit_artboard_to_art('Motiv');
 
-    f_ai.fit_artboard_to_art('Motiv');
+    job.nfo.wxh = sep.get_wxh();
 
-    job.get_wxh();
+    sep.delete_layer('BG');
 
-    f_ai.delete_layer('BG');
-
-    f_ai.delete_layer('HilfsLayer');
+    sep.delete_layer('HilfsLayer');
     
-
-    // switch (job.nfo.tech) {
-    //     case 'FLX' : f_all.saveFile (mofi.file('flx'), save_ops.ai_sep(), false);
-    //     break;
-    //     case 'STK' : f_all.saveFile (mofi.file('stk'), save_ops.ai_sep(), false);
-    //     break;
-    // }    
-    if(job.nfo.tech) {
-        f_all.saveFile (mofi.file(job.nfo.tech.toLowerCase()), save_ops.ai_sep(), false);
-    } else {
-        f_all.saveFile (mofi.file(job.nfo.tech.toLowerCase()), save_ops.ai_sep(), false);
-    }
+    var saveFile = pathmaker.file(job.nfo.tech.toLowerCase(), job.nfo);
+    f_all.saveFile (saveFile, save_ops.ai_sep(), false);
 }
 
-function check () 
-{ 
-    #include '/c/capri-links/scripts/includes/f_ai.jsx'
-
-    var artItems = f_ai.get_all_pathItems_on_layer('Motiv');
-
-    if(!artItems) {
-        alert('no paths filled with spotcolors found');
-        return false;
-    } else if (artItems.length > 0) {
-        return true;
-    }
-}
-
-if(check()) {
-    main();
-}
+main();

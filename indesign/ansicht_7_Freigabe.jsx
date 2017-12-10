@@ -2,18 +2,20 @@
 
 function main() {
     
-    #includepath '/c/capri-links/scripts/includes'
+    #includepath '/c/repos/adobeScripts1/includes/'
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
     #include 'f_id.jsx'
     #include 'f_id_mock.jsx'
     #include 'Job.jsx'
+    #include 'Pathmaker.jsx'
     #include 'MonoNamer.jsx'
     #include 'MonoGraphic.jsx'
     #include 'InteractSwitch.jsx'
     #include 'save_Options.jsx'
 
     var job = new Job(null,false);
+    var pm = new Pathmaker(job.nfo);
 
     function get_docs () 
     {

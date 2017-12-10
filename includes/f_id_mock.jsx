@@ -255,22 +255,14 @@
         var mN = new MonoNamer();
         var side = mN.side;
 
-        var myDoc = app.activeDocument,
-            printLayer = myDoc.layers.item('Prints'),
-            myPage = app.activeWindow.activePage;
+        var myDoc = app.activeDocument;
+        var printLayer = myDoc.layers.item('Prints');
+        var myPage = app.activeWindow.activePage;
 
         // loop through the array of prints to place on the activepage
-        var j, maxJ = printsArray.length;
-        var pO,
-            myPosition,
-            x,
-            xRef,
-            yLine,
-            y;
-
-        for (j = 0; j < maxJ; j += 1) 
+        for (var j = 0; j < printsArray.length; j++) 
         {
-            pO = printsArray[j];
+            var pO = printsArray[j];
 
             // if pO has print position info, use the front or back midline as x coordinate reference
             // so the file will be placed on the front or backside of the shirt
@@ -278,16 +270,16 @@
             {
                 if(side[pO.nfo.printId] === 2) 
                 {
-                    xRef = myPage.guides.item('midlineBack');
-                    x = xRef.location;
-                    yLine = myPage.graphicLines.item('necklineBack');
-                    y = (yLine.geometricBounds[0] + yLine.geometricBounds[2]) / 2;                
+                    var xRef = myPage.guides.item('midlineBack');
+                    var x = xRef.location;
+                    var yLine = myPage.graphicLines.item('necklineBack');
+                    var y = (yLine.geometricBounds[0] + yLine.geometricBounds[2]) / 2;                
                 } else 
                 {
-                    xRef = myPage.guides.item('midlineFront');
-                    x = xRef.location;                    
-                    yLine = myPage.graphicLines.item('necklineFront');
-                    y = (yLine.geometricBounds[0] + yLine.geometricBounds[2]) / 2;
+                    var xRef = myPage.guides.item('midlineFront');
+                    var x = xRef.location;                    
+                    var yLine = myPage.graphicLines.item('necklineFront');
+                    var y = (yLine.geometricBounds[0] + yLine.geometricBounds[2]) / 2;
                 }
             // if no specific printpos info is in the printId, always place the print on the front
             } else 
@@ -308,13 +300,100 @@
 
             // if there are films, position the graphic according to the sep position on the films
             if(pO.film) {
-                myPosition = [x+pO.filmInfos.xDist,y+pO.filmInfos.yDist];
+                var myPosition = [x+pO.filmInfos.xDist,y+pO.filmInfos.yDist];
                 pO.placedRef.parent.move(myPosition);
             } else {
                 // center graphic on x guide
-                var l = pO.placedRef.parent.geometricBounds[1],
-                    r = pO.placedRef.parent.geometricBounds[3],
-                myPosition = [x-(r-l)/2,y+80];
+                var l = pO.placedRef.parent.geometricBounds[1];
+                var r = pO.placedRef.parent.geometricBounds[3];
+                var myPosition = [x-(r-l)/2,y+80];
+                pO.placedRef.parent.move(myPosition);                
+            }
+            
+            // if the bag is printed on both sides
+            // duplicate the print and copy it to the backside of the bag
+            // and position it exactly like on the frontside
+            if(pO.nfo.printId == 'BeutelAA')
+            {                
+                x = myPage.guides.item('midlineBack').location;
+                yLine = myPage.graphicLines.item('necklineBack');
+                y = (yLine.geometricBounds[0] + yLine.geometricBounds[2]) / 2;
+
+                myPosition = [x+pO.filmInfos.xDist,y+pO.filmInfos.yDist]
+                var rec = pO.placedRef.parent;
+                rec.duplicate(myPosition);
+            }
+        }
+    },
+
+    placeMonoPrints : function (printsArray) 
+    {
+        
+        function getImageRef(pageRef, placedFile) {
+            for (var i = 0, maxI = pageRef.allGraphics.length; i < maxI; i += 1) {
+                var graphicRef = pageRef.allGraphics[i];
+                if (graphicRef.itemLink.filePath === placedFile.fsName) {
+                    return graphicRef
+                };
+            };
+        };
+
+        var mN = new MonoNamer();
+        var side = mN.side;
+
+        var myDoc = app.activeDocument;
+        var printLayer = myDoc.layers.item('Prints');
+        var myPage = app.activeWindow.activePage;
+
+        // loop through the array of prints to place on the activepage
+        for (var j = 0; j < printsArray.length; j++) 
+        {
+            var mP = printsArray[j];
+
+
+            // if pO has print position info, use the front or back midline as x coordinate reference
+            // so the file will be placed on the front or backside of the shirt
+            if(side.hasOwnProperty(pO.nfo.printId))
+            {
+                if(side[pO.nfo.printId] === 2) 
+                {
+                    var xRef = myPage.guides.item('midlineBack');
+                    var x = xRef.location;
+                    var yLine = myPage.graphicLines.item('necklineBack');
+                    var y = (yLine.geometricBounds[0] + yLine.geometricBounds[2]) / 2;                
+                } else 
+                {
+                    var xRef = myPage.guides.item('midlineFront');
+                    var x = xRef.location;                    
+                    var yLine = myPage.graphicLines.item('necklineFront');
+                    var y = (yLine.geometricBounds[0] + yLine.geometricBounds[2]) / 2;
+                }
+            // if no specific printpos info is in the printId, always place the print on the front
+            } else 
+            {
+                xRef = myPage.guides.item('midlineFront');
+                x = xRef.location;                
+                yLine = myPage.graphicLines.item('necklineFront');
+                y = (yLine.geometricBounds[0] + yLine.geometricBounds[2]) / 2;
+            }
+
+            // if there is no preview file, use the druckfile for placing in the mockup instead
+            var fileToPlace;
+            pO.preview ? fileToPlace = pO.preview : fileToPlace = pO.druck;
+            myPage.place(fileToPlace, undefined, printLayer);
+
+            // get the reference to the just placed graphicfile
+            pO.placedRef = getImageRef(myPage, fileToPlace);
+
+            // if there are films, position the graphic according to the sep position on the films
+            if(pO.film) {
+                var myPosition = [x+pO.filmInfos.xDist,y+pO.filmInfos.yDist];
+                pO.placedRef.parent.move(myPosition);
+            } else {
+                // center graphic on x guide
+                var l = pO.placedRef.parent.geometricBounds[1];
+                var r = pO.placedRef.parent.geometricBounds[3];
+                var myPosition = [x-(r-l)/2,y+80];
                 pO.placedRef.parent.move(myPosition);                
             }
             
@@ -360,8 +439,8 @@
                 myPO.tag = rE.printTag.exec(dFile.displayName)[0];
                 myPO.nfo = job.get_nfo_from_filename(dFile);
                 myPO.druck = dFile;
-                myPO.preview = mofo.folder('previews').getFiles(myPO.tag + '_Preview.*')[0];
-                myPO.film = mofo.folder('ddSD').getFiles('*'+ myPO.nfo.printId +'_'+ myPO.nfo.wxh +'_'+ myPO.nfo.tech +'_Film.indd')[0];
+                myPO.preview = pm.folder('previews').getFiles(myPO.tag + '_Preview.*')[0];
+                myPO.film = pm.folder('ddSD').getFiles('*'+ myPO.nfo.printId +'_'+ myPO.nfo.wxh +'_'+ myPO.nfo.tech +'_Film.indd')[0];
                 myPO.film ? myPO.filmInfos = this.getFilmInfo(myPO.film) : myPO.filmInfos = '';
                 pOs.push(myPO);
             }
@@ -579,10 +658,18 @@
             x1, x2, y1, y2,
             margPref = myPage.marginPreferences,
             previewFrameStyle = doc.objectStyles.item('previewFrameStyle');
+        /*
         y1 = margPref.top;
         x1 = margPref.left;
         y2 = myPage.bounds[2] - margPref.bottom;
         x2 = myPage.bounds[3] - margPref.right;
+        */
+
+        y1 = 0;
+        x1 = 0;
+        y2 = myPage.bounds[2];
+        x2 = myPage.bounds[3];
+
         var recBounds = [y1,x1,y2,x2];
         return myPage.rectangles.add(undefined, undefined, undefined, {geometricBounds:recBounds, contentType: ContentType.GRAPHIC_TYPE, appliedObjectStyle: previewFrameStyle});
     },
@@ -846,7 +933,8 @@
         myDialog.destroy();
     },
 
-    create_wawi_string_dialog : function (rowObjs, job) {
+    create_wawi_string_dialog : function (rowObjs, job) 
+    {
         var result = null;
         var dialogTitle;
         dialogTitle = "WaWi Infos nachtragen zu ->  ";

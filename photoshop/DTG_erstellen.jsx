@@ -1,12 +1,5 @@
 ﻿#target photoshop-60.064
 
-//~ #includepath '../includes'
-//~ #include 'augment_objects.jsx'
-//~ #include 'universal_functions.jsx'
-//~ #include 'photoshop_functions.jsx'
-//~ #include 'statics.jsx'
-//~ #include 'variables.jsx'
-
 function get_spot_channels(myDoc) 
 {
     var spotChans = [];

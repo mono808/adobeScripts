@@ -1,29 +1,24 @@
 ﻿#target illustrator
 function main ()
 {
-    #includepath '/c/capri-links/scripts/includes'
-    #include 'f_all.jsx'
-    #include 'mofo.jsx'
-    #include 'save_Options.jsx'
+    #includepath '/c/repos/adobeScripts1/includes/'
+    #include 'Pathmaker.jsx'
+    #include 'Typeahead.jsx'
 
+    var pathmaker = new Pathmaker();
     function check_if_file(aFile) {
         return aFile.constructor.name === 'File';
     }
 
-	var templates = Folder(mofo.templates).getFiles(check_if_file);
+	var templates = pathmaker.folder('templates').getFiles(check_if_file);
 	templates.sort();
 
-    var fileToOpen = f_all.choose_from_array(templates, 'displayName');
-	
-    app.open(fileToOpen);
+    var typeahead = new Typeahead();
+    var filesToOpen = typeahead.show_dialog(templates, 'displayName');
+ 
+    for (var i = 0; i < filesToOpen.length; i++) {
+        app.open(filesToOpen[i]);
+    }
 }
 
-function check()
-{
-    return true;
-}
-
-if(check())
-{
-    main();
-}
+main();

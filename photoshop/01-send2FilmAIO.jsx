@@ -1,8 +1,8 @@
-﻿#target photoshop-60.064
+#target photoshop-60.064
 
 function main() {
        
-    #includepath '/c/capri-links/scripts/includes'        
+    #includepath '/c/repos/adobeScripts1/includes/'    
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
     #include 'Job.jsx'

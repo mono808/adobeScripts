@@ -2,12 +2,12 @@
 
 function main () {
 
-    #include '/c/capri-links/scripts/includes/augment_objects.jsx'
-    #include '/c/capri-links/scripts/includes/f_all.jsx'
-    #include '/c/capri-links/scripts/includes/f_id.jsx'
-    #include '/c/capri-links/scripts/includes/f_id_mock.jsx'    
-    #include '/c/capri-links/scripts/includes/Job.jsx'
-    #include '/c/capri-links/scripts/includes/save_Options.jsx'
+    #includepath '/c/repos/adobeScripts1/includes/'
+    #include 'f_all.jsx'
+    #include 'f_id.jsx'
+    #include 'f_id_mock.jsx'    
+    #include 'Job.jsx'
+    #include 'save_Options.jsx'
 
     //job.set_nfo(null, false);
 

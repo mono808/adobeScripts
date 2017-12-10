@@ -43,7 +43,7 @@
             {
                 var doc = app.activeDocument;
                 var vLine = doc.pages[0].guides.item('vLine');
-                var hLine = doc.pages[0].guides.item('hLine');                    
+                var hLine = doc.pages[0].guides.item('hLine');
                 mySep.parent.move( [vLine.location + x, hLine.location + y] );
             }
 
@@ -65,18 +65,9 @@
                 return 'Sep centered on Page';
             }
         }
-
-        function myCallback( err, data ) {
-            if ( err ) {
-                $.writeln( data );
-            } else {
-                $.writeln( data );
-            }
-        }
-
         
         //var jsFilmBlanko = this.read_file(File('/c/capri-links/scripts/indesign/Film_1_Blanko.jsx'));      
-        indesign.executeScriptFile(File('/c/capri-links/scripts/indesign/Film_1_Blanko.jsx'));
+        indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/Film_1_Blanko.jsx'));
 
         var myArgs = {};
         myArgs.sep = sepFile;
@@ -86,12 +77,12 @@
         var bt = new BridgeTalk;
         bt.target = 'Indesign';        
         bt.body = script2Send.toSource() + "(" + myArgs.toSource() + ");";      
-        bt.onResult = function( inBT ) { myCallback( null, inBT.body );  };        
-        bt.onError = function( inBT ) { myCallback( 1, inBT.body );  };
+        bt.onResult = function( inBT ) { $.writeln(inBT.body) };
+        bt.onError = function( inBT ) { $.writeln(inBT.body) };
         bt.send(0);
 
         //var jsFilmFinalize = this.read_file(File('/c/capri-links/scripts/indesign/Film_2_Finalisieren.jsx'));      
-        indesign.executeScriptFile(File('/c/capri-links/scripts/indesign/Film_2_Finalisieren.jsx'));
+        indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/Film_2_Finalisieren.jsx'));
 
         return;
     },

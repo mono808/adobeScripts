@@ -1,5 +1,4 @@
-﻿#include '/c/capri-links/scripts/includes/mofo.jsx'
-#include '/c/capri-links/scripts/includes/rE.jsx'
+﻿#include '/c/capri-links/scripts/includes/rE.jsx'
 #include '/c/capri-links/scripts/includes/LastFolders.jsxinc'
 
 function Job (ref, fullExtract, nachdruckMoeglich) {
@@ -28,33 +27,23 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich) {
     if(!ref) {
         ref = this.get_ref();
     }
-
-//~     //if there is no ref from an activeDoc, get a jobFolder from the jobSafe (provides last used jobFolder)
-//~     if(!ref) {
-//~     	ref = this.jobSafe.get_set();
-//~     }
-    
-    // add file / folder to nfo
-    switch(ref.constructor.name) {            
-        case 'File' : this.nfo.file = ref;
-        break;
-        case 'Folder' : this.nfo.folder = ref;
-        break;
-        case 'Document' : this.nfo.file = ref.fullName;
-        break;
-    }
-    
+      
     //extract additional nfos from filename and folderstructure
     var tempNfo = null;
 
     switch(ref.constructor.name) {
-        case 'Document' : 
-            ref = ref.fullName;
-        case 'File' : 
+        case 'Document' :
+            if(!ref.saved) return null;
+            ref = ref.fullName;        
+        
+        case 'File' :
+            this.nfo.file = ref;
             tempNfo = this.get_nfo_from_filename(ref);
             this.add_to_nfo(tempNfo);
             ref = ref.parent;
+        
         case 'Folder' :
+            this.nfo.folder = ref;
             tempNfo = this.get_nfo_from_filepath(ref);
             this.add_to_nfo(tempNfo);
         break;
@@ -161,7 +150,7 @@ Job.prototype.get_ref_from_ai_doc = function (doc)
     var ref = null;
 
     //check if ref has a jobStyle FileName
-    if (rE.printTag.test(doc.name)) {
+    if (doc.name.match(rE.printTag) || doc.name.match(rE.printTag2)) {
         ref = doc;
     
     //if not, check if placedGraphic has a jobStyle FileName (only if its on Motiv-Layer)
@@ -518,192 +507,6 @@ Job.prototype.add_to_nfo = function (newNfo) {
             }
         }
 	}
-};
-
-Job.prototype.jobSafe = {
-    bridgeTalkScript : function (serialInput) {
-
-        /*global function for creating a jobSafe object with a private variable to store a folder reference*/
-        if(typeof jobSafe2Maker !== 'function')
-        {
-            var jobSafe2Maker = function (initFolder) 
-            {
-                var storedFolder = initFolder ? new Folder(initFolder) : null;
-                return {
-                    getset : function (args) {
-                        if(args) {
-                            if(args instanceof Folder) {
-                                storedFolder = args;
-                            } else if (args instanceof String) {
-                                storedFolder = new Folder(args);
-                            }
-                        } else {
-                            return storedFolder;
-                        }
-                    }
-                }
-            }
-        }
-        
-        var input = serialInput ? eval(serialInput) : null;
-        
-        /*if input is provided, check if there is a global jobSafe already*/
-        if(input) {
-            /* if there is, update the jobSafe with the provided folder*/
-            if(typeof jobSafe2 != "undefined") {
-                jobSafe2.getset(input);
-                
-                $.writeln('jobSafe updated to: ' + input.name);
-                return 'jobSafe updated to: ' + input.name;
-
-            /* if there is no jobSafe, init it with the provided folder*/
-            } else {                
-                jobSafe2 = jobSafe2Maker(input);
-                $.writeln('jobSafe initialized to: ' + input.name);
-                return 'jobSafe initialized to: ' + input.name;
-            }
-        
-        /*if no input is provided, check for a jobSafe*/
-        } else {
-            /*with a existing jobSafe return the stored folder*/
-            if(typeof jobSafe2 != "undefined") {
-                $.writeln('jobSafe exists, retrieving saved folder');
-                return jobSafe2.getset().toSource();
-            /*with no existing jobSafe and no input, return null*/
-            } else {
-                $.writeln('no jobSafe, no input, nothing found');
-                return null;
-            }
-        }
-    },
-
-    show_dialog : function (baseFolder) {
-
-        if(baseFolder) {
-            var retval = null;
-            var kd = ($.getenv("COMPUTERNAME") === 'MONOTOWER') ? '/e/Kundendaten/' : '//192.168.3.112/Kundendaten/';
-            var win = new Window('dialog', 'Choose Working Folder:');
-            
-            win.grp = win.add('group', undefined);
-            win.grp.activePnl = win.grp.add('panel', undefined, 'Use last Folder?');
-            win.grp.selectPnl = win.grp.add('panel', undefined, 'Select new Folder:');
-
-            win.grp.activePnl.clientGrp = win.grp.activePnl.add('group', undefined);    
-            win.grp.activePnl.folderGrp = win.grp.activePnl.add('group', undefined);
-            win.grp.activePnl.okGrp = win.grp.activePnl.add('group', undefined);
-
-            win.grp.activePnl.clientGrp.static = win.grp.activePnl.clientGrp.add('statictext', undefined, 'Client:');
-            win.grp.activePnl.clientGrp.vari = win.grp.activePnl.clientGrp.add('statictext', undefined, decodeURI(baseFolder.parent.name));
-
-            win.grp.activePnl.folderGrp.static = win.grp.activePnl.folderGrp.add('statictext', undefined, 'Job:');
-            win.grp.activePnl.folderGrp.vari = win.grp.activePnl.folderGrp.add('statictext', undefined, decodeURI(baseFolder.name));      
-
-            win.grp.activePnl.okGrp.ok = win.grp.activePnl.okGrp.add('button', undefined, 'Ok');
-            win.grp.activePnl.okGrp.cancel = win.grp.activePnl.okGrp.add('button', undefined, 'Cancel');
-            
-            win.grp.selectPnl.b2b = win.grp.selectPnl.add('button',undefined, 'B2B');
-            win.grp.selectPnl.b2c = win.grp.selectPnl.add('button',undefined, 'B2C');
-            win.grp.selectPnl.client = win.grp.selectPnl.add('button',undefined, 'this Client');
-
-            win.grp.activePnl.alignment = 'bottom';
-            win.grp.activePnl.spacing = 18;
-
-            win.grp.activePnl.okGrp.ok.onClick = function() {
-                retval = baseFolder;
-                win.close();
-            };
-
-            win.grp.activePnl.okGrp.cancel.onClick = function() {
-                win.close();
-            };        
-
-            win.grp.selectPnl.b2b.onClick = function() {
-                retval = Folder(kd + 'B2B').selectDlg('Select Job-Folder:');
-                win.close();
-            };
-
-            win.grp.selectPnl.b2c.onClick = function() {
-                retval = Folder(kd + 'B2C').selectDlg('Select Job-Folder:');
-                win.close();
-            };
-
-            win.grp.selectPnl.client.onClick = function() {                    
-                retval = baseFolder.parent.selectDlg('Select Job-Folder:');
-                win.close();
-            };
-            
-            win.show();
-
-            return retval;
-        }
-    },
-
-    send_via_BT : function (func, args) {
-        var bt = new BridgeTalk;
-        
-        bt.target = 'estoolkit';
-        
-        bt.body = func.toSource() + "("; 
-        if(args) {bt.body += args.toSource();}       
-        bt.body += ");";
-        
-        bt.onError = function(errObj) {
-            $.writeln(errObj.body);
-            bt.result = null;
-        };
-
-        bt.onResult = function (resObj) {                                              
-            bt.result = eval(resObj.body);
-        };
-
-        bt.send(500);
-        
-        return bt.result;
-    },
-
-    get_set : function (new_ref) {
-        if(new_ref) {
-            switch(new_ref.constructor.name) {
-                // if user specifies a folder, set the jobsafe accordingly
-                case 'File' : this.send_via_BT(this.bridgeTalkScript, new_ref.parent);
-                break;
-                case 'Document' : this.send_via_BT(this.bridgeTalkScript, new_ref.fullName.parent);
-                break;
-                case 'Folder' : this.send_via_BT(this.bridgeTalkScript, new_ref);
-            }
-                
-        } else {
-            // if not, check the jobSafe for a saved folderpath
-            //var retval = this.bridgeTalkScript();
-            var retval = this.send_via_BT(this.bridgeTalkScript);
-            var selected = null;
-            
-            // if a folder is found in the jobSafe, let user choose to use it or change it
-            if(retval) {
-                selected = this.show_dialog(retval);
-            
-            // if no folder is found in jobSafe, show user dialog to choose a folder on disk
-            } else {
-                selected = (mofo.folder('kd')).selectDlg('Select Job-Folder:');
-            }
-
-            // with nothing stored and user failed to choose sth, bail the fuck out
-            if(!selected) {
-                return null;
-            // without stored folder and the user chose one manually, set the jobSafe accordingly
-            } else if (!retval) {
-                this.send_via_BT(this.bridgeTalkScript, selected);
-                return selected;
-            
-            // with a stored folder and user chose a folder, check if they match or set jobSafe accordingly if not
-            } else if (retval.fullName != selected.fullName) {
-                this.send_via_BT(this.bridgeTalkScript, selected);
-                return selected;
-            } else {
-                return selected;
-            }
-        }
-    },
 };
 
 Job.prototype.get_ref_from_active_doc_old = function () {

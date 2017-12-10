@@ -2,8 +2,9 @@
 
 function create_aufkleber () {
 
-    #include '/c/capri-links/scripts/includes/MonoNamer.jsx'
-    #include '/c/capri-links/scripts/includes/f_id.jsx'
+    #includepath '/c/repos/adobeScripts1/includes/'
+    #include 'MonoNamer.jsx'
+    #include 'f_id.jsx'
 
     function createStyles() {
 
@@ -201,7 +202,7 @@ function create_aufkleber () {
 
 function main (doc) {
 	
-    #includepath '/c/capri-links/scripts/includes'
+    #includepath '/c/repos/adobeScripts1/includes/'
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
     #include 'f_id.jsx'
@@ -211,6 +212,7 @@ function main (doc) {
     #include 'MonoNamer.jsx'
 
     var job = new Job(null, false);
+    var pm = new Pathmaker(job.nfo);
 
     function import_graphic_to_cell(graphic, cell) 
     {
@@ -368,7 +370,8 @@ function main (doc) {
     }
     
     if(app.activeDocument.saved == false){
-        f_all.saveFile(mofi.file('filmhuelle'), undefined, false);
+        var saveFile = pm.film('filmhuelle');
+        f_all.saveFile(saveFile, undefined, false);
     }
 }
 

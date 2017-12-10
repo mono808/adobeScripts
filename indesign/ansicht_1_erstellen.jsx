@@ -2,21 +2,27 @@
 
 function main () {
 
-    #include '/c/capri-links/scripts/includes/augment_objects.jsx'
-    #include '/c/capri-links/scripts/includes/f_all.jsx'
-    #include '/c/capri-links/scripts/includes/f_id.jsx'
-    #include '/c/capri-links/scripts/includes/f_id_mock.jsx'    
-    #include '/c/capri-links/scripts/includes/Job.jsx'
-    #include '/c/capri-links/scripts/includes/save_Options.jsx'
-    #include '/c/capri-links/scripts/includes/MonoNamer.jsx'
+    #includepath '/c/repos/adobeScripts1/includes/'
+    #include 'augment_objects.jsx'
+    #include 'f_all.jsx'
+    #include 'f_id.jsx'
+    #include 'f_id_mock.jsx'    
+    #include 'Job.jsx'
+    #include 'save_Options.jsx'
+    #include 'MonoNamer.jsx'
+    #include 'Pathmaker.jsx'
+    #include 'Typeahead.jsx'
+    #include 'TexAdder.jsx'
 
     //(refDoc, fullextract, nachdruckMöglich)
     var job = new Job(null, false, true);
+    var pm = new Pathmaker(job.nfo);
+    var texAdder = new TexAdder();
 
     var templateFile, templateDoc,
         templateFiles = [
-            mofi.file('mockBagMaster'),
-            mofi.file('mockShirtMaster')
+            pm.file('mockBagMaster'),
+            pm.file('mockShirtMaster')
         ];
 
     // chose template to use (shirts bags whatever)
@@ -45,7 +51,9 @@ function main () {
 
 
     //let user choose which spreads to copy to the final mockup doc
-    var selectedPages = f_id_mock.selectTextilePages(templateDoc);
+    var typeahead = new Typeahead();
+    var selectedPages = typeahead.show_dialog(templateDoc.pages, 'label');
+    //var selectedPages = f_id_mock.selectTextilePages(templateDoc);
     f_id_mock.copySpreads(templateDoc, newDoc, selectedPages);
     templateDoc.close();
 
@@ -61,12 +69,12 @@ function main () {
     f_id_mock.choose_textil_color();
 
     if(app.activeDocument.saved === false) {
-        if(mofi.file('mockUpIndd').exists) {
+        if(pm.file('mockUpIndd').exists) {
             var newJob = Window.prompt('Ansicht existiert, bitte neu JobNr angeben (oder die Ansicht wird überschrieben)', job.nfo.jobNr);
-            var newFile = new File(mofi.file('mockUpIndd').path + '/' + mofi.file('mockUpIndd').displayName.replace(rE.jobNr, newJob));
+            var newFile = new File(pm.file('mockUpIndd').path + '/' + pm.file('mockUpIndd').displayName.replace(rE.jobNr, newJob));
             f_all.saveFile(newFile, undefined, false);
         } else {
-            f_all.saveFile(mofi.file('mockUpIndd'), undefined, false);
+            f_all.saveFile(pm.file('mockUpIndd'), undefined, false);
         }
     }
 
