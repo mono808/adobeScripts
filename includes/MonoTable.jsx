@@ -111,6 +111,40 @@
         return null;
     };
 
+    var make_standString = function (rC) {
+        var stand = (rC.stand + rC.height)<0 ? rC.stand-rC.height : rC.stand;
+        var roundedCM = roundHalf(stand*0.1);
+        var standString = 'ca. ';
+        if(stand > 0) {
+            standString += roundedCM + ' cm unter der';
+            standString += docScale == 6.5 ? ' Kragennaht' : ' Taschenöffnung';
+        } else if (stand < 0) {
+            standString += Math.abs(roundedCM) + ' cm über der Markierung';
+        }
+        return standString;
+    };
+
+    var update_standString = function (rC, oldRC) {
+        var stand = (rC.stand + rC.height)<0 ? Math.abs(rC.height+rC.stand) : rC.stand;
+        var roundedCM = roundHalf(stand*0.1);
+        var match = oldRC.stand.match(/(ca\.)\s(\d{1,2}\.?,?5?)\s?(.+)/i);
+
+        if(match) {
+            if(stand < 0) {
+                var tail = match[3].replace('unter', 'über');
+            } else {
+                var tail = match[3].replace('über', 'unter');
+            }
+            var updatedString = ''
+            updatedString += match[1] + ' ';
+            updatedString += Math.abs(roundedCM) + ' ';
+            updatedString += tail;
+            return updatedString;
+        } else {
+            return oldRC.stand.replace(/\d{1,2}\.?,?5?/, stand);
+        }        
+    };
+
     var write_nfo_to_row = function (myRow, rowContents) {
 
         myRow.cells.everyItem().appliedCellStyle = myDoc.cellStyles.item('defaultCellStyle');
@@ -130,25 +164,31 @@
         var rowContents = {};
         for(var p in columnOrder) {
             if(columnOrder.hasOwnProperty(p)) {
-                rowContents[p] = myRow.cells.item(columnOrder[p]);
+                rowContents[p] = myRow.cells.item(columnOrder[p]).contents;
             }
         }
         return rowContents;
     };
 
+    var roundHalf = function (num) {
+        num = (Math.round(num*2))/2;
+        return num;
+    };
+
     var read_monoGraphic = function (monoGraphic) {
-        var cA = {};
+        var rC = {};
 
-        cA.textilName = monoGraphic.get_textil_name();
-        cA.textilColor = monoGraphic.get_textil_color();
-        cA.printId = monoGraphic.get_printId();
-        cA.width = monoGraphic.get_width();
-        cA.stand = monoGraphic.get_stand();
-        cA.tech = monoGraphic.get_tech();
-        cA.colors = monoGraphic.get_colors();
-        cA.graphicId = monoGraphic.get_id();
+        rC.textilName = monoGraphic.get_textil_name();
+        rC.textilColor = monoGraphic.get_textil_color();
+        rC.printId = monoGraphic.get_printId();
+        rC.width = monoGraphic.get_width();
+        rC.height = monoGraphic.get_height();
+        rC.stand = monoGraphic.get_stand();
+        rC.tech = monoGraphic.get_tech();
+        rC.colors = monoGraphic.get_colors();
+        rC.graphicId = monoGraphic.get_id();
 
-        return cA;
+        return rC;
     };
 
     var get_user_input = function (rowContents) {
@@ -222,6 +262,7 @@
                 var myRow = myTable.rows.add(LocationOptions.AT_END, undefined, {name:monoGraphic.get_id()});
             }
             
+            rowContents.stand = make_standString(rowContents);
             write_nfo_to_row(myRow, rowContents);
         },
         
@@ -235,6 +276,8 @@
 
             var myRow = get_row_by_id(newContents.graphicId);
             if(myRow) {
+                var oldContents = read_nfo_from_row(myRow);
+                newContents.stand = update_standString(newContents, oldContents);
                 write_nfo_to_row(myRow, newContents);
             }
         }

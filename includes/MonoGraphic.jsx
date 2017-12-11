@@ -86,7 +86,11 @@
         },
 
         get_width : function () {
-            return (ref.geometricBounds[3] - ref.geometricBounds[1]);
+            return ref.geometricBounds[3] - ref.geometricBounds[1];
+        },
+
+        get_height : function () {
+            return ref.geometricBounds[2] - ref.geometricBounds[0];
         },
     
         get_file : function (fileType) {
@@ -98,51 +102,39 @@
         },
 
         get_stand : function () {
-            function roundHalf(num) {
-                num = (Math.round(num*2))/2;
-                return num;
-            }
             
-            function calculate_real_distance (verticalD) {
-                
-                if(verticalD > 0 && docScale == 6.5) {
-                    // mm -> cm * 0,1 * 1,075 (bei Shirts Faktor für die Krümmung der Brust / Schulterblätter innerhalb der ersten 13 cm ab Kragen)
-                    if(verticalD > 130) {
-                        printD = (130*0.1075 + (verticalD-130)*0.1).toFixed(2);
-                    } else {
-                        printD = (verticalD*0.1075).toFixed(2);
-                    }
+            var adjust_for_shirts = function (virtDist) {                
+                // mm -> cm * 0,1 * 1,075 (bei Shirts Faktor für die Krümmung der Brust 
+                // Schulterblätter innerhalb der ersten 13 cm ab Kragen)                    
+                if(virtDist > 110) {
+                    var bowedDist = 110*1.1;
+                    var straigtDist = virtDist-110;
+                    return bowedDist+straigtDist;
                 } else {
-                    printD = (verticalD*0.1).toFixed(2);
+                    return virtDist*1.1;
                 }
-                return roundHalf(printD);
-            }
+            };
 
-            function get_virtual_distance(geoBounds, yRef) {
-                if(geoBounds[0] > yRef) {
-                    return geoBounds[0] - yRef;
-                } else if (geoBounds[2] < yRef) {
-                    return geoBounds[2] - yRef;
-                }
-            }
-
-            var yFront, yBack, y;
             try {
-                yFront = ref.parentPage.graphicLines.item('necklineFront').geometricBounds[0],
-                yBack = ref.parentPage.graphicLines.item('necklineBack').geometricBounds[0];
+                var yFront = ref.parentPage.graphicLines.item('necklineFront').geometricBounds[0];
+                var yBack = ref.parentPage.graphicLines.item('necklineBack').geometricBounds[0];
             } catch(e) {
-                yFront = ref.parentPage.guides.item('necklineFront').location,
-                yBack = ref.parentPage.guides.item('necklineBack').location;
+                var yFront = ref.parentPage.guides.item('necklineFront').location;
+                var yBack = ref.parentPage.guides.item('necklineBack').location;
             }
 
             if(side === 'Front') {
-                y = yFront;
+                var y = yFront;
             } else if (side === 'Back') {
-                y = yBack;
+                var y = yBack;
             }
             
-            var virtualDistance = get_virtual_distance(ref.geometricBounds, y);
-            return calculate_real_distance(virtualDistance);
+            var virtualStand = ref.geometricBounds[0] - y;
+            if(virtualStand > 0 && docScale == 6.5) {
+                return adjust_for_shirts(virtualStand);
+            } else {
+                return virtualStand;
+            }
         },
 
         get_colors : function () {
