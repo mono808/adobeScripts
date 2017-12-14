@@ -117,7 +117,7 @@ MonoMockup.prototype.check_create_layer = function (layerName)
 
 MonoMockup.prototype.init = function (doc) 
 {
-    if(!this.doc) this.doc = app.activeDocument;
+    if(!this.doc && app.documents.length > 0) this.doc = app.activeDocument;
     
     with (this.doc.viewPreferences){
         horizontalMeasurementUnits = MeasurementUnits.millimeters;
@@ -221,10 +221,10 @@ MonoMockup.prototype.fill_job_infos = function (nfo)
     jobString += nfo.client;
     jobString += '\rAuftragsnummer:\r';
     jobString += nfo.jobNr;
-    jobString += '\rReferenz:\r'
+    jobString += '\rAuftragsname:\r';
+    jobString += nfo.jobName;
+    jobString += '\rReferenz:\r';
     jobString += nfo.jobNr != nfo.refNr ? nfo.refNr : '---';        
-    jobString += '\rDesign:\r';
-    jobString += nfo.design;
 
     tf.contents = jobString;
     var j, maxJ = tf.parentStory.paragraphs.length, pg;
@@ -393,8 +393,6 @@ MonoMockup.prototype.place_prints_on_page = function (monoPrints)
         }
 
         var side = mN.name_side(mP.id);
-
-        
         
         if(side == 'Back') {
             var xRef = myPage.guides.item('midlineBack');

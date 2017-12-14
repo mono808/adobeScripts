@@ -32,9 +32,9 @@
     mP.tag = get_tag(aFile);
     var printsFolder = mP.tech ? 'druckdaten-' + mP.tech : 'druckdaten';
 
-	mP.print = get_tagged_files(printsFolder, mP.tag + '_*');
+	mP.print   = get_tagged_files(printsFolder, mP.tag + '_*');
 	mP.preview = get_tagged_files('previews', mP.tag+'_Preview.*');
-	mP.film = get_tagged_files('druckdaten-sd', '*'+mP.tag+'_Film.indd');
+	mP.film    = get_tagged_files('druckdaten-sd', '*'+mP.tag+'_Film.indd');
 	mP.working = get_tagged_files('working', mP.tag+'_Working.*');
 
 	/*

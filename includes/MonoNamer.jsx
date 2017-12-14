@@ -1,4 +1,4 @@
-function MonoNamer () {
+﻿function MonoNamer () {
     this.printId = {
         lBrust   : 'linke Brust',
         rBrust   : 'rechte Brust',
@@ -38,6 +38,8 @@ function MonoNamer () {
         Rückseite   : 'Back',
         Rueckseite  : 'Back',            
         Nacken      : 'Back',
+        neckIn      : 'Back',
+        neckOut     : 'Back',
         Schulter    : 'Back',
         Back        : 'Back',
         Beutel      : 'Front',
@@ -116,5 +118,3 @@ MonoNamer.prototype.name_screens = function (myString) {
         return 1
     }
 };
-
-//var monoNamer = new MonoNamer();

@@ -160,11 +160,3 @@
         }
     };
 }
-
-//~ #target indesign
-//~ function main () {
-//~     var texAdder = new TexAdder();
-//~     texAdder.add_tex();
-//~     
-//~ }
-//~ main();

@@ -40,7 +40,7 @@
 
     var is_printFolder = function (a) {
         if(!is_folder(a)) return false;
-        return (a.displayName.toLocaleLowerCase().indexOf('druckdaten') > -1);
+        return (a.displayName.toLowerCase().indexOf('druckdaten') > -1);
     }
 
 	var jobFolder = get_jobFolder(folder);

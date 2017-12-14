@@ -1,4 +1,5 @@
-﻿function main () {
+﻿#target indesign
+function main () {
     
     #includepath '/c/repos/adobeScripts1/includes/'
     #include 'augment_objects.jsx'
@@ -19,12 +20,12 @@
     
     var job = new Job(null,false);
     var pm = new Pathmaker(job.nfo);
-    var typeahead = new Typeahead();
+    //var typeahead = new Typeahead();
     var mockup = new MonoMockup();
     
-    mockup.create_mockupDoc();
+    //mockup.create_mockupDoc();
     mockup.init();
-    mockup.import_pages();
+    //mockup.import_pages();
 
     mockup.fill_job_infos(job.nfo);
 

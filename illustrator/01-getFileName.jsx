@@ -8,9 +8,9 @@ function main() {
     #include 'Pathmaker.jsx'
     #include 'MonoNamer.jsx'
     #include 'save_Options.jsx'
-
-    var pathmaker = new Pathmaker();
+    
     var job = new Job(null, true, false);
+    var pathmaker = new Pathmaker(job.nfo);
   
     f_all.saveFile (pathmaker.file('workingAi', job.nfo), save_ops.ai_sep(), false);
 };

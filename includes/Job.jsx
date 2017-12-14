@@ -1,7 +1,8 @@
 ﻿#include '/c/capri-links/scripts/includes/rE.jsx'
 #include '/c/capri-links/scripts/includes/LastFolders.jsxinc'
 
-function Job (ref, fullExtract, nachdruckMoeglich) {
+function Job (ref, fullExtract, nachdruckMoeglich) 
+{
 	this.nfo = {
 		c2b : null,
 		client : null,
@@ -16,13 +17,14 @@ function Job (ref, fullExtract, nachdruckMoeglich) {
 		tech : null,
 		wxh : null,
 	};
-
+    this.regExJobNr = rE.jobNr;
     this.lastFolders = new LastFolders();
     this.lastFolders.import_txt();
     this.get_nfo(ref, fullExtract, nachdruckMoeglich);
 };
 
-Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich) {
+Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich) 
+{
     //try to get a reference to a job from the activeDocument
     if(!ref) {
         ref = this.get_ref();
@@ -33,17 +35,17 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich) {
 
     switch(ref.constructor.name) {
         case 'Document' :
-            if(!ref.saved) return null;
+            //if(!ref.saved) return null;
             ref = ref.fullName;        
         
         case 'File' :
-            this.nfo.file = ref;
+            //this.nfo.file = ref;
             tempNfo = this.get_nfo_from_filename(ref);
             this.add_to_nfo(tempNfo);
             ref = ref.parent;
         
         case 'Folder' :
-            this.nfo.folder = ref;
+            //this.nfo.folder = ref;
             tempNfo = this.get_nfo_from_filepath(ref);
             this.add_to_nfo(tempNfo);
         break;
@@ -171,7 +173,8 @@ Job.prototype.get_ref_from_ai_doc = function (doc)
     return ref;
 };
 
-Job.prototype.get_nfo_from_filename = function (target) {
+Job.prototype.get_nfo_from_filename = function (target) 
+{
         var nfo = {};
                     
         if(target.constructor.name === 'File') {            
@@ -186,64 +189,60 @@ Job.prototype.get_nfo_from_filename = function (target) {
             nfo.printId     = match[1];
             nfo.wxh         = match[2];
             nfo.tech        = match[3];
-            return nfo;
         }
 
         match = fileName.match(rE.printTag2)
         if (match) {
             nfo.printId     = match[1];
             nfo.tech        = match[2];
-            return nfo;
         }
 
         match = fileName.match(rE.doc)
         if (match) {
             nfo.jobNr       = match[1];
-            nfo.jobName     = match[2];
-            nfo.doc         = match[3];
-            return nfo
+            nfo.jobName     = match[3];
+            nfo.doc         = match[4];
         }
+        
+        return nfo;
 };
 
-Job.prototype.get_nfo_from_filepath = function (fldr) {
-    function check_folder_for_nfo(f, nfo) 
-    {
-        var fName = f.displayName,                
-            jobMatch = fName.match(rE.jobNr);
-        
-        if (jobMatch) {
-            var folderNewRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_([a-z0-9äüöß-]+)/i);
-            var folderOldRegExp = new RegExp(/(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)\s\(([a-z0-9äüöß-]+)\)/i);
-            var match = fName.match(rE.jobNameNew);
-            
-            match = match ? match : fName.match(rE.jobNameOld);
-            
-            Folder.current = f;
-            nfo.refNr  = jobMatch[0];
-            nfo.folder = f;
-            nfo.client = f.parent.displayName;
-            nfo.c2b    = f.parent.parent.displayName;
-            nfo.shop   = jobMatch[2] == 'wme' ? 'wme' : 'cs';
-            
-            if(!nfo.jobName && match) {
-                nfo.jobName = match[3];
-            }
-        } else {
-            if(f.parent != null) check_folder_for_nfo(f.parent, nfo);
-        }
+Job.prototype.get_jobBaseFolder = function (fld) 
+{
+    if(fld.displayName.match(this.regExJobNr)) {
+        return fld;
+    } else if (fld.parent) {
+        return this.get_jobBaseFolder(fld.parent);
+    } else {
+        return null;
     }
+};
 
-    var nfo = {};
-    switch (fldr.constructor.name) {
-        case 'File' : fldr = fldr.parent;
-        case 'Folder' : check_folder_for_nfo(fldr, nfo);
-        break;
-    }
+Job.prototype.get_nfo_from_filepath = function (fldr) 
+{
+    if (fldr.constructor.name === 'File') {fldr = fldr.parent};
+ 
+    var jobFolder = this.get_jobBaseFolder(fldr);
+    if(!jobFolder) return null;
+
+    Folder.current = jobFolder;
     
+    var match = jobFolder.displayName.match(rE.jobNameNew);
+    match = match ? match : fName.match(rE.jobNameOld);
+    
+    var nfo = {};
+    nfo.refNr   = match[1];
+    nfo.shop    = match[2] == 'wme' ? 'wme' : 'cs';
+    nfo.jobName = match[3] ? match[3] : undefined;
+    nfo.folder  = jobFolder;
+    nfo.client  = jobFolder.parent.displayName;
+    nfo.c2b     = jobFolder.parent.parent.displayName;
+
     return nfo;
 };
 
-Job.prototype.get_nfo_from_user = function () {
+Job.prototype.get_nfo_from_user = function () 
+{
     var mN = new MonoNamer();
     var result = {
         printId : this.nfo.printId || null,
@@ -376,7 +375,8 @@ Job.prototype.get_nfo_from_user = function () {
     return result
 };
 
-Job.prototype.get_jobNames = function (jobfolder) {
+Job.prototype.get_jobNames = function (jobfolder) 
+{
     var jobfolders = jobfolder.parent.getFiles(rE.jobNr),
         jobNames = [],
         jobName;
@@ -397,7 +397,8 @@ Job.prototype.get_jobNames = function (jobfolder) {
     return jobNames;
 };
 
-Job.prototype.get_jobNr_from_user = function () {
+Job.prototype.get_jobNr_from_user = function () 
+{
 
     var result = {
         jobNr : this.nfo.refNr || null,
@@ -458,7 +459,8 @@ Job.prototype.get_jobNr_from_user = function () {
     return result.jobNr;
 };
 
-Job.prototype.get_wxh = function () {
+Job.prototype.get_wxh = function () 
+{
     var w = null,
         h = null,
         doc = app.activeDocument;
@@ -479,119 +481,13 @@ Job.prototype.get_wxh = function () {
     return this.nfo.wxh;
 };
 
-
-
-
-
-Job.prototype.save_folder = function (input) {
-    var fd;
-    switch(input.constructor.name) {
-        case 'File' : fd = input.parent;
-        break;
-        case 'Document' : fd = input.fullName.parent;
-        break;
-        case 'Folder' : fd = input;
-    }
-
-    $.writeln('update jobSafe & lastFolders to: ' + fd.displayName);        
-    this.jobSafe.get_set(fd);
-    this.lastFolders.add(fd);
-}
-
-Job.prototype.add_to_nfo = function (newNfo) {
+Job.prototype.add_to_nfo = function (newNfo) 
+{
 	if(newNfo) {
-        var p;
-        for(p in this.nfo) {
+        for(var p in this.nfo) {
             if(this.nfo.hasOwnProperty(p) && !this.nfo[p] && newNfo[p]) {
                 this.nfo[p] = newNfo[p];
             }
         }
 	}
 };
-
-Job.prototype.get_ref_from_active_doc_old = function () {
-    var ref = null,
-        doc = null;
-
-    switch (app.name) {
-        case 'Adobe Illustrator' :
-            doc = app.documents.length > 0 ? app.activeDocument : null;
-            if (doc) {
-                //check if ref has a jobStyle FileName
-                if (rE.printTag.test(doc.name)) {
-                    ref = doc;
-                
-                //if not, check if placedGraphic has a jobStyle FileName (only if its on Motiv-Layer)
-                } else if (doc.placedItems.length > 0) {
-                    for(var i=0; i < doc.placedItems.length; i++) {
-                        var pI = doc.placedItems[i];
-                        if(pI.layer == doc.layers.getByName('Motiv')) {
-                            ref = doc.placedItems[0].file;
-                        }
-                    }
-                
-                //if not, check if the whole filepath contains a jobnumber
-                } else if (rE.jobNr.test(doc.fullName)) {
-                    ref = doc;
-                }
-            }
-        break;
-        
-        case 'Adobe InDesign' :
-            if((app.documents.length > 0) && (app.layoutWindows.length > 0)) {
-                doc = app.activeDocument;
-            } else {
-                doc = null;
-            }
-            
-            //close docs without a window                   
-            var i, maxI, myDoc;      
-            for(i = 0, maxI = app.documents.length; i < maxI; i += 1) {
-                myDoc = app.documents[i];
-                if(myDoc.windows.length < 1) {
-                    myDoc.close(SaveOptions.NO);
-                }
-            }
-            
-            if (doc) {
-                if (rE.print.test(doc.name)) {
-                    ref = doc;
-                } else if (doc.allGraphics.length > 0) {                    
-                    try {
-                        var checkThis = doc.layers.item('motivEbene');
-                        var checkthis = checkThis.name;
-                        ref = new File(checkThis.allGraphics[0].properties.itemLink.filePath);
-                    } catch (e) {
-                        ref = doc;
-                    }
-                } else if (doc.saved && rE.printTag.test(doc.filePath.fullName)) {
-                    ref = doc;
-                }
-            }
-        break;
-
-        case 'Adobe Photoshop' :
-            doc = app.documents.length > 0 ? app.activeDocument : null;
-            try {
-                ref = doc;
-                var check = ref.fullName;
-                if ( rE.printTag.test(doc.name) || rE.jobNr.test(doc.path.fsName) ) {
-                    ref = doc;
-                } else {
-                    ref = null;
-                }
-            } catch(e) {
-                ref = null;
-            }
-        break;
-    }
-
-    //check adobe apps for open documents and try to get a reference file
-    if(ref) {
-        this.save_folder(ref);
-        return ref;
-    } else {   
-        return this.jobSafe.get_set();
-    }
-};
-

@@ -761,6 +761,3 @@ MonoFilm.prototype.close = function ()
     }
     this.filmDoc.close();
 };
-
-
-//var myFilm = new MonoFilm();

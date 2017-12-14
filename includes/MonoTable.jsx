@@ -78,11 +78,11 @@
         var totalWidth = myTable.parent.geometricBounds[3]-myTable.parent.geometricBounds[1];
         switch (docScale) {
             case 4.5 : // for bags
-                var columnWidths = [6, 12, 15, 8, 5, 15, 9, 25, 5];
+                var columnWidths = [6, 12, 15, 10, 5, 15, 9, 25, 5];
                 break;
                         
             default :  //for shirts
-                var columnWidths = [6, 14, 15, 8, 6, 17, 9, 22, 5];
+                var columnWidths = [6, 14, 15, 10, 6, 17, 9, 22, 5];
         }
         
         var sum = sum_array(columnWidths);
@@ -180,14 +180,21 @@
 
         rC.textilName = monoGraphic.get_textil_name();
         rC.textilColor = monoGraphic.get_textil_color();
-        rC.printId = monoGraphic.get_printId();
-        rC.width = monoGraphic.get_width();
-        rC.height = monoGraphic.get_height();
+        rC.printId = monoNamer.name('printId', monoGraphic.get_printId());
+        rC.width = monoGraphic.get_width().toFixed(0);
+        rC.height = monoGraphic.get_height().toFixed(0);
         rC.stand = monoGraphic.get_stand();
-        rC.tech = monoGraphic.get_tech();
+        rC.tech = monoNamer.name('tech', monoGraphic.get_tech());
         rC.colors = monoGraphic.get_colors();
         rC.graphicId = monoGraphic.get_id();
 
+        return rC;
+    };
+
+    var style_rowContents = function (rC) {
+        rC.stand = make_standString (rC);
+        rC.width = rC.width.toFixed(0);
+        rC.height = rC.height.toFixed(0);
         return rC;
     };
 
@@ -231,6 +238,7 @@
         colors : 7,
         graphicId: 8
     };
+    var monoNamer = new MonoNamer();
     var myDoc;
     var myLayer;
     var docScale;
@@ -254,6 +262,7 @@
             if(!myTable) return null;
             var rowContents = read_monoGraphic(monoGraphic);
             rowContents = get_user_input(rowContents);
+            rowContents.stand = make_standString (rowContents);
             
             var lastRow = myTable.rows.lastItem();
             if(lastRow.contents.join('') == '') {
@@ -262,7 +271,6 @@
                 var myRow = myTable.rows.add(LocationOptions.AT_END, undefined, {name:monoGraphic.get_id()});
             }
             
-            rowContents.stand = make_standString(rowContents);
             write_nfo_to_row(myRow, rowContents);
         },
         

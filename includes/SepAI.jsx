@@ -401,11 +401,10 @@ SepAI.prototype.add_to_pantone_txt = function (pantoneStr)
 SepAI.prototype.rename_pantone_colors = function () 
 {
     var panSpots = []; //spotcolors with default PANTONE name
-    var pantoneRegEx = /PANTONE/;
     
     for (var i = 0, maxI = this.doc.spots.length; i < maxI; i+=1) {
         var spot = this.doc.spots[i];
-        if(pantoneRegEx.test(spot.name)) { 
+        if(spot.name.indexOf('PANTONE') > -1) { 
             spot.name = spot.name.replace('PANTONE ', '');
             panSpots.push(spot);
         }

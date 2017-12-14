@@ -1,4 +1,4 @@
-function Typeahead () {
+﻿function Typeahead () {
     this.create_names_array = function (array, propertyToList) {            
         var names = [];
         for(var i = 0; i < array.length; i++) {

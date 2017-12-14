@@ -1,7 +1,4 @@
-﻿#includepath '/c/capri-links/scripts/includes'
-#include 'MonoFilm.jsx'
-
-function MonoSep (sep)
+﻿function MonoSep (sep)
 {       
     if(sep instanceof File) {
         this.file = sep;
@@ -62,7 +59,3 @@ MonoSep.prototype.get_graphic = function () {
         }
     }
 };
-
-//~ var sepFile = new File('/c/capri-links/kundendaten/B2B/Criminals/546A17-014_Mausi-Shirts/Druckdaten-SD/Front_SD_Print.ai');
-//~ var sep = new MonoSep(sepFile);
-//~ $.writeln(sep.get_spots().toSource());

@@ -104,8 +104,8 @@
         get_stand : function () {
             
             var adjust_for_shirts = function (virtDist) {                
-                // mm -> cm * 0,1 * 1,075 (bei Shirts Faktor für die Krümmung der Brust 
-                // Schulterblätter innerhalb der ersten 13 cm ab Kragen)                    
+                // 1,1 (bei Shirts Faktor für die Krümmung der Brust 
+                // Schulterblätter innerhalb der ersten 11 cm ab Kragen)
                 if(virtDist > 110) {
                     var bowedDist = 110*1.1;
                     var straigtDist = virtDist-110;
@@ -228,4 +228,3 @@
         }
     }
 };
-
