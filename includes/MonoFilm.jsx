@@ -553,7 +553,7 @@ MonoFilm.prototype.get_spotNames = function ()
     var spots = this.get_all_spotColors();
     var names = [];
     for (var i = 0; i < spots.length; i++) {
-        names.push(spots[i].name);
+        names.push(spots[i].name.replace(/\s/g, '\xa0'));
     }
     return names;
 };
@@ -686,9 +686,24 @@ MonoFilm.prototype.save = function (job, showDialog, close)
         saveDoc.close();
 };
 
+MonoFilm.prototype.print_to_postscript = function (myDoc, targetFile, printPreset) 
+{
+    var myPPreset = printPreset.constructor.name == 'PrinterPreset' ? printPreset : app.printerPresets.item(printPreset);
+    var f = targetFile instanceof File ? targetFile : new File(targetFile);
+    var doc = myDoc && myDoc.constructor.name == 'Document' ? myDoc : app.activeDocument;
+    var myDPPref = doc.printPreferences;
+
+    with(myDPPref) {
+        printer = Printer.postscriptFile;
+        activePrinterPreset = myPPreset;        
+        printFile = f;            
+    }
+
+    return doc.print(false, undefined);
+};
+
 MonoFilm.prototype.print = function ()
 {
-
     if(!this.filmDoc.saved) {
         alert('Film wurde noch nicht gespeichert, bitte erst abspeichern');
         return;
@@ -697,14 +712,12 @@ MonoFilm.prototype.print = function ()
     var saveFolder = this.filmDoc.fullName.parent;
      
     var pdfName = saveName + '.pdf';
-    var pdfFile = new File(staticPaths.string('filmOut') + pdfName);
+    var pdfFile = new File(pm.path('filmOut') + pdfName);
     
     var psName = saveName + '.ps';
-    var psFile = new File(staticPaths.string('filmIn') + psName);
+    var psFile = new File(pm.path('filmIn') + psName);
 
-    print_to_postscript (this.filmDoc, psFile, 'monoFilms');
-       
-    // copy_file_via_bridgeTalk(pdfFile, saveFolder, false);
+    this.print_to_postscript (this.filmDoc, psFile, 'monoFilms');
 };
 
 MonoFilm.prototype.get_sepPos = function ()

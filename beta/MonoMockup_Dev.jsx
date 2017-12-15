@@ -23,11 +23,12 @@ function main () {
     //var typeahead = new Typeahead();
     var mockup = new MonoMockup();
     
-    //mockup.create_mockupDoc();
+    mockup.create_mockupDoc();
     mockup.init();
-    //mockup.import_pages();
+    mockup.import_pages();
 
     mockup.fill_job_infos(job.nfo);
+    mockup.show_shop_logo (job.nfo.shop);
 
     var jobFolder = new JobFolder(job.nfo.folder);
     var monoPrints = jobFolder.get_prints();

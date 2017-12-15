@@ -31,7 +31,7 @@ function main () {
         monoTable.add_row(monoGraphics[i]);
     }
 
-    monoTable.update_row(monoGraphics[0], false);
-    monoTable.update_row(monoGraphics[1], false);
+    //monoTable.update_row(monoGraphics[0], false);
+    //monoTable.update_row(monoGraphics[1], false);
 }
 main();

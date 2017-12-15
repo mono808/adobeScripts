@@ -78,11 +78,11 @@
         var totalWidth = myTable.parent.geometricBounds[3]-myTable.parent.geometricBounds[1];
         switch (docScale) {
             case 4.5 : // for bags
-                var columnWidths = [6, 12, 15, 10, 5, 15, 9, 25, 5];
+                var columnWidths = [6, 12, 15, 10, 10, 15, 9, 25, 5];
                 break;
                         
             default :  //for shirts
-                var columnWidths = [6, 14, 15, 10, 6, 17, 9, 22, 5];
+                var columnWidths = [6, 14, 15, 10, 10, 17, 9, 22, 5];
         }
         
         var sum = sum_array(columnWidths);
@@ -185,7 +185,7 @@
         rC.height = monoGraphic.get_height().toFixed(0);
         rC.stand = monoGraphic.get_stand();
         rC.tech = monoNamer.name('tech', monoGraphic.get_tech());
-        rC.colors = monoGraphic.get_colors();
+        rC.colors = monoGraphic.get_colors().join(', ');
         rC.graphicId = monoGraphic.get_id();
 
         return rC;

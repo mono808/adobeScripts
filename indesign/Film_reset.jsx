@@ -1,17 +1,17 @@
 ﻿#target indesign
 
-#includepath '/c/repos/adobeScripts1/includes'
+#includepath '/c/capri-links/scripts2/includes'
 #include 'MonoNamer.jsx'
 #include 'MonoFilm.jsx'
 #include 'MonoSep.jsx'
 #include 'PasserFab.jsx'
+#include 'statics.jsx'
+#include 'variables.jsx'
 #include 'Job.jsx'
-#include 'Pathmaker.jsx'
 
 function update_film () {
 
     var job = new Job(null, false);
-    var pm = new Pathmaker();
 
     var myFilm = new MonoFilm(app.activeDocument);
         
@@ -19,7 +19,12 @@ function update_film () {
 
     myFilm.reset();
 
-    myFilm.add_marks();
+    if(myFilm.type == 'Bags') {
+        var regMarks = [0,2,4,6];
+    } else {
+        var regMarks = [0,2,4,6];
+    }
+    myFilm.add_marks(regMarks);
     myFilm.add_spotInfo2();
     myFilm.add_jobInfo(job);
     myFilm.position_textFrames();

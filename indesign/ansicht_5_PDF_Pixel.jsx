@@ -10,14 +10,14 @@ function main () {
     #include 'save_Options.jsx'
 
     //job.set_nfo(null, false);
-
+    var pm = new Pathmaker();
     var myDoc = app.activeDocument,
         myFilename = myDoc.fullName.displayName,
         myFolder = myDoc.fullName.parent,
         myName = myFilename.substring(0, myFilename.lastIndexOf('.'));
         
-    var distIn = new File(mofo['ansichtPxIn'] + myName + '.ps');
-    var distOut = new File(mofo['ansichtPxOut'] + myName + '.pdf');
+    var distIn = new File(pm.path('ansichtIn') + myName + '.ps');
+    var distOut = new File(pm.path('ansichtOut') + myName + '.pdf');
     
     //hide internLayer
     try{myDoc.layers.item('Intern').visible = false;} catch(e){}
