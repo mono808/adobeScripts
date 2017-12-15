@@ -1,15 +1,19 @@
 ﻿#target indesign
-#includepath '/c/capri-links/scripts2/includes'
-#include 'augment_objects.jsx'
-#include 'universal_functions.jsx'
-#include 'indesign_functions.jsx'
-#include 'MonoNamer.jsx'
-#include 'MonoFilm.jsx'
-#include 'statics.jsx'
-#include 'Pathmaker.jsx'
+#includepath '/c/repos/adobeScripts1/includes'
 #include 'Job.jsx'
+#include 'JobFolder.jsx'
+#include 'MonoFilm.jsx'
+#include 'MonoMockup.jsx'
+#include 'MonoNamer.jsx'
+#include 'MonoPrint.jsx'
+#include 'MonoSep.jsx'
+#include 'Pathmaker.jsx'
+#include 'TexAdder.jsx'
+#include 'Typeahead.jsx'
+#include 'universal_functions.jsx'
 
-function createTextFrame(){
+function createTextFrame()
+{
     var myDoc = app.documents.item(0),
         myPage = myDoc.pages.item(0),
         myTextFrame = myPage.textFrames.add();
@@ -45,7 +49,8 @@ function get_spots (filmFile)
     return sepInfo
 };
 
-function myGetBounds(myDoc, myPage){
+function myGetBounds(myDoc, myPage)
+{
     var myPageWidth = myDoc.documentPreferences.pageWidth,
         myPageHeight = myDoc.documentPreferences.pageHeight
     
@@ -64,7 +69,8 @@ function myGetBounds(myDoc, myPage){
     return [myY1, myX1, myY2, myX2];
 }
 
-function createStyles() {
+function createStyles() 
+{
 
     var myDoc = app.activeDocument;
 
@@ -161,7 +167,8 @@ function createStyles() {
     }
 }    
 
-function createTable(myDoc) {
+function createTable(myDoc) 
+{
 
     var tableTempString = "Client1\tClient 2\tJobNr\tjobName\rPos1\tPos2\tPos3\tPos4\rColors1\tColors2\tColors3\tColors4\rimage1\timage2\timage3\timage4";
     
@@ -189,7 +196,8 @@ function createTable(myDoc) {
     return myTable;
 }
 
-function create_aufkleber () {
+function create_aufkleber () 
+{
 
     var docWidth = 207,
         docHeight = 146;
@@ -438,11 +446,10 @@ function checkCreateStyle (type, name)
     return newStyle;
 };
 
-function filmhuelle_erstellen () {
-    
-    var job = new Job();
-    job.get_nfo(null, false, false);
-    var pM = new Pathmaker(job.nfo);
+function filmhuelle_erstellen () 
+{
+    var job = new Job(null, false, false);
+    var pm = new Pathmaker(job.nfo);
 
     var doc = create_aufkleber ();
     var firstPage = doc.pages.item(0);
@@ -457,27 +464,27 @@ function filmhuelle_erstellen () {
     fill_table_with_jobNfo(firstTable, job);
 
     
-    var i, maxI, fourtett, myPage, pageArray = [];
-    //calculate number of pages needed (4 graphics per page)
-    pageCount = Math.ceil(myPrints.length/4);
+    var pageArray = [];    
+    var pageCount = Math.ceil(myPrints.length/4); //calculate number of pages needed (4 graphics per page)
     
     // create duplicates of firstpage if needed (already filled with jobnfo only, empty elsewhere)
-    for(i=0; i < pageCount; i++){
-        myPage = i == 0 ? firstPage : firstPage.duplicate(LocationOptions.AT_END);
+    for(var i=0; i < pageCount; i++){
+        var myPage = i == 0 ? firstPage : firstPage.duplicate(LocationOptions.AT_END);
         pageArray.push(myPage);
     }
 
     // use the array of empty pages to fill with 4 prints each
     for(i=0;i < pageArray.length; i+=1){
-        fourtett = myPrints.splice(0,4);  
-        myPage = pageArray[i];
-        myTable = myPage.textFrames.item(0).tables.item(0),
+        var fourtett = myPrints.splice(0,4);  
+        var myPage = pageArray[i];
+        var myTable = myPage.textFrames.item(0).tables.item(0);
         fill_table_with_printNfo(fourtett, myTable);
     }
     
     if(app.activeDocument.saved == false){
-        save_file(pM.get_file('filmhuelle'), undefined, false);
+        save_file(pm.file('filmhuelle'), undefined, false);
     }
 }
 
+var monoNamer = new MonoNamer();
 filmhuelle_erstellen();

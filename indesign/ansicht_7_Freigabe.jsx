@@ -11,11 +11,14 @@ function main() {
     #include 'Pathmaker.jsx'
     #include 'MonoNamer.jsx'
     #include 'MonoGraphic.jsx'
+    #include 'MonoPrint.jsx'
+    #include 'MonoFilm.jsx'
     #include 'InteractSwitch.jsx'
     #include 'save_Options.jsx'
 
     var job = new Job(null,false);
     var pm = new Pathmaker(job.nfo);
+    var jobFolder = new JobFolder(job.nfo.folder);
 
     function get_docs () 
     {
@@ -24,7 +27,7 @@ function main() {
             filmhuelle : null,
         };
         
-        var mockUps = mofo.folder('ansicht').getFiles('*.indd');
+        var mockUps = pm.folder('ansicht').getFiles('*.indd');
         var i, maxI;            
         for(i = 0, maxI = mockUps.length; i < maxI; i += 1){
             //if(mockUps[i] instanceof File && rE.doc.test(decodeURI(mockUps[i].name))) {
@@ -33,7 +36,7 @@ function main() {
             }
         }
         
-        var filmhuelle = mofi.file('filmhuelle');
+        var filmhuelle = pm.file('filmhuelle');
         if(filmhuelle.exists) {
             myDocs.filmhuelle = filmhuelle;
         }
@@ -106,15 +109,16 @@ function main() {
 
     function check_sizes (ansichtDoc) 
     {
-        var i, g, monoGraphic, mismatches = [];
-        for(i=0; i<ansichtDoc.allGraphics.length; i++){
-            g = ansichtDoc.allGraphics[i];
-            fN = g.properties.itemLink.name;
-            if(g.properties.itemLayer == ansichtDoc.layers.item('Prints') &&
-               g.parentPage.appliedMaster != ansichtDoc.masterSpreads.item('C-Preview')) {
-                monoGraphic = new MonoGraphic(g);
+        var mismatches = [];
+        for(var i=0; i<ansichtDoc.allGraphics.length; i++){
+            var g = ansichtDoc.allGraphics[i];
+            var fN = g.properties.itemLink.name;
+            var isOnPrintLayer = g.properties.itemLayer == ansichtDoc.layers.item('Prints');
+            var isOnPreviewPage = g.parentPage.appliedMaster == ansichtDoc.masterSpreads.item('C-Preview');
+            if( isOnPrintLayer && !isOnPreviewPage) {
+                var monoGraphic = new MonoGraphic(g);
                 if(!monoGraphic.check_size()) {
-                    mismatches.push(monoGraphic.fileName)
+                    mismatches.push(monoGraphic.fileName);
                 }
             }
         }
