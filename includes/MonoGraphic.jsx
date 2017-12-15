@@ -168,9 +168,9 @@
 
         check_size : function () {
             var placedWidth = this.get_width();
+            var sizesMatch;
             switch(monoPrint.tech.toUpperCase()) {
-                case 'SD' :
-                    
+                case 'SD' :               
                     if(monoPrint.film) {
                         var monoFilm = new MonoFilm(monoPrint.film);
                         var sepPos = monoFilm.get_sepPos();
@@ -178,18 +178,11 @@
                         monoFilm.filmDoc.close(SaveOptions.no);
                         
                         var sizesMatch = (placedWidth.toFixed(0) == sepWidth.toFixed(0));
-
-                        if(sizesMatch) return true;
-
-                        var alertStr = 'Druckgröße in Ansicht: ' + gWidth + ' passt nicht zum Dateinamen: ' + nfoWidth + '\nTrotzdem weitermachen?';
-                        return Window.confirm(alertStr);
-                    
-                    } else {
-                        var alertStr = 'Could not check graphic sizes, continue?';
-                        return Window.confirm(alertStr);
                     }
                 break;
+
             }
+            return sizesMatch;
         },
 
         get_order : function () {

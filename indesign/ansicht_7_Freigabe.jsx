@@ -12,13 +12,18 @@ function main() {
     #include 'MonoNamer.jsx'
     #include 'MonoGraphic.jsx'
     #include 'MonoPrint.jsx'
+    #include 'MonoMockup.jsx'
+    #include 'MonoTable.jsx'
     #include 'MonoFilm.jsx'
+    #include 'MonoSep.jsx'
+    #include 'Typeahead.jsx'
+    #include 'TexAdder.jsx'    
     #include 'InteractSwitch.jsx'
     #include 'save_Options.jsx'
 
     var job = new Job(null,false);
     var pm = new Pathmaker(job.nfo);
-    var jobFolder = new JobFolder(job.nfo.folder);
+    //var jobFolder = new JobFolder(job.nfo.folder);
 
     function get_docs () 
     {
@@ -107,46 +112,14 @@ function main() {
         return result;
     }
 
-    function check_sizes (ansichtDoc) 
-    {
-        var mismatches = [];
-        for(var i=0; i<ansichtDoc.allGraphics.length; i++){
-            var g = ansichtDoc.allGraphics[i];
-            var fN = g.properties.itemLink.name;
-            var isOnPrintLayer = g.properties.itemLayer == ansichtDoc.layers.item('Prints');
-            var isOnPreviewPage = g.parentPage.appliedMaster == ansichtDoc.masterSpreads.item('C-Preview');
-            if( isOnPrintLayer && !isOnPreviewPage) {
-                var monoGraphic = new MonoGraphic(g);
-                if(!monoGraphic.check_size()) {
-                    mismatches.push(monoGraphic.fileName);
-                }
-            }
-        }
-
-        if(mismatches.length > 0) {
-            var chkStr = 'Size of Preview does not match Film:\n';
-            chkStr += mismatches.join('\n');
-            alert(chkStr);
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     function print_docs (docs, print)
     {
-        // Ansichten ausdrucken
-        var i, maxI, doc, rowConts;
-        for(i=0, maxI = docs.ansichten.length; i<maxI; i+=1){
-            doc = app.open(docs.ansichten[i],true);
-
-            if(!check_sizes(doc)) {
-                doc.close(SaveOptions.YES);
-                return false;
-            }
+        // Ansichten ausdrucken       
+        for(var i=0; i < docs.ansichten.length; i+=1){
+            var doc = app.open(docs.ansichten[i],true);
             
-            rowConts = f_id_mock.read_tables(doc);
-            rowObjs = f_id_mock.generate_wawi_strings(rowConts);
+            var rowConts = f_id_mock.read_tables(doc);
+            var rowObjs = f_id_mock.generate_wawi_strings(rowConts);
             if(print) {doc.print(false, muPPreset)}
         }
                     
@@ -179,6 +152,31 @@ function main() {
 
     if(filesToPrint.ansichten.length < 1 && !filesToPrint.filmhuelle) {
         return;
+    }
+
+    var  errors = [];
+    for (var i = 0; i < filesToPrint.ansichten.length; i++) 
+    {
+        var monoMockup = new MonoMockup(app.open(filesToPrint.ansichten[i],true));
+        for (var j = 0; j < monoMockup.doc.pages.length; j++) 
+        {
+            var myPage = monoMockup.doc.pages[j];
+            var isOnPreviewPage = myPage.appliedMaster == monoMockup.doc.masterSpreads.item('C-Preview');
+            if(isOnPreviewPage) continue;
+            var monoGraphics = monoMockup.get_monoGraphics(myPage, monoMockup.layers.prints);
+            for (var k = 0; k < monoGraphics.length; k++) 
+            {
+                var mG = monoGraphics[k];
+                if(!mG.check_size()) 
+                {   
+                    errors.push(mG);
+                }
+            }
+        }
+    }
+    if(errors.length > 0) {
+        var alertStr = 'Druckgrößen in Ansicht weicht von Druckdaten ab / konnten nicht geprüft werden.\nTrotzdem weitermachen?';
+        if(!Window.confirm(alertStr)) return null;
     }
 
     var rowObjs; // objs containing the strings extracted from the mockup to copy to wawi    

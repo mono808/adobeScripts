@@ -1,4 +1,4 @@
-﻿function MonoMockup () 
+﻿function MonoMockup (initDoc) 
 {
     var csroot = Folder($.getenv("csroot"));
     this.templates = {
@@ -16,6 +16,8 @@
     this.scale;
     this.masterPages = {};
     this.layers = {};
+
+    if(initDoc && initDoc.constructor.name == 'Document') this.init(initDoc);
 };
 
 MonoMockup.prototype.typeahead = new Typeahead();
