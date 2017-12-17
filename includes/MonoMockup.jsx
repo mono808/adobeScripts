@@ -708,6 +708,20 @@ MonoMockup.prototype.get_monoGraphics = function (myPage,myLayer)
     return myGraphics;
 };
 
+MonoMockup.prototype.get_all_monoGraphics = function () 
+{
+    var printsLayer = this.layers.prints;
+    var previewMaster = this.doc.masterSpreads.item('C-Preview');
+    var monoGraphics = [];
+    for (var i = 0; i < this.doc.allGraphics.length; i++) {
+        var graphic = this.doc.allGraphics[i];
+        if(graphic.parent.itemLayer != printsLayer) continue;
+        if(graphic.parentPage.appliedMaster == previewMaster) continue;
+        monoGraphics.push(new MonoGraphic(graphic));
+    }
+    return monoGraphics;
+};
+
 MonoMockup.prototype.write_graphic_infos_to_table = function (myTable, myGraphics) 
 {
     function get_textil_nfo_from_user(myGraphic) {

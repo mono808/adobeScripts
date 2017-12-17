@@ -1,4 +1,4 @@
-﻿var f_all = {
+var f_all = {
 
     is_number : function (n) {
       return !isNaN(parseFloat(n)) && isFinite(n);

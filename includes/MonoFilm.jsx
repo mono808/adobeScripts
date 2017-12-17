@@ -1,4 +1,4 @@
-﻿function MonoFilm (film, hidden)
+﻿function MonoFilm (initObj, hidden)
 {
     this.hidden = hidden || false;
     this.filmWidth = 420;
@@ -8,6 +8,12 @@
         {w:300,h:420,name:'a3',align:'top'},
         {w:120,h:300,name:'ar',align:'top'},
     ];
+    this.backgroundColor = {
+        space:ColorSpace.RGB,
+        model:ColorModel.PROCESS,
+        colorValue:[214,255,207],
+        name:'bgColor'
+    };
     this.colors = {};
     this.layers = {};
     this.sep = {};
@@ -15,34 +21,39 @@
     this.vLine = null;
     this.hLine = null;
     this.type;
-    
-    if(film) {
-        if (film instanceof File) {
-            this.filmFile = film;
-            this.filmDoc = app.open(film, false);
-        } else if (film && film.constructor.name == 'Document'){
-            this.filmDoc = film;
+
+    if(initObj) {
+        if (initObj instanceof File && initObj.exists) {
+            this.init(app.open(initObj, false));
+        } else if (initObj instanceof 'Document'){
+            this.init(initObj);
         }
     }
-
-    if(!this.filmDoc) this.filmDoc = this.create_template(hidden);
-    this.init();
 };
 
-MonoFilm.prototype.init = function () 
-{
-    this.masterSpread  = this.filmDoc.masterSpreads.item('A-Musterseite');
-    this.filmPage = this.filmDoc.pages.item(0);
-    this.colors.reg = this.filmDoc.colors.item('Registration');
-    this.colors.none = this.filmDoc.swatches.item('None');
+MonoFilm.prototype.init = function (initDoc) {
 
-    with (this.filmDoc.viewPreferences){
+    this.filmDoc = initDoc;
+    this.filmFile = initDoc.saved ? initDoc.fullName : null;
+    this.filmPage = initDoc.pages.item(0);
+    this.masterSpread  = initDoc.masterSpreads.item('A-Musterseite');   
+    try {
+        var bgColor = initDoc.colors.itemByName('bgColor');
+        var check = bgColor.name;        
+    } catch(e) {
+        var bgColor = initDoc.colors.add(this.backgroundColor);
+    }
+    this.colors.bg = bgColor;
+    this.colors.reg = initDoc.colors.item('Registration');
+    this.colors.none = initDoc.swatches.item('None');
+
+    with (initDoc.viewPreferences){
         horizontalMeasurementUnits = MeasurementUnits.millimeters;
         verticalMeasurementUnits = MeasurementUnits.millimeters;
         rulerOrigin = RulerOrigin.pageOrigin;
     }
 
-    with (this.filmDoc.textDefaults) {
+    with (initDoc.textDefaults) {
         appliedFont = app.fonts.item('Myriad Pro');
         justification = Justification.LEFT_ALIGN;
         pointSize = 8;
@@ -51,12 +62,12 @@ MonoFilm.prototype.init = function ()
     }
 
     try {
-        var vL = this.filmDoc.guides.item('vLine');
-        $.writeln(vL.name);
+        var vL = initDoc.guides.item('vLine');
+        //$.writeln(vL.name);
         vL.label = vL.name = 'vLine';
         this.vLine = vL;
-        var hL = this.filmDoc.guides.item('hLine');
-        $.writeln(hL.name);
+        var hL = initDoc.guides.item('hLine');
+        //$.writeln(hL.name);
         hL.label = hL.name = 'hLine';
         this.hLine = hL;
     } catch (e) {}
@@ -68,7 +79,7 @@ MonoFilm.prototype.init = function ()
     this.layers.colors = this.check_create_layer('farbenEbene', 'colors');
     this.layers.reg    = this.check_create_layer('passerEbene', 'reg');
     
-    this.filmDoc.activeLayer = this.layers.sep;
+    initDoc.activeLayer = this.layers.sep;
 
     this.get_sep();
     //if(!this.hidden) this.type = this.get_type();
@@ -90,33 +101,22 @@ MonoFilm.prototype.create_template = function ()
         right = 0;
     }
 
-    this.filmDoc = app.documents.add(!this.hidden, myDocPreset, {});
-    this.masterSpread  = this.filmDoc.masterSpreads.item('A-Musterseite');
-    this.filmPage = this.filmDoc.pages.item(0);
-    this.colors.reg = this.filmDoc.colors.item('Registration');
-    this.colors.none = this.filmDoc.swatches.item('None');
-
-    if(!this.hidden) this.filmDoc.layoutWindows.item(0).viewDisplaySetting = ViewDisplaySettings.OPTIMIZED;
-    this.filmDoc.transparencyPreferences.blendingSpace = BlendingSpace.RGB;
-
+    var newDoc = app.documents.add(!this.hidden, myDocPreset, {});
+    newDoc.transparencyPreferences.blendingSpace = BlendingSpace.RGB;
+    if(!this.hidden) {
+        newDoc.layoutWindows.item(0).viewDisplaySetting = ViewDisplaySettings.OPTIMIZED;
+    }
+    
     // remove default Swatches
-    for (var i = this.filmDoc.swatches.length-1; i >= 0; i -= 1) {
-        var swatch = this.filmDoc.swatches[i];
+    for (var i = newDoc.swatches.length-1; i >= 0; i -= 1) {
+        var swatch = newDoc.swatches[i];
         if(swatch.name != 'Registration' && swatch.name != 'None' && swatch.name != 'Paper' && swatch.name != 'Black') {
             swatch.remove();
         }
     }
 
-    var backgroundColor = {
-        space:ColorSpace.RGB,
-        model:ColorModel.PROCESS,
-        colorValue:[214,255,207],
-        name:'bgColor'
-    };
-    this.colors.bg = this.filmDoc.colors.add(backgroundColor);
-
-    this.layers.guides = this.filmDoc.layers.item(this.filmDoc.layers.length-1);
-    with (this.layers.guides) {
+    var guidesLayer = newDoc.layers.item(newDoc.layers.length-1);
+    with (guidesLayer) {
         name = 'guides';
         printable = false;
         visible = true;
@@ -136,8 +136,10 @@ MonoFilm.prototype.create_template = function ()
         fitToPage:false
     };
 
-    this.vLine = this.filmDoc.guides.add(undefined, vLine);
-    this.hLine = this.filmDoc.guides.add(undefined, hLine);
+    var vLine = newDoc.guides.add(undefined, vLine);
+    var hLine = newDoc.guides.add(undefined, hLine);
+
+    this.init(newDoc);
 
     // create guide objects and a colored background
     for (var i = 0, maxI = this.guideRecs.length; i < maxI; i += 1) {
@@ -145,9 +147,9 @@ MonoFilm.prototype.create_template = function ()
     }
     
     // lock the guidesLayer so it does not interfer when manually placing a graphicfile
-    this.layers.guides.locked = true;
+    guidesLayer.locked = true;
 
-    return this.filmDoc;
+    return newDoc;
 };
 
 MonoFilm.prototype.check_create_layer = function (/* ... */)
@@ -158,7 +160,7 @@ MonoFilm.prototype.check_create_layer = function (/* ... */)
             var name = arguments[i];
             try {
                 var l = this.filmDoc.layers.itemByName(name);
-                $.writeln(l.name);
+                //$.writeln(l.name);
                 if(l.name != target) {l.name = target}
                 return l;
             } catch (e) {}
@@ -174,7 +176,7 @@ MonoFilm.prototype.get_layer = function(/*...*/)
             var name = arguments[i];
             try {
                 var l = this.filmDoc.layers.itemByName(name);
-                $.writeln(l.name);
+                //$.writeln(l.name);
                 return l;
             } catch (e) {}
         }
@@ -227,7 +229,7 @@ MonoFilm.prototype.place_sep = function (graphicFile, width, height, displacemen
         sepCoor.x = xRef + displacement;
         sepCoor.y = 100;
         this.sep.rect.move( [sepCoor.x, sepCoor.y] );
-        $.writeln('Sep placed according to PlacementInfos');
+        //$.writeln('Sep placed according to PlacementInfos');
 
     } else {
         // center sep on page
@@ -322,7 +324,7 @@ MonoFilm.prototype.add_jobInfo = function (job)
     return infoTF;
 };
 
-MonoFilm.prototype.add_spotInfo = function ()
+MonoFilm.prototype.add_spotInfo_numbered = function ()
 {
     this.layers.colors = this.check_create_layer('farbenEbene','colors');
     this.filmDoc.activeLayer = this.layers.colors;    
@@ -681,6 +683,7 @@ MonoFilm.prototype.save = function (job, showDialog, close)
 
     if(saveFile)
         this.filmDoc.save(saveFile);
+        this.filmFile = this.filmDoc.fullName;
     
     if(close)
         saveDoc.close();
@@ -765,12 +768,15 @@ MonoFilm.prototype.get_sepWidth = function ()
     return sepWidth;
 };
 
-MonoFilm.prototype.close = function ()
+MonoFilm.prototype.close = function (saveOpts)
 {
-
     if(!this.filmDoc.saved) {
         alert('Film wurde noch nicht gespeichert, bitte erst abspeichern');
         return;
     }
-    this.filmDoc.close();
+    if(saveOpts) {
+        this.filmDoc.close(saveOpts);
+    } else {       
+        this.filmDoc.close();
+    }
 };

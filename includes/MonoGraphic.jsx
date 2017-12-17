@@ -2,7 +2,7 @@
 {
     var check_folder = function (fldr) {
         var jobFolder;
-        if (fldr.displayName.match(rE.jobNr)) {
+        if (fldr.displayName.match(reJobNr)) {
             jobFolder = fldr;
         } else {
             jobFolder = check_folder(fldr.parent)
@@ -26,7 +26,7 @@
         x2 = (gB1[3] < gB2[3]);
         return (y1 && x1 && y2 && x2);
     };
-
+    var reJobNr = /\d{1,5}(wme|ang|cs|a)\d\d-0\d\d/i;
     var ref = myGraphic;
     var doc = myGraphic.parentPage.parent.parent;
     var docScale =doc.documentPreferences.pageWidth/ 297;
@@ -35,8 +35,8 @@
     var filePath = myGraphic.properties.itemLink.filePath;
     var myFile = File(filePath);
     var myFolder = myFile.parent;
-    var jobFolder = check_folder(myFolder);
-    var monoPrint = new MonoPrint(myFile, jobFolder);
+    var jobFolder;
+    var monoPrint;
 
     var divider = doc.guides.item('sideDivider');
     var side = myGraphic.geometricBounds[3] < divider.location ? 'Front' : 'Back';
@@ -61,10 +61,14 @@
         },
 
         get_printId : function () {
+            if(!jobFolder) jobFolder = check_folder(myFolder);
+            if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
             return monoPrint.id ? monoPrint.id : '...';
         },
 
         get_tech : function () {
+            if(!jobFolder) jobFolder = check_folder(myFolder);
+            if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
             return monoPrint.tech ? monoPrint.tech : '...';
         },
 
@@ -94,6 +98,8 @@
         },
     
         get_file : function (fileType) {
+            if(!jobFolder) jobFolder = check_folder(myFolder);
+            if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
             if(monoPrint.hasOwnProperty(fileType) && monoPrint[fileType] && monoPrint[fileType] instanceof File) {
                 return monoPrint[fileType]
             } else {
@@ -138,7 +144,8 @@
         },
 
         get_colors : function () {
-
+            if(!jobFolder) jobFolder = check_folder(myFolder);
+            if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
             switch (monoPrint.tech.toUpperCase()) {
                 case 'SD' :
                     if(monoPrint.film) {
@@ -169,6 +176,8 @@
         check_size : function () {
             var placedWidth = this.get_width();
             var sizesMatch;
+            if(!jobFolder) jobFolder = check_folder(myFolder);
+            if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
             switch(monoPrint.tech.toUpperCase()) {
                 case 'SD' :               
                     if(monoPrint.film) {

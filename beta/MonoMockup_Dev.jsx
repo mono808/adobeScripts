@@ -17,7 +17,11 @@ function main () {
     #include 'MonoSep.jsx'
     #include 'Typeahead.jsx'
     #include 'TexAdder.jsx'
-    
+
+    for (var i = 0; i < app.documents.length; i++) {
+        app.documents[i].close(SaveOptions.NO);
+    }
+
     var job = new Job(null,false);
     var pm = new Pathmaker(job.nfo);
     //var typeahead = new Typeahead();

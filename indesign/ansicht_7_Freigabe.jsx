@@ -1,5 +1,60 @@
 ﻿#target indesign
 
+function select_docs (arrayOfFiles) {
+    var selectedFiles = [];
+    var checkBoxes = [];
+    var w = new Window ("dialog");
+    w.alignChildren = "fill";
+    
+    var checkPnl = w.add("panel");
+    checkPnl.alignChildren = "left";
+    
+    var btnGrp   = w.add("group");
+    btnGrp.alignChildren = "fill";
+    
+    for (var i = 0; i < arrayOfFiles.length; i++) {
+        checkBoxes.push(checkPnl.add ("checkbox", undefined, "\u00A0"+arrayOfFiles[i].displayName));
+    }
+    
+    var print = btnGrp.add ("button", undefined, "Print");
+    print.onClick = function () {
+        for (var i = 0; i < checkBoxes.length; i++){
+            if(checkBoxes[i].value) {
+                selectedFiles.push(arrayOfFiles[i]);
+            }
+        }
+        w.close();
+    }
+
+    var cancel = btnGrp.add("button", undefined, "Cancel");
+    cancel.onClick = function () {
+        selectedFiles = [];
+        w.close()
+    }
+    
+    w.show ();
+
+    return selectedFiles;
+}
+
+function print_docs (myFiles)
+{
+    var fhPPreset = app.printerPresets.item('filmhuelle');
+    var muPPreset = app.printerPresets.item('printMockup');
+
+    for(var i = 0; i < myFiles.length; i++ ) {
+        var myFile = myFiles[i];
+        var doc = app.open(myFile,true);
+        if(myFile.displayName.match(/Ansicht\.indd/i)) {            
+            doc.print(false, muPPreset);
+            doc.close(SaveOptions.ASK);
+        } else {
+            doc.print(false, fhPPreset);
+            doc.close(SaveOptions.YES);
+        }
+    }
+}
+
 function main() {
     
     #includepath '/c/repos/adobeScripts1/includes/'
@@ -8,6 +63,7 @@ function main() {
     #include 'f_id.jsx'
     #include 'f_id_mock.jsx'
     #include 'Job.jsx'
+    #include 'JobFolder.jsx'
     #include 'Pathmaker.jsx'
     #include 'MonoNamer.jsx'
     #include 'MonoGraphic.jsx'
@@ -23,175 +79,56 @@ function main() {
 
     var job = new Job(null,false);
     var pm = new Pathmaker(job.nfo);
-    //var jobFolder = new JobFolder(job.nfo.folder);
-
-    function get_docs () 
-    {
-        var myDocs = {
-            ansichten : [],
-            filmhuelle : null,
-        };
-        
-        var mockUps = pm.folder('ansicht').getFiles('*.indd');
-        var i, maxI;            
-        for(i = 0, maxI = mockUps.length; i < maxI; i += 1){
-            //if(mockUps[i] instanceof File && rE.doc.test(decodeURI(mockUps[i].name))) {
-            if(mockUps[i] instanceof File) {
-                myDocs.ansichten.push(mockUps[i]);
-            }
-        }
-        
-        var filmhuelle = pm.file('filmhuelle');
-        if(filmhuelle.exists) {
-            myDocs.filmhuelle = filmhuelle;
-        }
-        return myDocs;
-    }
-
-    function choose_docs (allDocs)
-    {
-        var result = {
-            ansichten : [],
-            filmhuelle : null
-        };
-        
-        var win = new Window('dialog {text: "Dokumente ausdrucken: ", alignChildren: "fill"}');
-        win.spacing = 4;
-        
-        var ansPnl = win.add('panel', undefined, '');
-        ansPnl.alignChildren = 'left';
-        
-        if(allDocs.filmhuelle) {
-            var fhPnl = win.add('panel', undefined, '');
-            fhPnl.alignChildren = 'left';
-        }
-        
-        var btnGrp = win.add('group', undefined, '');
-        btnGrp.alignment = 'right';
-        
-
-        var i,
-            maxI,
-            ansicht;
-
-        for (i = 0, maxI = allDocs.ansichten.length; i < maxI; i += 1) 
-        {
-            ansicht = allDocs.ansichten[i];
-            ansPnl[i] = ansPnl.add("checkbox", undefined, decodeURI(ansicht.name));
-            ansPnl[i].value = false;
-        };
-
-        if(fhPnl) {var fhChkbox = fhPnl.add('checkbox', undefined, 'Filmhülle');}
-
-        btnGrp.yes = btnGrp.add('button', undefined, 'Ok');
-        btnGrp.no =  btnGrp.add('button', undefined, 'Abbrechen');
-
-        btnGrp.yes.onClick = function () {
-
-            var i, maxI, chkbx;
-            for (i=0, maxI = ansPnl.children.length; i<maxI; i+=1) {
-                chkbx = ansPnl.children[i];
-                if(chkbx.value) {
-                    result.ansichten.push(allDocs.ansichten[i]);
-                }
-            }
-            
-            if(fhChkbox && fhChkbox.value) {
-                result.filmhuelle = allDocs.filmhuelle;
-            }
-
-            win.close();
-        };
-
-        btnGrp.no.onClick = function() {
-            result = null;
-            win.close();
-        };
-               
-        win.show();
-        return result;
-    }
-
-    function print_docs (docs, print)
-    {
-        // Ansichten ausdrucken       
-        for(var i=0; i < docs.ansichten.length; i+=1){
-            var doc = app.open(docs.ansichten[i],true);
-            
-            var rowConts = f_id_mock.read_tables(doc);
-            var rowObjs = f_id_mock.generate_wawi_strings(rowConts);
-            if(print) {doc.print(false, muPPreset)}
-        }
-                    
-        if (print && docs.filmhuelle) {
-            doc = app.open(docs.filmhuelle);
-            doc.print(false, fhPPreset);
-            doc.close(SaveOptions.YES);
-        }
-
-        return true;
-    }
+    var jobFolder = new JobFolder(job.nfo.folder);
 
     var iASwitch = new InteractSwitch();
     iASwitch.set('none');
 
-    var fhPPreset = app.printerPresets.item('filmhuelle');
-    var muPPreset = app.printerPresets.item('printMockup');
+    var myDocs = jobFolder.get_mockups();
+    var filmhuelle = jobFolder.get_filmhuelle();
+    if(filmhuelle) myDocs.push(filmhuelle[0]);
 
-    var myDocs = get_docs();    
+    var filesToPrint = select_docs(myDocs);
+    if(filesToPrint.length < 1) return;
 
-    var filesToPrint = choose_docs(myDocs);
+    var errors = [];
+    var rowContents = [];
+    
+    // loop through all files
+    for (var i = 0; i < filesToPrint.length; i++) {
+        var myFile = filesToPrint[i];
+        if(myFile.displayName.match(/Ansicht\.indd/i)) {
+            var monoMockup = new MonoMockup(app.open(myFile,true));
+            for (var j = 0; j < monoMockup.doc.pages.length; j++) {
+                var monoTable = new MonoTable(monoMockup.doc.pages[j]);
+                var pageRowContents = monoTable.read_rows();
+                if(pageRowContents) {
+                    rowContents = rowContents.concat(pageRowContents);
+                }
+            }
 
-    ///////////////////////////
-    // var ok = ;
-    // for(var i = 0; i < filesToPrint.ansichten; i+=1) {
-    //     var 
-    // }
-    // var ok = check_sizes(filesToPrint.ansichten);
-    //////////////////////////
+            var monoGraphics = monoMockup.get_all_monoGraphics();
 
-    if(filesToPrint.ansichten.length < 1 && !filesToPrint.filmhuelle) {
-        return;
-    }
-
-    var  errors = [];
-    for (var i = 0; i < filesToPrint.ansichten.length; i++) 
-    {
-        var monoMockup = new MonoMockup(app.open(filesToPrint.ansichten[i],true));
-        for (var j = 0; j < monoMockup.doc.pages.length; j++) 
-        {
-            var myPage = monoMockup.doc.pages[j];
-            var isOnPreviewPage = myPage.appliedMaster == monoMockup.doc.masterSpreads.item('C-Preview');
-            if(isOnPreviewPage) continue;
-            var monoGraphics = monoMockup.get_monoGraphics(myPage, monoMockup.layers.prints);
-            for (var k = 0; k < monoGraphics.length; k++) 
-            {
+            for (var k = 0; k < monoGraphics.length; k++) {
                 var mG = monoGraphics[k];
-                if(!mG.check_size()) 
-                {   
+                if(!mG.check_size()) {   
                     errors.push(mG);
                 }
             }
         }
     }
+
     if(errors.length > 0) {
         var alertStr = 'Druckgrößen in Ansicht weicht von Druckdaten ab / konnten nicht geprüft werden.\nTrotzdem weitermachen?';
         if(!Window.confirm(alertStr)) return null;
     }
 
-    var rowObjs; // objs containing the strings extracted from the mockup to copy to wawi    
-
-    var ok = print_docs(filesToPrint, true);
+    // objs containing the strings extracted from the mockup to copy to wawi    
+    print_docs(filesToPrint);
 
     iASwitch.set('all');
     //if(ok) f_id_mock.create_ui(rowObjs, job);
     if(ok) f_id_mock.create_wawi_string_dialog(rowObjs, job);
 }
 
-function check() {    
-    return true;
-}
-
-if(check()){
-    main();
-}
+main();

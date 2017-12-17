@@ -35,6 +35,7 @@
             var myTF = myPage.textFrames.item('printTableFrame');
             var check = myTF.name;
             var myTable = myTF.tables.item(0);
+            check = myTable.name;
             return myTable;
         } catch(e) {
             return null;
@@ -44,7 +45,7 @@
     var create_table = function (myPage) {
         
         myTable = get_table(myPage);
-        if(myTable)myTable.remove();
+        if(myTable && myTable.name)myTable.remove();
         
         var tFBounds = myDoc.masterSpreads.item('A-FixedStuff').pageItems.item('printTabFrame').geometricBounds;
         var myTF = myPage.textFrames.add({geometricBounds:tFBounds, itemLayer:myLayer, name: 'printTableFrame'});
@@ -102,7 +103,7 @@
 
     var get_row_by_id = function(id) {
         if(!myTable) return null;
-        var cellIndex = columnOrder.graphicId;
+        var cellIndex = columnOrder.id;
         for (var i = 0; i < myTable.rows.length; i++) {
             if(myTable.rows[i].cells[cellIndex].contents == id) {
                 return myTable.rows[i];
@@ -177,7 +178,8 @@
 
     var read_monoGraphic = function (monoGraphic) {
         var rC = {};
-
+        var monoNamer = new MonoNamer();
+        
         rC.textilName = monoGraphic.get_textil_name();
         rC.textilColor = monoGraphic.get_textil_color();
         rC.printId = monoNamer.name('printId', monoGraphic.get_printId());
@@ -186,7 +188,7 @@
         rC.stand = monoGraphic.get_stand();
         rC.tech = monoNamer.name('tech', monoGraphic.get_tech());
         rC.colors = monoGraphic.get_colors().join(', ');
-        rC.graphicId = monoGraphic.get_id();
+        rC.id = monoGraphic.get_id();
 
         return rC;
     };
@@ -227,6 +229,45 @@
         return rC;
     };
 
+    var choose_id_dialog = function (rows) {
+        var w = new Window ("dialog");
+        w.alignChildren = "fill";
+        w.add("statictext", undefined, "keine passende Tabellenzeile gefunden.\rNeue Zeilen ID wählen:");
+        var radio_group = w.add ("panel");
+        radio_group.alignChildren = "left";
+        for (var i = 0; i < rows.length; i++) {
+            radio_group.add ("radiobutton", undefined, rows[i].cells.item(columnOrder['id']).contents);
+        }
+        
+        w.add ("button", undefined, "OK");
+        // set dialog defaults
+        radio_group.children[0].value = true;
+        function selected_rbutton (rbuttons) {
+            for (var i = 0; i < rbuttons.children.length; i++) {
+                if (rbuttons.children[i].value == true) {
+                    return i;
+                }
+            }
+        }
+        if (w.show () == 1) {
+            return rows[selected_rbutton (radio_group)];
+        }
+    }
+
+    var update_row_id = function (newID) {
+        var rows = [];
+        for (var i = 1; i < myTable.rows.length; i++) {
+            rows.push(myTable.rows[i]);
+        }
+
+        var selectedRow = choose_id_dialog(rows);
+        if(selectedRow) {
+            selectedRow.cells.item(columnOrder['id']).contents = newID.toString();
+            return selectedRow;
+        }
+        return null;
+    };
+
     var columnOrder = {
         run : 0,
         textilName : 1,
@@ -236,15 +277,15 @@
         stand : 5,
         tech : 6,
         colors : 7,
-        graphicId: 8
+        id: 8
     };
-    var monoNamer = new MonoNamer();
+    
     var myDoc;
     var myLayer;
     var docScale;
     var myTable;
-	//var tableInitString = 'Menge:\tArtikel:\tFarbe(n):\tPosition:\tBreite (mm):\tDruckstand:\tVerfahren:\tDruckfarben:\rx\tx\tx\tx\tx\tx\tx\tx\r';
-    var tableInitString = 'Menge:\tArtikel:\tFarbe(n):\tPosition:\tBreite (mm):\tDruckstand:\tVerfahren:\tDruckfarben:\tId:\r';    
+    var tableInitString = 'Menge:\tArtikel:\tFarbe(n):\tPosition:\tBreite (mm):\tDruckstand:\tVerfahren:\tDruckfarben:\tId:\r';
+    var lastRowContents;
 
     if(initPage && initPage.constructor.name == 'Page') init(initPage);
 
@@ -261,7 +302,14 @@
         add_row : function (monoGraphic) {
             if(!myTable) return null;
             var rowContents = read_monoGraphic(monoGraphic);
-            rowContents = get_user_input(rowContents);
+            if(lastRowContents && lastRowContents.beidseitig) {
+                rowContents.run = '';
+                rowContents.textilName = '';
+                rowContents.textilColor = ''; 
+            } else {
+                rowContents = get_user_input(rowContents);
+            }
+            
             rowContents.stand = make_standString (rowContents);
             
             var lastRow = myTable.rows.lastItem();
@@ -272,8 +320,41 @@
             }
             
             write_nfo_to_row(myRow, rowContents);
+            lastRowContents = rowContents;
         },
-        
+
+        read_rows : function () {
+            if(!myTable) return null;
+            var rowContents = [];
+            for (var i = 1; i < myTable.rows.length; i++) {
+                var rC = read_nfo_from_row(myTable.rows[i])
+                rowContents.push(rC);
+            }
+            return rowContents;
+        },
+
+        update_stand : function (monoGraphic) {
+            if(!myTable) return null;
+            if(!monoGraphic) return null;
+            
+            var id = monoGraphic.get_id();            
+            
+            var myRow = get_row_by_id(id);
+            if(!myRow) {myRow = update_row_id(id);}
+            if(!myRow) return;
+            
+            var oldContents = read_nfo_from_row(myRow);
+            var rC = {
+                height : monoGraphic.get_height().toFixed(0),
+                width : monoGraphic.get_width().toFixed(0),
+                stand : monoGraphic.get_stand(),
+            };
+            rC.stand = update_standString(rC, oldContents);
+            
+            myRow.cells.item(columnOrder['stand']).contents = rC.stand;
+            myRow.cells.item(columnOrder['width']).contents = rC.width;
+        },
+
         update_row : function (monoGraphic, getUserInput) {
             if(!myTable) return null;
             if(!monoGraphic) return null;
@@ -282,7 +363,7 @@
                 newContents = get_user_input(newContents);
             }
 
-            var myRow = get_row_by_id(newContents.graphicId);
+            var myRow = get_row_by_id(newContents.id);
             if(myRow) {
                 var oldContents = read_nfo_from_row(myRow);
                 newContents.stand = update_standString(newContents, oldContents);

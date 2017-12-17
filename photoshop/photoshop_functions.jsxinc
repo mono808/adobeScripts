@@ -1,0 +1,905 @@
+﻿function get_guide_location(myDoc) 
+{
+    if(myDoc.guides.length > 0 && myDoc.guides.length < 3) 
+    {
+        var defaultPos = {};
+        defaultPos.x = new UnitValue(myDoc.width.value/2*-1, 'mm');
+        defaultPos.y = new UnitValue(80, 'mm');
+        
+        var 
+        guidePos = {},
+        hasVerticalGuide = false,
+        i,
+        myGuide;
+        for (i = 0; i < myDoc.guides.length; i+=1) {
+            myGuide = myDoc.guides[i];
+            if (myGuide.direction === Direction.VERTICAL) {
+                hasVerticalGuide = true;
+                guidePos.x = myGuide.coordinate*-1;
+            } else {
+                guidePos.y = myGuide.coordinate*-1;
+            }
+        }
+
+        var info = 'Dokument enthält Hilfslinien. Sollen diese zur Platzierung verwenden werden?';
+        info += '\n\nBenötigt wird genau eine vertikale Hilflinie zur Markierung der Shirt-/ Beutelmitte.';
+        info += 'Optional ist eine zweite waagerechte HL zur Markierung der Kragennaht / Taschenkante';
+        if(hasVerticalGuide && Window.confirm(info))
+        {
+            guidePos.y = guidePos.y || defaultPos.y;
+            return guidePos;
+        }
+    } else {
+        alert('Dokument enthält keine oder zu viele Hilfslinien, Motiv wird mittig platziert!');
+        return defaultPos;
+    }
+}
+
+function trim_doc(myDoc)
+{
+    var trims = ['TOPLEFT', 'BOTTOMRIGHT', 'NOE'];
+    var trim = f_all.choose_from_array(trims, undefined, 'Bild zuschneiden?');
+    if(trim != 'NOE') {
+        myDoc.trim(TrimType[trim]);
+    }
+    return myDoc;
+}
+
+function remove_component_channels(myDoc) 
+{
+    var i,chan;
+    if (myDoc.componentChannels.length > 0) {
+        myDoc.activeChannels = myDoc.componentChannels;
+        for (i = myDoc.componentChannels.length-1; i >= 0; i-=1) {
+            chan = myDoc.channels[i];
+            chan.remove();
+        };
+    };
+    return myDoc;
+}
+    
+function remove_alpha_channels(myDoc, containTeeChannel) 
+{
+    var i,
+        chan,
+        teeColor;
+
+    i = myDoc.channels.length-1;
+    do{
+        chan = myDoc.channels[i];
+        if(chan.kind === ChannelType.MASKEDAREA || chan.kind === ChannelType.SELECTEDAREA) {
+            if(/tee|shirt|tasche|beutel/i.test(chan.name)) {
+                teeColor = chan.color;
+                if(containTeeChannel) {
+                    continue;
+                }
+            }
+            chan.remove();
+        };
+    }while(i--);
+
+    return teeColor;
+}
+    
+function recolor_white_spotchannels(myDoc) 
+{
+    var 
+    i,
+    maxI,
+    chan,
+    chanColor,
+    ubNames = /^(Unterleger|UL|UB|Underbase|Weiß1|Vordruck)$/i,
+    w1Names = /^(Weiß|White|Weiß2|HL)$/i,
+    dWNames = /^(UL\+Weiß|UB\+White|UB\+|Weiß1&2|Weiß1\+2)$/i;
+
+    for (i = 0, maxI = myDoc.channels.length; i < maxI; i += 1) {
+        chan = myDoc.channels[i];
+        chan.name = chan.name.replace(/weiss/gi, 'Weiß');
+        if(chan.kind === ChannelType.SPOTCOLOR) {
+            if(ubNames.test(chan.name)) {
+                chanColor = new SolidColor();
+                chanColor.hsb.brightness = 100;
+                chanColor.hsb.hue = 300;
+                chanColor.hsb.saturation = 20;
+                chan.color = chanColor;
+            } else if (w1Names.test(chan.name)) {
+                chanColor = new SolidColor();
+                chanColor.hsb.brightness = 100;
+                chanColor.hsb.hue = 120;
+                chanColor.hsb.saturation = 20;
+                chan.color = chanColor;
+            } if (dWNames.test(chan.name)) {
+                chanColor = new SolidColor();
+                chanColor.hsb.brightness = 100;
+                chanColor.hsb.hue = 210;
+                chanColor.hsb.saturation = 20;
+                chan.color = chanColor;                    
+            }
+        }
+    }
+    return myDoc;
+}
+
+function rename_cmyk(myDoc) 
+{
+    var forbiddenNames = /^(Cyan|Magenta|Yellow|Gelb|Black|Schwarz)$/i,
+        i,
+        chan,
+        renamedChans = [];
+    
+    i = myDoc.channels.length-1;
+    do {
+        chan = myDoc.channels[i];
+        if(chan.kind === ChannelType.SPOTCOLOR) {
+            if(forbiddenNames.test(chan.name) ){
+                renamedChans.push(chan.name);
+                chan.name += ' Ink'
+                renamedChans.push(chan.name);
+            }
+        }
+    }while(i--)
+    
+    if(renamedChans.length > 0) 
+    {
+        var alertString = 'Reserved Channel-Names have been renamed:\r'
+        for(i = 0; i < renamedChans.length; i+=2) 
+        {
+            alertString += renamedChans[i] + ' -> ' + renamedChans[i+1] + '\n';
+        };
+        alert(alertString);
+    }
+    return renamedChans;
+}
+    
+function add_RGB_channels(myDoc) 
+{
+    var activeChans = myDoc.activeChannels;
+    add_Grey_channel(myDoc);
+    myDoc.changeMode(ChangeMode.RGB);
+    myDoc.activeChannels = activeChans;
+    return myDoc;
+}
+
+// requires an active selection 
+// 'RvlS' = reveal selection - 'RvlA' = reveal all - 'HdSl' = hide selection
+function make_layer_mask(maskType) 
+{
+    if( maskType == undefined) maskType = 'RvlS';
+    var desc140 = new ActionDescriptor();
+        desc140.putClass( charIDToTypeID('Nw  '), charIDToTypeID('Chnl') );
+    var ref51 = new ActionReference();
+        ref51.putEnumerated( charIDToTypeID('Chnl'), charIDToTypeID('Chnl'), charIDToTypeID('Msk ') );
+    desc140.putReference( charIDToTypeID('At  '), ref51 );
+    desc140.putEnumerated( charIDToTypeID('Usng'), charIDToTypeID('UsrM'), charIDToTypeID(maskType) );
+    executeAction( charIDToTypeID('Mk  '), desc140, DialogModes.NO );
+}
+
+function add_Grey_channel(myDoc)
+{
+
+    var white,
+        chan;
+
+    white = new RGBColor();
+    white.red = 255;
+    white.green = 255;
+    white.blue = 255;
+       
+    chan = myDoc.channels.add();
+    chan.name = 'Grey';
+    chan.kind = ChannelType.SPOTCOLOR;
+    myDoc.selection.load(chan);
+    myDoc.selection.fill(white);
+    myDoc.activeChannels = [chan];
+    this.move_channel_to_index(1);
+    
+    myDoc.changeMode(ChangeMode.GRAYSCALE);
+    var bgLayer = myDoc.artLayers[0];
+    bgLayer.isBackgroundLayer = false;
+
+    myDoc.selection.selectAll();
+    myDoc.selection.clear();
+
+    return this
+}
+    
+function create_layers_from_spotChannels(myDoc) 
+{
+    try {
+        var bgLayer = myDoc.artLayers.getByName('Hintergrund');
+    } catch(e) {
+        var bgLayer = myDoc.artLayers[0];
+    };
+    
+    bgLayer.isBackgroundLayer = false;
+    myDoc.selection.selectAll();
+    myDoc.selection.clear();
+    
+    var chan,
+        spotLayer,
+        i,
+        maxI;
+    
+    for (i = 3, maxI = myDoc.channels.length; i < maxI; maxI -= 1) {
+        chan = myDoc.channels[i];
+        if (chan.kind === ChannelType.SPOTCOLOR) {
+            
+            myDoc.activeChannels = [chan];
+            myDoc.selection.load(chan);
+            spotLayer = myDoc.artLayers.add();
+            myDoc.activeLayer = spotLayer;
+            myDoc.selection.fill(chan.color);
+            spotLayer.name = chan.name;
+            spotLayer.opacity = 100;
+            chan.remove();
+
+        } else {
+            if (chan.kind === ChannelType.MASKEDAREA || chan.kind === ChannelType.SELECTEDAREA) {
+                chan.remove();
+            }
+        }
+    };
+    myDoc.selection.deselect();                        
+    myDoc.activeChannels = myDoc.componentChannels;
+    return myDoc;
+}
+    
+function merge_spotChannels(myDoc) 
+{
+    try {
+        var bgLayer = myDoc.artLayers.getByName('Hintergrund');
+    } catch(e) {
+        var bgLayer = myDoc.artLayers[0];
+    };
+    
+    bgLayer.isBackgroundLayer = false;
+    myDoc.selection.selectAll();
+    myDoc.selection.clear();        
+    
+    var chan,
+        i,
+        maxI;
+    
+    for (i = 3, maxI = myDoc.channels.length; i < maxI; maxI -= 1) {                            
+        chan = myDoc.channels[i];
+        if (chan.kind == ChannelType.SELECTEDAREA || chan.kind == ChannelType.MASKEDAREA) {
+            chan.kind = ChannelType.SPOTCOLOR;
+        }
+        chan.merge();
+    };            
+
+    myDoc.selection.deselect();                        
+    myDoc.activeChannels = myDoc.componentChannels;
+    return myDoc;
+}
+    
+function move_channel_to_index(idx) 
+{
+    try {
+        var idmove = charIDToTypeID( "move" );
+        var desc3 = new ActionDescriptor();
+        var idnull = charIDToTypeID( "null" );
+        var ref2 = new ActionReference();
+        var idChnl = charIDToTypeID( "Chnl" );
+        var idOrdn = charIDToTypeID( "Ordn" );
+        var idTrgt = charIDToTypeID( "Trgt" );
+        ref2.putEnumerated( idChnl, idOrdn, idTrgt );
+        desc3.putReference( idnull, ref2 );
+        var idT = charIDToTypeID( "T   " );
+        var ref3 = new ActionReference();
+        var idChnl = charIDToTypeID( "Chnl" );
+        ref3.putIndex( idChnl, idx );
+        desc3.putReference( idT, ref3 );
+        executeAction( idmove, desc3, DialogModes.NO );
+    } catch (e) {alert(e)};
+}
+
+function activate_all_channels(myDoc) 
+{
+    var myDoc = app.activeDocument,
+        allChans = [],
+        i,
+        maxI,
+        chan;
+
+    for(i = 0, maxI = myDoc.channels.length; i < maxI; i += 1) {
+        chan = myDoc.channels[i];
+        allChans.push(chan);
+    }
+    myDoc.activeChannels = allChans;
+    return myDoc;
+}
+
+function check_for_pantone(myDoc) 
+{
+    var pantoneChannels = [];
+    var i = myDoc.channels.length-1;
+    var check;
+    do {    
+        var chan = myDoc.channels[i];
+        if (chan.kind !== ChannelType.COMPONENT){
+            try { check = chan.color; }
+            catch (e) { pantoneChannels.push(chan.name); }
+        }
+    } while (i--)
+
+    /*check back & foreground color 4 pantone*/
+    try{
+        check = app.foregroundColor;
+        check = app.backgroundColor;
+    } catch(e) {
+        reset_colors();
+    }
+                   
+    return pantoneChannels;
+}
+
+function get_spot_channels(myDoc) 
+{
+    var spotChans = [];
+    var i = myDoc.channels.length-1;
+    
+    do {
+        var chan = myDoc.channels[i];
+        if (chan.kind == ChannelType.SPOTCOLOR) {
+            spotChans.push(chan);
+        };
+    } while (i--)
+    
+    if(spotChans.length > 0) {
+        return spotChans.reverse();
+    } else {
+        return false;
+    }
+}
+
+function reset_colors() 
+{
+    var idRset = charIDToTypeID( "Rset" );
+    var desc1 = new ActionDescriptor();
+    var idnull = charIDToTypeID( "null" );
+    var ref1 = new ActionReference();
+    var idClr = charIDToTypeID( "Clr " );
+    var idClrs = charIDToTypeID( "Clrs" );
+    ref1.putProperty( idClr, idClrs );
+    desc1.putReference( idnull, ref1 );
+    executeAction( idRset, desc1, DialogModes.NO );
+}
+
+function check_histogram (chan) 
+{
+    var visState = chan.visible;
+    if(!visState) {chan.visible = true;}
+    
+    var
+    hg = chan.histogram,
+    totalPixels = chan.parent.width.as('px') * chan.parent.height.as('px'),
+    totalArea = chan.parent.width.as('cm') * chan.parent.height.as('cm'),
+    i = 254,
+    // blackness = overall darkness of the channel = ink coverage on press
+    // 100% black pixel -> darkness +1, 50% black pixel -> darkness +0.5
+    // hg[0] -> amount of 100% black pixels    
+    blackness = hg[0],
+    greyPixels = 0;
+    
+    do {
+        blackness += hg[i]*((255-i)/255);
+        greyPixels += hg[i]; //counting greyPixels to check if channel is bitmapped -> only black/white pixels
+        i--;
+    }while(i>0)
+
+    chan.visible = visState;
+
+    return {
+        name : chan.name,
+        inkCoverage : blackness/totalPixels,
+        area : totalArea*(blackness/totalPixels),
+        // if the overall blackness equals the number of black pixels
+        // -> there must be no grey pixels -> true 1bit bitmap
+        isOneBit : (greyPixels == 0)
+    };
+}
+
+function show_report(reports) 
+{
+    var retval = false;
+    var w = new Window("dialog", 'Channels Report');
+    w.orientation = 'column';
+
+        var tablePnl = w.add('panel');        
+        tablePnl.orientation = 'row'
+
+            var nameGrp = tablePnl.add('group');
+            nameGrp.orientation = 'column';
+            nameGrp.add('statictext',undefined, 'Channel Name:');
+            
+            var covGrp = tablePnl.add('group');
+            covGrp.orientation = 'column';
+            covGrp.add('statictext',undefined, 'Ink Coverage:');
+
+            var areaGrp = tablePnl.add('group');
+            areaGrp.orientation = 'column';
+            areaGrp.add('statictext',undefined, 'Ink Area:');
+            
+            var bitGrp = tablePnl.add('group');
+            bitGrp.orientation = 'column';
+            bitGrp.add('statictext',undefined, 'Is 1bit:');
+
+            var i, rep, stxt, totalInkCoverage = 0, allOneBit = true;
+            for(i=0; i < reports.length; i+=1) {
+                rep = reports[i];
+                totalInkCoverage += rep.inkCoverage;
+                if(!rep.isOneBit) allOneBit = false;
+                nameGrp.add('statictext',undefined,rep.name);
+                covGrp.add('statictext',undefined,(rep.inkCoverage*100).toFixed(0) + ' %');
+                areaGrp.add('statictext',undefined,(rep.area).toFixed(0) + ' cm²');
+                bitGrp.add('statictext',undefined,rep.isOneBit ? 'YES' : 'NO');
+            }
+            /*last row for the overall info*/
+            /* nameGrp.add('statictext',undefined,'TOTAL:');
+            covGrp.add('statictext',undefined,(totalInkCoverage*100).toFixed(0) + ' %');
+            bitGrp.add('statictext',undefined, allOneBit ? 'YES' : 'NO'); */
+
+        var btnGrp = w.add('group');
+        btnGrp.orientation = 'row';
+            var okBtn = btnGrp.add('button', undefined, 'Ok');
+            var cclBtn = btnGrp.add('button', undefined, 'Cancel');
+            okBtn.onClick = function() {
+                retval = true;
+                w.close();                
+            };
+            cclBtn.onClick = function() {
+                retval = false;
+                w.close();
+            };
+
+    w.show();
+    return retval;
+}
+
+function check_ink_coverage (myDoc) 
+{
+    var 
+    oldUnits = app.preferences.rulerUnits,
+    i,maxI,
+    ch,
+    chanRep,
+    report = {
+        channels : [],
+        allOneBit : true,
+    };
+
+    app.preferences.rulerUnits = Units.PIXELS;
+
+    for(i=0,maxI = myDoc.channels.length; i < maxI; i+=1) {
+        ch=myDoc.channels[i];
+        if(ch.kind == ChannelType.SPOTCOLOR) {
+            chanRep = check_histogram(ch);
+            if(!chanRep.isOneBit) {report.allOneBit = false}
+            report.channels.push(chanRep);
+        }
+    }
+
+    if(show_report(report.channels)) {
+        return report;
+    } else {
+        return false;
+    }
+}
+
+function create_preview_doc(sourceDoc, saveFile) 
+{
+    /* create a combined selection from all spotchannels
+       then merge all spotchannels including t-shirt channel into rgb
+       and use the created selection to make a layermask */
+    var 
+    myDoc = sourceDoc.duplicate(),
+    sel = myDoc.selection;
+    sel.deselect();
+    
+    var saveOps = new PhotoshopSaveOptions ();
+    with(saveOps) {
+        alphaChannels = false;
+        spotColors = false;
+        layers = true;
+        embedColorProfile = true;
+    }
+
+    var spotChans = get_spot_channels(myDoc);
+    if(spotChans.length < 1) {
+        myDoc.close();
+        alert("No spotchannels found, can't create Preview Doc");
+        return;
+    }
+
+    var myChans = [];
+    var chan;
+    for (var i = myDoc.componentChannels.length, maxI = myDoc.channels.length; i < maxI; i++) {
+        chan = myDoc.channels[i];
+        chan.rep = check_histogram(chan);
+        myChans.push(chan);
+    }
+
+    var hasTeeChan = false;
+    for (var i = 0; i < myChans.length; i++) {
+        chan = myChans[i];
+
+        if(Number(chan.rep.inkCoverage) < 1) {
+            if(chan.kind == ChannelType.SPOTCOLOR) { /*use only spotchans for creating the final mask*/
+                try {
+                    var test = sel.bounds; /*works only with an existing selection*/
+                    sel.load(chan,SelectionType.EXTEND, false); /*if there is a selection, EXTEND it*/
+                } catch(e) { /*if there is no selection, EXTEND wont work, so REPLACE the empty selection with chanInfo*/
+                    sel.load(chan,SelectionType.REPLACE, false);
+                }
+            } else {
+                chan.remove();
+                myChans.splice(i,1);
+                i--;
+            }
+        } else {
+            /*if channel is 100% black, the channel most definitely is the teecolor channel*/
+            var confirmStr = '';
+            confirmStr += 'The Channel "';
+            confirmStr += chan.name;
+            confirmStr += '" looks like the t-shirt channel.\n Is that correct?';
+            hasTeeChan = Window.confirm(confirmStr);
+
+            if(hasTeeChan) { /*if teeChannel is not a spotChan, it will get lost in channel merge*/
+                if(chan.kind != ChannelType.SPOTCOLOR) {
+                    chan.kind = ChannelType.SPOTCOLOR;
+                }
+            } else {
+                chan.remove();
+                myChans.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    var maskChan = myDoc.channels.add();/*save the selection in an alpha channel*/
+    with(maskChan) {
+        kind = ChannelType.MASKEDAREA;
+        name = 'myMask';
+    }
+    sel.store(maskChan,SelectionType.REPLACE);
+    sel.deselect();
+
+    if(!hasTeeChan) {
+        var teeChan = create_tee_channel(myDoc);
+        myChans.unshift(teeChan);
+    }
+
+    if (myDoc.mode != DocumentMode.RGB) { /*add rgb channels if none are present*/
+        if (myDoc.componentChannels.length > 1) {
+            myDoc.changeMode(ChangeMode.RGB);
+        } else {
+            add_RGB_channels(myDoc);
+        }
+    }
+
+    for (i = 0; i < myChans.length; i++) {
+        myChans[i].merge();/*merge all spotchans into the rgb chans*/
+    }
+
+    var myLayer = myDoc.artLayers[0];
+    myDoc.activeLayer = myLayer;
+    myLayer.isBackgroundLayer = false;
+
+    sel.load(maskChan, SelectionType.REPLACE, false);
+    make_layer_mask('RvlS');/*use the stored selection to create a mask for the artlayer*/
+
+    maskChan.remove();/*remove the redundant stored selection, since it its now stored as layermask anyway*/
+    sel.deselect();
+
+    if(!saveFile) { /*if no saveFile is provided, use same name and folder as sourceDoc with new extension*/
+        //var dimensions = get_width_and_height(myDoc);
+        var tag = '_SD_Preview';
+        var saveFile = change_filename(sourceDoc.fullName, ['_SD_Working', tag], 'psd');
+        saveFile = saveFile.saveDlg();
+    }
+    if(saveFile) myDoc.saveAs(saveFile,saveOps,false);
+
+    return myDoc;
+}
+
+function create_sep_doc(sourceDoc, saveFile) 
+{
+    var myDoc = sourceDoc.duplicate();
+    myDoc.selection.deselect();
+   
+    if (myDoc.componentChannels.length > 0) {
+        remove_component_channels(myDoc);
+        remove_alpha_channels(myDoc, true);
+        remove_tee_channel(myDoc);
+    };
+
+    rename_cmyk(myDoc);/*spotchannels named like cmyk channels cause problems*/
+
+    recolor_white_spotchannels(myDoc);/*apply a little tint to whites to make them visible on white background*/
+
+    var i = myDoc.channels.length-1;
+    do {
+        myDoc.channels[i].visible = true;/*make all chans visible for easy visual checking*/
+    } while (i--)
+
+    var isOk = check_ink_coverage(myDoc);
+
+    //var dimensions = get_width_and_height (myDoc);
+    
+    if(!saveFile) {
+        var tag = '_SD_Druck';
+        var saveFile = change_filename(sourceDoc.fullName, ['_SD_Working', tag], '.eps');
+        //var saveFile = change_filename(sourceDoc.fullName, '_SD_Druck', '.eps');
+        saveFile = saveFile.saveDlg();
+    }
+    
+    if(saveFile) save_dcs2(saveFile);
+    
+    return myDoc;
+}
+
+function remove_tee_channel(myDoc) 
+{
+    var iaSwitch = new InteractSwitch();    
+    iaSwitch.set('all');
+    
+    for (var i = myDoc.channels.length - 1; i >= 0; i--) {
+        var chan = myDoc.channels[i];        
+        var rep = check_histogram(chan);        
+        if(Number(rep.inkCoverage) >= 1) {
+            var confirmStr = '';
+            confirmStr += 'The Channel "';
+            confirmStr += chan.name;
+            confirmStr += '" looks like the t-shirt channel.\n Do you want to remove it for film output?';
+            
+            var delChan = Window.confirm(confirmStr);
+            if(delChan) chan.remove();
+        }
+    }
+    iaSwitch.reset();
+}
+
+function check_for_tee_channel(myDoc) 
+{
+    var iaSwitch = new InteractSwitch();    
+    iaSwitch.set('all');
+    
+    var i, chan;
+    for (var i = myDoc.channels.length - 1; i >= 0; i--) {
+        chan = myDoc.channels[i];
+        rep = check_histogram(chan);        
+        if(rep.inkCoverage >= 1) {
+            var confirmStr = '';
+            confirmStr += 'The Channel "';
+            confirmStr += chan.name;
+            confirmStr += '" looks like the t-shirt channel.\n Do you want to remove it for film output?';
+            
+            if(Window.confirm(confirmStr)) {
+                return chan;
+            }
+        }
+    }
+    iaSwitch.reset();
+    return false;
+}
+
+function save_dcs2 (saveFile)
+{
+    var idsave = charIDToTypeID( "save" );
+        var desc2 = new ActionDescriptor();
+        var idAs = charIDToTypeID( "As  " );
+            var desc3 = new ActionDescriptor();
+            var idPrvw = charIDToTypeID( "Prvw" );
+            var idEPSP = charIDToTypeID( "EPSP" );
+            var idTIFF = charIDToTypeID( "TIFF" );
+            desc3.putEnumerated( idPrvw, idEPSP, idTIFF );
+            var idDpth = charIDToTypeID( "Dpth" );
+            var idDpth = charIDToTypeID( "Dpth" );
+            var idEghB = charIDToTypeID( "EghB" );
+            desc3.putEnumerated( idDpth, idDpth, idEghB );
+            var idDCS = charIDToTypeID( "DCS " );
+            var idDCS = charIDToTypeID( "DCS " );
+            var idseventwoCS = charIDToTypeID( "72CS" );
+            desc3.putEnumerated( idDCS, idDCS, idseventwoCS );
+            var idEncd = charIDToTypeID( "Encd" );
+            var idEncd = charIDToTypeID( "Encd" );
+            var idASCI = charIDToTypeID( "ASCI" );
+            desc3.putEnumerated( idEncd, idEncd, idASCI );
+            var idHlfS = charIDToTypeID( "HlfS" );
+            desc3.putBoolean( idHlfS, false );
+            var idTrnF = charIDToTypeID( "TrnF" );
+            desc3.putBoolean( idTrnF, false );
+            var idClMg = charIDToTypeID( "ClMg" );
+            desc3.putBoolean( idClMg, false );
+            var idIntr = charIDToTypeID( "Intr" );
+            desc3.putBoolean( idIntr, false );
+        var idPhDtwo = charIDToTypeID( "PhD2" );
+        desc2.putObject( idAs, idPhDtwo, desc3 );
+        var idIn = charIDToTypeID( "In  " );
+        desc2.putPath( idIn, saveFile );
+        var idDocI = charIDToTypeID( "DocI" );
+        desc2.putInteger( idDocI, 37 );
+        var idsaveStage = stringIDToTypeID( "saveStage" );
+        var idsaveStageType = stringIDToTypeID( "saveStageType" );
+        var idsaveBegin = stringIDToTypeID( "saveBegin" );
+        desc2.putEnumerated( idsaveStage, idsaveStageType, idsaveBegin );
+    executeAction( idsave, desc2, DialogModes.NO );
+}
+
+function create_tee_channel (myDoc) 
+{
+    if(!Window.confirm('T-Shirt Kanal erstellen?')) return null;
+                
+    var oldForegroundColor = app.foregroundColor;
+    var oldActiveChans = myDoc.activeChannels;
+    
+    //reset_colors();
+    
+    var visChans = [],
+        visChan;
+    for(var i = 0, maxI = myDoc.channels.length; i < maxI; i++) {
+        visChan = myDoc.channels[i];
+        if(visChan.visible) visChans.push(visChan);
+    }
+    
+    //myDoc.activeChannels = myDoc.componentChannels;
+    app.showColorPicker();
+    var myColor = app.foregroundColor;
+    var chan = myDoc.channels.add();
+    chan.name = 'Tee';
+    chan.kind = ChannelType.SPOTCOLOR;
+    chan.color = myColor;
+    chan.opacity = 100;
+    
+
+    if(myDoc.componentChannels.length < 1) {
+        add_RGB_channels (myDoc);
+    }
+
+    move_channel_to_index(myDoc.componentChannels.length+1);
+
+    myDoc.activeChannels = oldActiveChans; 
+    for(var i = 0; i < visChans.length; i++) {
+        visChans[i].visible = true;
+    }
+      
+    app.foregroundColor = oldForegroundColor;
+    return chan;
+}
+
+function get_width_and_height(myDoc) 
+{
+    if(myDoc) {
+        var dimensions = {};
+        dimensions.width = myDoc.width.as('mm');
+        dimensions.height = myDoc.height.as('mm');
+        dimensions.wxh = dimensions.width.toFixed(0) + 'x' + dimensions.height.toFixed(0);
+        return dimensions;
+    }
+}
+
+function check_ink_coverage (myDoc) 
+{
+    
+    var oldUnits = app.preferences.rulerUnits;
+    app.preferences.rulerUnits = Units.PIXELS;
+
+    var myDoc = app.activeDocument;
+    
+    var i,maxI, ch,
+        histogram_reports = [],
+        report;    
+    
+    for(i=0,maxI = myDoc.channels.length; i < maxI; i+=1) {
+        ch=myDoc.channels[i];
+        if(ch.kind == ChannelType.SPOTCOLOR) {
+            report = check_histogram(ch);
+            histogram_reports.push(report);
+        }
+    }
+
+    var isOk = show_report(histogram_reports);
+    app.preferences.rulerUnits = oldUnits;
+
+    return isOk;
+}
+
+function get_raster_settings() 
+{
+
+    var bmpConvert = {
+        Round : 'BitmapHalfToneType.ROUND',
+        Diamond : 'BitmapHalfToneType.DIAMOND',
+        Ellipse : 'BitmapHalfToneType.ELLIPSE',
+        Line : 'BitmapHalfToneType.LINE',
+        Square : 'BitmapHalfToneType.SQUARE',
+        Cross : 'BitmapHalfToneType.CROSS'
+    };
+
+    var bmpList = [
+        'Round',
+        'Diamond',
+        'Ellipse',
+        'Line',
+        'Square',
+        'Cross'
+    ];
+
+    var resList = [300,600,720,900,1200,1440];
+
+    var lpiList = [10,15,20,25,30,35,40,45,50,55,60];
+
+    var result = {};
+
+    var win = new Window('dialog', 'monos Raster-Script');
+
+    win.setPnl = win.add('panel', [10,  10, 240, 225], 'Raster-Einstellungen:');
+    win.okGrp =  win.add('group', [10, 235, 240, 265], 'Ready?');
+
+    win.setPnl.lpi =   win.setPnl.add('group',[5,  10, 225,  45]);
+    win.setPnl.wnkl =  win.setPnl.add('group',[5,  50, 225,  85]);
+    win.setPnl.wnklK = win.setPnl.add('group',[5,  90, 225, 125]);
+    win.setPnl.res =   win.setPnl.add('group',[5, 130, 225, 165]);
+    win.setPnl.dot =   win.setPnl.add('group',[5, 170, 225, 205]);
+
+    win.setPnl.lpi.txt = win.setPnl.lpi.add('statictext', [5,5,130,25], 'LPI (Linien pro Zoll):');
+    win.setPnl.lpi.set = win.setPnl.lpi.add('dropdownlist', [135,5,210,25], 55);
+
+    win.setPnl.wnkl.txt = win.setPnl.wnkl.add('statictext',[5,5,160,25], 'Rasterwinkel:');
+    win.setPnl.wnkl.set = win.setPnl.wnkl.add('edittext', [165,5,210,25], 165);
+
+    win.setPnl.wnklK.txt = win.setPnl.wnklK.add('statictext',[5,5,160,25], 'Rasterwinkel sisBlack:');
+    win.setPnl.wnklK.set = win.setPnl.wnklK.add('edittext', [165,5,210,25], 15);
+
+    win.setPnl.res.txt = win.setPnl.res.add('statictext',[5,5,130,25], 'Auflösung:');
+    win.setPnl.res.set = win.setPnl.res.add('dropdownlist', [135,5,210,25], 900);
+
+    win.setPnl.dot.txt = win.setPnl.dot.add('statictext',     [5,5,130,25], 'Punktform:');
+    win.setPnl.dot.set = win.setPnl.dot.add('dropdownlist',  [135,5,210,25], 'Ellipse');
+
+    win.okGrp.yes = win.okGrp.add('button', [10, 5, 110, 30], 'Ok');
+    win.okGrp.no =  win.okGrp.add('button', [120, 5, 220, 30], 'Abbrechen');
+
+    var i,
+        maxI,
+        item;
+
+    for (i = 0, maxI = lpiList.length; i < maxI; i += 1) {
+        item = win.setPnl.lpi.set.add('item', lpiList[i]);
+    };
+    win.setPnl.lpi.set.selection = win.setPnl.lpi.set.items[9];
+
+    for (i = 0, maxI = resList.length; i < maxI; i += 1) {
+        item = win.setPnl.res.set.add('item', resList[i]);
+    };
+    win.setPnl.res.set.selection = win.setPnl.res.set.items[2];
+
+    for (i = 0, maxI = bmpList.length; i < maxI; i += 1) {
+        item = win.setPnl.dot.set.add('item', bmpList[i]);
+    };
+    win.setPnl.dot.set.selection = win.setPnl.dot.set.items[2];
+
+    win.okGrp.yes.onClick = function () {
+
+        if(is_number(win.setPnl.wnkl.set.text) && is_number(win.setPnl.wnklK.set.text)) {
+            result.wnkl = Number(win.setPnl.wnkl.set.text);
+            result.wnklK = Number(win.setPnl.wnklK.set.text);
+        } else {
+            alert('Enter Numbers only!');
+            return
+        }
+
+        result.lpi = Number(win.setPnl.lpi.set.selection.text);
+        result.res = Number(win.setPnl.res.set.selection.text);
+        result.dot = eval(bmpConvert[win.setPnl.dot.set.selection]);
+        win.close();
+    }
+    win.okGrp.no.onClick = function() {
+        result = false;
+        win.close();
+    };
+
+    win.show();
+    return result
+}  

@@ -1,34 +1,44 @@
 ﻿#target indesign
-
 function main () {
-
+    
     #includepath '/c/repos/adobeScripts1/includes/'
-    #include 'augment_objects.jsx'
-    #include 'f_all.jsx'
     #include 'Job.jsx'
-    #include 'save_Options.jsx'
-    #include 'f_id.jsx'
-    #include 'f_id_mock.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'Pathmaker.jsx'
     #include 'JobFolder.jsx'
+    #include 'MonoPrint.jsx'
+    #include 'MonoNamer.jsx'
+    #include 'MonoFilm.jsx'
+    #include 'MonoMockup.jsx'
+    #include 'Pathmaker.jsx'
+    #include 'MonoSep.jsx'
+    #include 'Typeahead.jsx'
+    #include 'TexAdder.jsx'
 
-    var job = new Job(null, false);
-    var pm = new Pathmaker(job.nfo);
-    var jobFolder = new JobFolder(job.nfo.folder);
-
-    f_id.viewPrefSwitch.set('fast');
-
-    var printsToPlace = jobFolder.get_prints();
-    var printsToPlace = f_id_mock.getPrints(job.nfo.folder);
-    
-    f_id_mock.placePrintsOnPage(printsToPlace);
-    
-    if(app.activeDocument.saved === false) {
-        f_all.saveFile(pm.file('mockUpIndd'), undefined, false);
+    /*
+    for (var i = 0; i < app.documents.length; i++) {
+        app.documents[i].close(SaveOptions.NO);
     }
+    */
 
-    f_id.viewPrefSwitch.reset();
-}
+    var job = new Job(null,false);
+    var pm = new Pathmaker(job.nfo);
+    //var typeahead = new Typeahead();
+    var mockup = new MonoMockup();
+    
+    //mockup.create_mockupDoc();
+    mockup.init();
+    //mockup.import_pages();
+
+    //mockup.fill_job_infos(job.nfo);
+    //mockup.show_shop_logo (job.nfo.shop);
+
+    var jobFolder = new JobFolder(job.nfo.folder);
+    var monoPrints = jobFolder.get_prints();
+
+    mockup.place_prints_on_page (monoPrints);
+
+    //mockup.add_preview_page();
+    
+    //mockup.save();
+};
 
 main();

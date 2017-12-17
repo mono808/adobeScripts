@@ -1,45 +1,35 @@
 ﻿#target indesign
-
 function main () {
 
     #includepath '/c/repos/adobeScripts1/includes/'
-    #include 'augment_objects.jsx'
-    #include 'f_all.jsx'
-    #include 'f_id.jsx'
-    #include 'f_id_mock.jsx'    
-    #include 'rE.jsx'
     #include 'Job.jsx'
-    #include 'MonoGraphic.jsx'
+    #include 'JobFolder.jsx'
     #include 'MonoNamer.jsx'
-
-    var job = new Job(null, false);
-
-    var myDoc = app.activeDocument;
-
-    f_id.viewPrefSwitch.set('fast');
-
-    var i, maxI, myPage, printsLayer, pageGraphics, myTable,
-        myGraphics = {};
-
-    myPage = myDoc.layoutWindows[0].activePage;
+    #include 'MonoFilm.jsx'
+    #include 'MonoMockup.jsx'
+    #include 'MonoGraphic.jsx'
+    #include 'MonoTextil.jsx'
+    #include 'MonoTable.jsx'
+    #include 'MonoPrint.jsx'
+    #include 'Pathmaker.jsx'
+    #include 'MonoSep.jsx'
+    #include 'Typeahead.jsx'
+    #include 'TexAdder.jsx'
     
-    printsLayer = myDoc.layers.item('Prints');
+    var monoMockup = new MonoMockup();
+    monoMockup.init(app.activeDocument);
     
-    pageGraphics = f_id_mock.get_placed_graphics(myPage, printsLayer);
+    var myPage = app.activeWindow.activePage;
+    var monoGraphics = monoMockup.get_monoGraphics(myPage, monoMockup.layers.prints);
     
-    myTable = f_id_mock.create_table(myPage);
-    
-    f_id_mock.write_graphic_infos_to_table(myTable, pageGraphics);
+	var monoTable = new MonoTable(myPage);
+	monoTable.create_table(myPage, true);
+   
+    for(var i = 0; i < monoGraphics.length; i++) {
+        monoTable.add_row(monoGraphics[i]);
+    }
 
-    f_id.viewPrefSwitch.set('normal');
-
-    f_id_mock.add_stand_listener(true);
+    //monoTable.update_stand(monoGraphics[0]);
+    //monoTable.update_row(monoGraphics[1], false);
 }
-
-function check() {
-    return true;
-}
-
-if(check()){
-    main();
-}
+main();

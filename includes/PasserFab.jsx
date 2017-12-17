@@ -63,8 +63,8 @@ PasserFab.prototype.create_centerMark = function (xy, name)
 PasserFab.prototype.create_regMark = function (xy)
 {
     var pS  = {
-        stroke : 0.25,
-        rad1 : 3,
+        stroke : 0.35,
+        rad1 : 2.5,
         rad2 : 4,
         cross : 4
     };

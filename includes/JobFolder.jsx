@@ -24,6 +24,10 @@
 		}
 	};
 
+	var get_docs = function () {
+
+	};
+
 	var is_file = function (a) {
 		return a instanceof File;
 	};
@@ -47,10 +51,12 @@
 	var base = jobFolder ? jobFolder : folder;
 
 	var printFolders = base.getFiles(is_printFolder);
+	var ansichtenFolder = new Folder(base + '/ansicht');
+	var filmhuellenFolder = new Folder(base + '/druckdaten-sd');
 	
 	var monoPrints = [];
 	for (var i = 0; i < printFolders.length; i++) {
-		get_monoPrints(printFolders[i])
+		get_monoPrints(printFolders[i]);
 	}
 
 	/* Public API
@@ -69,6 +75,14 @@
 
 		get_prints : function () {
 			return monoPrints;
+		},
+
+		get_mockups : function () {
+			return ansichtenFolder.getFiles('*Ansicht.indd');
+		},
+
+		get_filmhuelle : function () {
+			return filmhuellenFolder.getFiles('*ilmhuelle.indd');
 		}
 	}
 }
