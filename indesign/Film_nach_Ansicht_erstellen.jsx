@@ -1,45 +1,42 @@
 ﻿#target indesign
 
-#includepath '/c/capri-links/scripts2/includes'
-#include 'augment_objects.jsx'
-#include 'universal_functions.jsx'
-#include 'indesign_functions.jsx'
-#include 'indesign_mockup_functions.jsx'
-#include 'MonoGraphic.jsx'
-#include 'MonoNamer.jsx'
-#include 'MonoFilm.jsx'
-#include 'MonoSep.jsx'
-#include 'PasserFab.jsx'
-#include 'statics.jsx'
-#include 'variables.jsx'
-#include 'Job.jsx'
+
 
 function main () {
-
-    var job = new Job(null, false);
+    
+    #includepath '/c/repos/adobeScripts1/includes/'
+    #include 'augment_objects.jsx'
+    #include 'Job.jsx'
+    #include 'JobFolder.jsx'
+    #include 'MonoNamer.jsx'
+    #include 'MonoFilm.jsx'
+    #include 'MonoMockup.jsx'
+    #include 'MonoGraphic.jsx'
+    #include 'MonoTextil.jsx'
+    #include 'MonoPrint.jsx'
+    #include 'Pathmaker.jsx'
+    #include 'PasserFab.jsx'
+    #include 'MonoSep.jsx'
+    #include 'Typeahead.jsx'
+    #include 'TexAdder.jsx'
 
     var mockUpDoc = app.activeDocument;
     
     for (var i = 0; i < mockUpDoc.selection.length; i++) {
-        var myGraphic = new MonoGraphic(mockUpDoc.selection[i].graphics[0]);
-        job.get_nfo (myGraphic.myFile, true, false);
+        var monoGraphic = new MonoGraphic(mockUpDoc.selection[i].graphics[0]);
+        var job = new Job (monoGraphic.get_file('print'), true, false);
+        var pm = new Pathmaker(job.nfo);
 
-        var myFilm = new MonoFilm();
-        myFilm.place_sep(myGraphic.get_sepFile(), myGraphic.get_width(), myGraphic.get_height(), myGraphic.get_displacment());
-        myFilm.get_sep_type();
-        if(myFilm.get_all_spotColors().length > 1) {
-            if(myFilm.type == 'Bags') {
-                var regMarks = [4,6];
-            } else {
-                var regMarks = [0,2];
-            }
-        }
-        myFilm.add_marks(regMarks);
-        myFilm.add_spotInfo2();
-        myFilm.add_jobInfo(job);
-        myFilm.position_textFrames();
-        myFilm.resize_page();
-        myFilm.save(job);
+        var monoFilm = new MonoFilm();
+        monoFilm.create_template();
+        monoFilm.place_sep(monoGraphic.get_file('print'), monoGraphic.get_width(), monoGraphic.get_height(), monoGraphic.get_displacement());
+        monoFilm.get_sep_type();
+        monoFilm.add_marks();
+        monoFilm.add_spotInfo2();
+        monoFilm.add_jobInfo(job);
+        monoFilm.position_textFrames();
+        monoFilm.resize_page();
+        monoFilm.save(job);
     }
 }
 

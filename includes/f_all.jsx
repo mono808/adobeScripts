@@ -1,4 +1,4 @@
-var f_all = {
+﻿var f_all = {
 
     is_number : function (n) {
       return !isNaN(parseFloat(n)) && isFinite(n);
@@ -67,8 +67,8 @@ var f_all = {
         }
         
         //var jsFilmBlanko = this.read_file(File('/c/capri-links/scripts/indesign/Film_1_Blanko.jsx'));      
-        indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/Film_1_Blanko.jsx'));
-
+        indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/Film_Blanko.jsx'));
+        
         var myArgs = {};
         myArgs.sep = sepFile;
         myArgs.x = pos && pos.x ? pos.x.as('mm') : null;
@@ -82,7 +82,7 @@ var f_all = {
         bt.send(0);
 
         //var jsFilmFinalize = this.read_file(File('/c/capri-links/scripts/indesign/Film_2_Finalisieren.jsx'));      
-        indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/Film_2_Finalisieren.jsx'));
+        indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/Film_Finalisieren.jsx'));
 
         return;
     },

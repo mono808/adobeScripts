@@ -1,7 +1,9 @@
-﻿#target indesign
+﻿#targetengine session
+#target indesign
 
-function toggle_standListener (turnOn) 
+function toggle_standListener () 
 {   
+    #includepath '/c/repos/adobeScripts1/includes'
     #include 'MonoGraphic.jsx'
     #include 'MonoTable.jsx'
     

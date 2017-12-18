@@ -1,7 +1,8 @@
-﻿#target indesign
+﻿#targetengine session 
+#target indesign
 
-function toggle_standListener (turnOn) 
-{   
+function toggle_standListener () {
+    
     #include 'MonoGraphic.jsx'
     #include 'MonoTable.jsx'
     
@@ -56,5 +57,3 @@ function toggle_standListener (turnOn)
 if(app.documents.length > 0 && app.activeDocument) {
     toggle_standListener();
 }
-
-    

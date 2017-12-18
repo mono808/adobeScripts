@@ -25,7 +25,7 @@
     if(initObj) {
         if (initObj instanceof File && initObj.exists) {
             this.init(app.open(initObj, false));
-        } else if (initObj instanceof 'Document'){
+        } else if (initObj instanceof Document){
             this.init(initObj);
         }
     }

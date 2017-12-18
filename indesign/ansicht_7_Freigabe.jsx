@@ -119,12 +119,12 @@ function main() {
     }
 
     if(errors.length > 0) {
-        var alertStr = 'Druckgrößen in Ansicht weicht von Druckdaten ab / konnten nicht geprüft werden.\nTrotzdem weitermachen?';
+        var alertStr = 'Druckgrößen in Ansicht weicht von Druckdaten ab / konnten nicht geprüft werden.\n\nTrotzdem weitermachen?';
         if(!Window.confirm(alertStr)) return null;
     }
 
     // objs containing the strings extracted from the mockup to copy to wawi    
-    print_docs(filesToPrint);
+    //print_docs(filesToPrint);
 
     iASwitch.set('all');
     //if(ok) f_id_mock.create_ui(rowObjs, job);

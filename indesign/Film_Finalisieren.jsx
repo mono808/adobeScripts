@@ -22,7 +22,6 @@ function main () {
     var pm = new Pathmaker(job.nfo);
 
     var monoFilm = new MonoFilm(app.activeDocument);
-    monoFilm.reset ();
     
     monoFilm.add_marks ();
 

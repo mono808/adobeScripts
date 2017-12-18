@@ -45,6 +45,24 @@
     /* Public API
     ----------------------------------------------------*/
     return {
+        get_displacement : function () {
+            
+            var xFront, xBack, x;
+
+            xFront = page.guides.item('midlineFront').location;
+            xBack = page.guides.item('midlineBack').location;
+
+            if (side === 'Front') {
+                x = xFront;
+            } else if (side === 'Back') {
+                x = xBack;
+            }
+            var geoBounds = ref.geometricBounds;
+            var displacement = geoBounds[1] > x ? geoBounds[1] - x : geoBounds[1] - x;
+
+            return displacement;
+        },
+
         get_textil : function () {
             var layer = doc.layers.item('Textils');
 
