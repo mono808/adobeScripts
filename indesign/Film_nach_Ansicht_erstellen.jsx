@@ -47,7 +47,7 @@ function check() {
     }
     
     if(app.activeDocument.selection.length < 1) {
-        alert('Bitte erst ein Grafik auswählen')
+        alert('Bitte erst eine Grafik auswählen');
         return false;
     }
 

@@ -1,9 +1,9 @@
 ﻿#target photoshop-60.064
 
-#includepath '/c/capri-links/scripts2/includes'
+#includepath '/c/repos/adobeScripts1/includes'
 #include 'augment_objects.jsx'
 #include 'universal_functions.jsx'
-#include 'photoshop_functions.jsx'
+#include 'photoshop_functions.jsxinc'
 #include 'interactSwitch.jsx'
 #include 'statics.jsx'
 #include 'variables.jsx'
