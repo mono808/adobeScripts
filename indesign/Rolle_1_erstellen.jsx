@@ -4,7 +4,9 @@ function main() {
 
     #includepath '/c/repos/adobeScripts1/includes/'
 	#include 'f_all.jsx'
-	#include 'mofo.jsx'
+	#include 'Pathmaker.jsx'
+
+	var pm = new Pathmaker();
 
 	var f = {
         load_place_gun_multipage_pdf : function (pdfs) 
@@ -151,9 +153,9 @@ function main() {
 
 	var myDoc = f.create_rollen_doc(docSize);
 
-	//var pdfsToPlace = mofo.folder('filmOut').openDlg("Select Files:", "*.pdf", true);
+	//var pdfsToPlace = pm.folder('filmOut').openDlg("Select Files:", "*.pdf", true);
     //var myFolder = Folder.selectDialog();
-    var myFolder = mofo.folder('filmOut');
+    var myFolder = pm.folder('filmOut');
     var pdfsToPlace = myFolder.openDlg("Select Files:", "*.pdf", true);
 
     f.load_place_gun_multipage_pdf(pdfsToPlace);

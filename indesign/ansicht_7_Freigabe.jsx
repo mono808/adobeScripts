@@ -55,6 +55,58 @@ function print_docs (myFiles)
     }
 }
 
+function generate_wawi_strings (rowContent)
+{
+    var resStrings = [];
+    var texString;
+    var wawiString;
+    var rowStrings = {};
+              
+    texString  = rowContent.run;  // Stückzahl
+    texString += 'x ';               
+    texString += rowContent.textilName;  // Artikel
+    texString += ' in ';
+    texString += rowContent.textilColor;  // Farben
+    texString += ' - Druckposition: ';
+    texString += rowContent.printId;  // Druckposi
+
+    wawiString  = 'Produktionsdetails --> ';
+    wawiString += rowContent.tech == 'Siebdruck' ? 'Druckfarben (~ Pantone C): ' : 'Druckfarben: ';
+    wawiString += rowContent.colors;
+    wawiString += ' - Druckbreite: ca. ';
+    wawiString += rowContent.width/10;
+    wawiString += ' cm - Motiv: ';
+    
+    rowStrings.textil = texString;
+    rowStrings.wawi = wawiString;
+
+    return rowStrings;
+}
+
+function show_wawi_string_dialog (rowContents, job) 
+{
+    var result = null;
+    var dialogTitle;
+    dialogTitle = "WaWi Infos nachtragen zu ->  ";
+    dialogTitle += job ? job.nfo.jobNr + ' - ' + job.nfo.client : 'irgendeinem bekloppten Auftrag';
+
+    var win = new Window ('dialog', dialogTitle);
+    win.alignChildren = 'fill';
+        var aPnl;
+        for(var i = 0; i < rowContents.length; i++) {
+            var rowContent = rowContents[i];
+            var rowStrings = generate_wawi_strings(rowContent);
+            aPnl = win.add('panel', undefined, '');
+            aPnl.alignChildren = 'fill';
+            aPnl.add('statictext', undefined, rowStrings.textil);
+            aPnl.add('edittext', undefined, rowStrings.wawi);
+        }
+    
+    win.add('button', undefined, 'Cancel');
+
+    win.show();
+}
+
 function main() {
     
     #includepath '/c/repos/adobeScripts1/includes/'
@@ -124,11 +176,11 @@ function main() {
     }
 
     // objs containing the strings extracted from the mockup to copy to wawi    
-    //print_docs(filesToPrint);
+    print_docs(filesToPrint);
 
     iASwitch.set('all');
     //if(ok) f_id_mock.create_ui(rowObjs, job);
-    if(ok) f_id_mock.create_wawi_string_dialog(rowObjs, job);
+    show_wawi_string_dialog(rowContents, job);
 }
 
 main();

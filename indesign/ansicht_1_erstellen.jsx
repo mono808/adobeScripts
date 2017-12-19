@@ -24,7 +24,7 @@ function main () {
     mockup.init();
     mockup.import_pages();
 
-    show_shop_logo = function (job.nfo.shop);
+    mockup.show_shop_logo(job.nfo.shop);
     mockup.fill_job_infos(job.nfo);
 
     var jobFolder = new JobFolder(job.nfo.folder);

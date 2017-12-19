@@ -6,11 +6,12 @@ function main() {
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
     #include 'f_id.jsx'
-    #include 'mofo.jsx'
+    #include 'Pathmaker.jsx'
     #include 'rE.jsx'
 
     var myDoc = app.activeDocument;
     var myWin = myDoc.layoutWindows.item(0);
+    var pm = new Pathmaker();
 
     //collect of fileNames of placed PDFs for nameing the output file accordingly
     function collect_placed_pdfs () {
@@ -77,10 +78,10 @@ function main() {
 
 	var saveName = namesArray.join('_');
 
-    var psFolder = mofo.folder('rolleIn');
+    var psFolder = pm.folder('rolleIn');
     var psFile =   new File(psFolder.fullName  + '/' + saveName + '.ps');
     
-    var saveFolder = mofo.folder('rolleSaved');
+    var saveFolder = pm.folder('rolleSaved');
     var saveFile = new File(saveFolder.fullName + '/' + saveName + '.indd');
     
     f_all.saveFile(saveFile, undefined, false);
