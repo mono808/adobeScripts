@@ -154,8 +154,12 @@
         for (var p in rowContents) {
             if(rowContents.hasOwnProperty(p) && rowContents[p] != '') {
                 if(columnOrder.hasOwnProperty(p)) {
-                    var i = columnOrder[p];
-                    myRow.cells.item(i).contents = rowContents[p].toString();
+                    var myCell =  myRow.cells.item(columnOrder[p]);
+                    if(myCell.isValid) {
+                        myCell.contents = rowContents[p].toString();
+                    } else {
+                        $.writeln('could not write to cell: ' + p);
+                    }               
                 }
             }
         }        
@@ -165,7 +169,12 @@
         var rowContents = {};
         for(var p in columnOrder) {
             if(columnOrder.hasOwnProperty(p)) {
-                rowContents[p] = myRow.cells.item(columnOrder[p]).contents;
+                var myCell = myRow.cells.item(columnOrder[p]);
+                if(myCell.isValid) {
+                    rowContents[p] = myCell.contents;
+                } else {
+                    rowContents[p] = '';
+                }
             }
         }
         return rowContents;
