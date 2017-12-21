@@ -1,0 +1,23 @@
+<pantones>
+	<color>
+		<name>PANTONE 485 C</name>
+		<colorName>Rot</colorName>
+		<totalArea>49.99</totalArea>
+	</book>
+	<color>
+		<name>PANTONE 102 C</name>
+		<colorName>Gelb</colorName>
+		<totalArea>39.95</totalArea>
+	</book>
+	<color>
+		<name>PANTONE Orange 021 C</name>
+		<colorName>Orange</colorName>
+		<colorName>RotOrange</colorName>
+		<totalArea>29.99</totalArea>
+	</book>
+	<color>
+		<name>PANTONE Red 032 C</name>
+		<colorName>Rot</colorName>
+		<totalArea>30.00</totalArea>
+	</book>
+</pantones>
