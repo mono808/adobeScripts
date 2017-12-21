@@ -244,7 +244,7 @@ function prepCell (cell)
         leftInset:1,
         bottomInset:1,
         rightInset:1
-    }       
+    };      
     cell.paragraphs[0].properties = {
         leading:0,
         justification:Justification.centerAlign,
@@ -252,7 +252,7 @@ function prepCell (cell)
         rightIndent:1,
         firstLineIndent:1,
         lastLineIndent:1,
-    }
+    };
 }
 
 function import_graphic_to_cell (graphic, cell) 
@@ -351,10 +351,7 @@ function create_aufkleber ()
 
     var myTable = createTable(myDoc);
 
-    with (myDoc.textDefaults) {
-        //appliedParagraphStyle = myDoc.paragraphStyles.item('defaultPStyle');
-        hyphenation = false;
-    }
+    myDoc.textDefaults.hyphenation = false;
 
     return myDoc;
 }
