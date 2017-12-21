@@ -37,8 +37,9 @@
 	};	
 
 	var is_print = function (a) {
+        var fileName = a.displayName;
 		if(!is_file(a)) return false;
-		if(a.displayName.match(/film\.indd/i)) return false;
+		if(fileName.match(/film\.(indd|pdf)/i)) return false;
 		return true;
 	};
 

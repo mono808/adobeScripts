@@ -26,12 +26,18 @@
 	};
 
 	var baseFolder = baseFolder;
-	var tagRegEx = /^([a-z0-9äüöß-]+)_(\d{1,3}x\d{1,3})?_?(SD|DTA|DTG|SUB|FLX|FLK|STK)_?(print|druck|sep|working|preview|film)?\.[a-z]{2,3}$/i;	
+	var tagRegEx = /^([a-z0-9äüöß-]+)_(\d{1,3}x\d{1,3})?_?(SD|DTA|DTG|SUB|FLX|FLK|STK)_?(print|druck|sep|working|preview|film)?\.[a-z]{2,3}$/i;
+    // 817A15-012_[Logo2Z-14cm_Front]_Sep
+    var tag15 = /(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_\[([a-z0-9äüöß-]+)_([a-z0-9äüöß-]+)\]_(sep|film|entwurf)/i;
+    var tag16 = /([a-z0-9äüöß-]+)_([0-9]{1,3}x[0-9]{1,3})_(sd|flx|flk|dta|dtg|stk|sub)/i;
+    var tag17 = /([a-z0-9äüöß-]+)_(sd|flx|flk|dta|dtg|stk|sub)_(working|print|preview|druck|entwurf)/i;
 	
     this.tag = this.get_tag(aFile);
     var printsFolder = this.tech ? 'druckdaten-' + this.tech : 'druckdaten';
 
 	this.print   = this.get_tagged_files(printsFolder, this.tag + '_*');
+    if(!this.print) this.print = aFile;
+    
 	this.preview = this.get_tagged_files('previews', this.tag+'_Preview.*');
 	this.film    = this.get_tagged_files('druckdaten-sd', '*'+this.tag+'_Film.indd');
 	this.working = this.get_tagged_files('working', this.tag+'_Working.*');

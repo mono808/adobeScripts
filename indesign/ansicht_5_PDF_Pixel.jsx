@@ -7,14 +7,15 @@ function main () {
     #include 'f_id.jsx'
     #include 'f_id_mock.jsx'    
     #include 'Job.jsx'
+    #include 'Pathmaker.jsx'
     #include 'save_Options.jsx'
 
     //job.set_nfo(null, false);
     var pm = new Pathmaker();
-    var myDoc = app.activeDocument,
-        myFilename = myDoc.fullName.displayName,
-        myFolder = myDoc.fullName.parent,
-        myName = myFilename.substring(0, myFilename.lastIndexOf('.'));
+    var myDoc = app.activeDocument;
+    var myFilename = myDoc.fullName.displayName;
+    var myFolder = myDoc.fullName.parent;
+    var myName = myFilename.substring(0, myFilename.lastIndexOf('.'));
         
     var distIn = new File(pm.path('ansichtIn') + myName + '.ps');
     var distOut = new File(pm.path('ansichtOut') + myName + '.pdf');

@@ -50,8 +50,10 @@
 
         place_files_on_page : function (myFiles) {
             var images = [];
+            var texLayer = doc.layers.item('Textils');
+            texLayer = texLayer.isValid ? texLayer : doc.activeLayer;
             for (var i = 0; i < myFiles.length; i++) {
-                var retval = doc.layoutWindows[0].activePage.place(myFiles[i], undefined, doc.activeLayer);
+                var retval = doc.layoutWindows[0].activePage.place(myFiles[i], undefined, texLayer);
                 if(retval && retval.length > 0) images.push(retval[0]);
             }
             return images;

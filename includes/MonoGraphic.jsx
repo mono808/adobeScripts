@@ -164,6 +164,8 @@
         get_colors : function () {
             if(!jobFolder) jobFolder = check_folder(myFolder);
             if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
+            if(!monoPrint.tech) return ['nach Abbildung'];
+            
             switch (monoPrint.tech.toUpperCase()) {
                 case 'SD' :
                     if(monoPrint.film) {

@@ -1,4 +1,4 @@
-#target photoshop-60.064
+﻿#target photoshop-60.064
 
 function save_dcs2(saveFile) {
     var idsave = charIDToTypeID( "save" );
@@ -47,10 +47,12 @@ function main() {
     #includepath '/c/repos/adobeScripts1/includes/'    
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
+    #include 'f_ps.jsx'
     #include 'Job.jsx'
     #include 'MonoNamer.jsx'
+    #include 'Pathmaker.jsx'
     #include 'save_Options.jsx'
-    #include 'f_ps.jsx'
+    
 
     var job = new Job(null, true, false);
     var pm = new Pathmaker(job.nfo);
@@ -77,12 +79,12 @@ function main() {
     f_ps.recolor_white_spotchannels();
 
     //f_all.saveFile(pm.file('sepEps'), save_ops.sepPS(), false);
-    var saveFile = pm.file('sepEps');
+    var saveFile = pm.file('sepDCS2');
     if (!saveFile.parent.exists) {
         saveFolder = new Folder(saveFile.parent)
         saveFolder.create();
     };
-    save_dcs2(pm.file('sepEps'));
+    save_dcs2(saveFile);
     
     f_all.send_sep_to_indesign(sepDoc.fullName, sepPos);
 
