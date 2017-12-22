@@ -228,7 +228,7 @@ Job.prototype.get_nfo_from_filepath = function (fldr)
     Folder.current = jobFolder;
     
     var match = jobFolder.displayName.match(rE.jobNameNew);
-    match = match ? match : fName.match(rE.jobNameOld);
+    match = match ? match : jobFolder.displayName.match(rE.jobNameOld);
     
     var nfo = {};
     nfo.refNr   = match[1];

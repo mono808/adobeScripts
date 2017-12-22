@@ -188,6 +188,7 @@
     var read_monoGraphic = function (monoGraphic) {
         var rC = {};
         var monoNamer = new MonoNamer();
+        var colors = monoGraphic.get_colors();
         
         rC.textilName = monoGraphic.get_textil_name();
         rC.textilColor = monoGraphic.get_textil_color();
@@ -196,7 +197,7 @@
         rC.height = monoGraphic.get_height().toFixed(0);
         rC.stand = monoGraphic.get_stand();
         rC.tech = monoNamer.name('tech', monoGraphic.get_tech());
-        rC.colors = monoGraphic.get_colors().join(', ');
+        rC.colors = (colors && colors.length > 0) ? colors.join(', ') : 'kA';
         rC.id = monoGraphic.get_id();
 
         return rC;

@@ -138,7 +138,7 @@ function main() {
 
     var myDocs = jobFolder.get_mockups();
     var filmhuelle = jobFolder.get_filmhuelle();
-    if(filmhuelle) myDocs.push(filmhuelle[0]);
+    if(filmhuelle && filmhuelle.length > 0) myDocs.push(filmhuelle[0]);
 
     var filesToPrint = select_docs(myDocs);
     if(filesToPrint.length < 1) return;
