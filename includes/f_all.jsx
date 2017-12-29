@@ -19,55 +19,55 @@
             }
         }
     },
+
+    bt_position_sep_on_film : function (serializedmyArgs) 
+    {
+        function centerOnPage (itemRef)
+        {
+            var iWidth = itemRef.geometricBounds[3] - itemRef.geometricBounds[1];
+            var iHeight = itemRef.geometricBounds[2] - itemRef.geometricBounds[0];
+            var myDoc = app.activeDocument;
+            var pWidth = myDoc.documentPreferences.pageWidth;
+            var pHeight = myDoc.documentPreferences.pageHeight;
+            
+            var centerCoor = {};
+            centerCoor.x = pWidth/2 - iWidth /2;
+            centerCoor.y = pHeight/2 - iHeight /2;
+            itemRef.parent.move( [centerCoor.x, centerCoor.y] );
+        }
+    
+        function positionSep (x,y)
+        {
+            var doc = app.activeDocument;
+            var vLine = doc.pages[0].guides.item('vLine');
+            var hLine = doc.pages[0].guides.item('hLine');
+            mySep.parent.move( [vLine.location + x, hLine.location + y] );
+        }
+
+        var myArgs = eval(serializedmyArgs);
+        var iDoc = app.activeDocument;
+        var myPage = iDoc.pages[0];
+        var sepLayer = iDoc.layers.item('motivEbene');
+        var sepRef = myPage.place(myArgs.sep);
+        var mySep = iDoc.layers.item('motivEbene').allGraphics[0];
+        
+        iDoc.activeLayer = sepLayer;
+        
+        if (myArgs.x != null && myArgs.y != null) {
+            positionSep(myArgs.x, myArgs.y);
+            return 'Sep placed according to PlacementInfos';
+        } else {
+            centerOnPage(mySep);
+            return 'Sep centered on Page';
+        }
+    },
         
     send_sep_to_indesign : function (sepFile, pos) 
     {
+        var blankoFilmScript = File('/c/repos/adobeScripts1/indesign/Film_Blanko.jsx');
+        var finalizeScript = File('/c/repos/adobeScripts1/indesign/Film_Finalisieren.jsx');
 
-        function script2Send (serializedmyArgs) {            
-
-            function centerOnPage (itemRef)
-            {
-                var iWidth = itemRef.geometricBounds[3] - itemRef.geometricBounds[1];
-                var iHeight = itemRef.geometricBounds[2] - itemRef.geometricBounds[0];
-                var myDoc = app.activeDocument;
-                var pWidth = myDoc.documentPreferences.pageWidth;
-                var pHeight = myDoc.documentPreferences.pageHeight;
-                
-                var centerCoor = {};
-                centerCoor.x = pWidth/2 - iWidth /2;
-                centerCoor.y = pHeight/2 - iHeight /2;
-                itemRef.parent.move( [centerCoor.x, centerCoor.y] );
-            }
-        
-            function positionSep (x,y)
-            {
-                var doc = app.activeDocument;
-                var vLine = doc.pages[0].guides.item('vLine');
-                var hLine = doc.pages[0].guides.item('hLine');
-                mySep.parent.move( [vLine.location + x, hLine.location + y] );
-            }
-
-            var myArgs = eval(serializedmyArgs);
-            var iDoc = app.activeDocument;
-            var myPage = iDoc.pages[0];
-            var sepLayer = iDoc.layers.item('motivEbene');
-            var sepRef = myPage.place(myArgs.sep);
-            var mySep = iDoc.layers.item('motivEbene').allGraphics[0];
-            
-            iDoc.activeLayer = sepLayer;
-            
-            if (myArgs.x != null && myArgs.y != null) {
-                positionSep(myArgs.x, myArgs.y);
-                /*app.doScript(myArgs.finalizeScript);*/
-                return 'Sep placed according to PlacementInfos';
-            } else {
-                centerOnPage(mySep);
-                return 'Sep centered on Page';
-            }
-        }
-        
-        //var jsFilmBlanko = this.read_file(File('/c/capri-links/scripts/indesign/Film_1_Blanko.jsx'));      
-        indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/Film_Blanko.jsx'));
+        indesign.executeScriptFile(blankoFilmScript);
         
         var myArgs = {};
         myArgs.sep = sepFile;
@@ -76,18 +76,18 @@
 
         var bt = new BridgeTalk;
         bt.target = 'Indesign';        
-        bt.body = script2Send.toSource() + "(" + myArgs.toSource() + ");";      
+        bt.body = f_all.bt_position_sep_on_film.toSource() + "(" + myArgs.toSource() + ");";      
         bt.onResult = function( inBT ) { $.writeln(inBT.body) };
         bt.onError = function( inBT ) { $.writeln(inBT.body) };
         bt.send(0);
 
-        //var jsFilmFinalize = this.read_file(File('/c/capri-links/scripts/indesign/Film_2_Finalisieren.jsx'));      
-        indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/Film_Finalisieren.jsx'));
+        indesign.executeScriptFile(finalizeScript);
 
         return;
     },
 
-    read_file : function (aFile) {     
+    read_file : function (aFile) 
+    {
         if(aFile && aFile instanceof File) {
             aFile.open('r', undefined, undefined);
             aFile.encoding = "UTF-8";      
@@ -120,25 +120,23 @@
         }
     },
     
-    saveFile : function (dest, saveOps, close) 
+    saveFile : function (dest, saveOps, close, showDialog) 
     {
-        var saveFile,
-            saveFolder,
-            saveDoc;      
+
+        var saveDoc = app.activeDocument;
 
         if(dest instanceof File) {
-            saveFile = dest;
+            var saveFile = dest;
         } else {
-            saveFile =  new File(dest);
+            var saveFile =  new File(dest);
         }
         
         if (!saveFile.parent.exists) {
-            saveFolder = new Folder(saveFile.parent)
+            var saveFolder = new Folder(saveFile.parent)
             saveFolder.create();
         };
 
-        saveDoc = app.activeDocument;
-
+        if(showDialog) saveFile = saveFile.saveDlg('Please check Filename');
 
         try {
             switch (app.name) {
@@ -386,87 +384,9 @@
     
     choose_from_array : function (myArray, propToList, dialogTitle)
     {
-        var result = null;
-        var win = new Window('dialog', dialogTitle || 'Die Qualle & der Wal:');
-        win.spacing = 4;
-        
-        var helper = function (i) {
-            return function (e) {
-                result = myArray[i];
-                //alert('Wow SUPER. Nee echt, ganz toll gemacht...');
-                win.close();
-            }
-        }
-
-        try {
-            var i,
-                maxI,
-                listEntry;
-
-            for (i = 0, maxI = myArray.length; i < maxI; i += 1) {
-
-                listEntry = propToList ? myArray[i][propToList].toString() : myArray[i].toString();
-
-                win[i] = win.add("button", [25, 25, 250, 45], listEntry.toString());
-                win[i].onClick = helper(i);
-            };
-
-        } catch (e) {
-            alert(e);
-        };
-               
-        win.show();
-        return result;
-    },
-
-    choose_from_array_indd : function (myArray, propToList, dialogTitle) 
-    {
-    },
-
-    choose_multiple_from_array : function (myArray, propToList, dialogTitle)
-    {
-        var result = null;
-        
-        var win = new Window('dialog', dialogTitle || 'Please choose:');
-        win.spacing = 4;
-        
-        var rdPnl = win.add('panel', undefined, '');
-        var okGrp = win.add('group', undefined, '');
-
-        var i,
-            maxI,
-            listEntry;
-
-        for (i = 0, maxI = myArray.length; i < maxI; i += 1) 
-        {
-            listEntry = propToList ? myArray[i][propToList].toString() : myArray[i].toString();
-            rdPnl[i] = rdPnl.add("checkbox", [25, 25, 250, 50], listEntry.toString());
-            rdPnl[i].value = false;
-        };
-
-        okGrp.yes = okGrp.add('button', undefined, 'Ok');
-        okGrp.no =  okGrp.add('button', undefined, 'Abbrechen');
-
-        okGrp.yes.onClick = function () {
-
-            var i, maxI, retArray = [], chkbx;
-            for (i=0, maxI = rdPnl.children.length; i<maxI; i+=1) {
-                chkbx = rdPnl.children[i];
-                if(chkbx.value) {
-                    retArray.push(myArray[i]);
-                }
-            }
-            win.close();
-            result = retArray;
-        };
-
-        okGrp.no.onClick = function() {
-            result = null;
-            win.close();
-        };
-               
-        win.show();
-        return result;
+        var btnList = new ButtonList;
+        var retval = btnList.show_dialog(myArray, propToList, dialogTitle);
+        return retval ? retval : null;
     },
 
     escapeRegExp : function (str) {
@@ -474,6 +394,57 @@
     }
 };
 
+function ButtonList () {
+    this.create_names_array = function (array, propertyToList) {            
+        var names = [];
+        for(var i = 0; i < array.length; i++) {
+            names.push(array[i][propertyToList]);
+        }
+        return names;
+    },
+
+    this.get_member = function (haystack, needle, propertyToCheck) {
+        for (var i = 0; i < haystack.length; i++) {
+            var val = propertyToCheck ? haystack[i][propertyToCheck] : haystack[i];                   
+            if( val == needle) {
+                return haystack[i];
+            }
+        }
+        return null;
+    },
+
+    this.show_dialog = function (array, propertyToList, dialogTitle) {
+        if(propertyToList) {
+            var names = this.create_names_array(array, propertyToList);
+        } else {
+            var names = array;
+        }
+        
+        var selected;
+        var w = new Window ('dialog', dialogTitle);
+        w.alignChildren = "fill";
+
+        var pnl = w.add('panel');
+        for (var i = 0; i < names.length; i++) {
+            var btn = pnl.add("button",[25, 25, 250, 45], names[i]);
+            btn.onClick = function () {
+                selected = this.text;
+                w.close();
+            }
+        }
+
+        if (w.show () != 2){
+            if(selected) {
+                if(!propertyToList) return selected;
+                else {
+                    return(this.get_member(array, selected, propertyToList));
+                }
+            }
+        }
+        
+        w.close();
+    }    
+}
 
 
 

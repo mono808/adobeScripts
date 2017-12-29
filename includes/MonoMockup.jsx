@@ -993,11 +993,13 @@ MonoMockup.prototype.create_wawi_string_dialog = function (rowObjs, job)
     win.show();
 };   
 
-MonoMockup.prototype.create_hinweis_frame = function (hwStr) 
+MonoMockup.prototype.add_hinweis = function () 
 {
-    var myPage = app.activeWindow.activePage,
-        doc = myPage.parent.parent,
-        internLayer = doc.layers.item('Intern');
+    var myPage = app.activeWindow.activePage;
+    var doc = myPage.parent.parent;
+    var internLayer = doc.layers.item('Intern');
+
+    var hwStr = Window.prompt('Hinweis eingeben');
 
     doc.activeLayer = internLayer;
 

@@ -1,26 +1,20 @@
 ﻿#target indesign
-
 function main () {
-
+    
     #includepath '/c/repos/adobeScripts1/includes/'
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
     #include 'f_id.jsx'
-    #include 'f_id_mock.jsx'
+    #include 'MonoMockup.jsx'
+    #include 'MonoSep.jsx'
+    #include 'Typeahead.jsx'
+    #include 'TexAdder.jsx'
 
-    var hwStr = Window.prompt('Hinweis eingeben du Vogel');
-    f_id_mock.create_hinweis_frame(hwStr);
+    //var job = new Job(null,false);
+    //var pm = new Pathmaker(job.nfo);
+    //var typeahead = new Typeahead();
+    var mockup = new MonoMockup(app.activeDocument);
+    mockup.add_hinweis();
+};
 
-}
-
-function check() {
-    if(app.documents.length > 0 && app.activeDocument) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-if(check()) {
-    main();
-}
+main();

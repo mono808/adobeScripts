@@ -242,7 +242,7 @@
     var choose_id_dialog = function (rows) {
         var w = new Window ("dialog");
         w.alignChildren = "fill";
-        w.add("statictext", undefined, "keine passende Tabellenzeile gefunden.\rNeue Zeilen ID wählen:");
+        w.add("statictext", undefined, "keine passende Tabellenzeile gefunden. Diese Zeile aktualisieren:");
         var radio_group = w.add ("panel");
         radio_group.alignChildren = "left";
         for (var i = 0; i < rows.length; i++) {

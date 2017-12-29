@@ -5,7 +5,6 @@ function main () {
     #includepath '/c/repos/adobeScripts1/includes/'
     #include 'f_all.jsx'
     #include 'f_id.jsx'
-    #include 'f_id_mock.jsx'    
     #include 'Job.jsx'
     #include 'Pathmaker.jsx'
     #include 'save_Options.jsx'

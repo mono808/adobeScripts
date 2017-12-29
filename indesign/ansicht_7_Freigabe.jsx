@@ -111,9 +111,6 @@ function main() {
     
     #includepath '/c/repos/adobeScripts1/includes/'
     #include 'augment_objects.jsx'
-    #include 'f_all.jsx'
-    #include 'f_id.jsx'
-    #include 'f_id_mock.jsx'
     #include 'Job.jsx'
     #include 'JobFolder.jsx'
     #include 'Pathmaker.jsx'
@@ -125,7 +122,7 @@ function main() {
     #include 'MonoFilm.jsx'
     #include 'MonoSep.jsx'
     #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'    
+    #include 'TexAdder.jsx'
     #include 'InteractSwitch.jsx'
     #include 'save_Options.jsx'
 
@@ -179,7 +176,6 @@ function main() {
     print_docs(filesToPrint);
 
     iASwitch.set('all');
-    //if(ok) f_id_mock.create_ui(rowObjs, job);
     show_wawi_string_dialog(rowContents, job);
 }
 

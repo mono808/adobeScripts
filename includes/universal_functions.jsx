@@ -421,41 +421,6 @@ function duplicate_folder (wf, destination, newName, refFile)
     };
 }
 
-function choose_from_array (myArray, propToList, dialogTitle)
-{
-    var result = null;
-    var win = new Window('dialog', dialogTitle || 'Leervorlage wählen:');
-    win.spacing = 4;
-    
-    var helper = function (i) {
-        return function (e) {
-            result = myArray[i];
-            //alert('Wow SUPER. Nee echt, ganz toll gemacht...');
-            win.close();
-        }
-    }
-
-    try {
-        var i,
-            maxI,
-            listEntry;
-
-        for (i = 0, maxI = myArray.length; i < maxI; i += 1) {
-
-            listEntry = propToList ? myArray[i][propToList].toString() : myArray[i].toString();
-
-            win[i] = win.add("button", [25, 25, 250, 45], listEntry.toString());
-            win[i].onClick = helper(i);
-        };
-
-    } catch (e) {
-        alert(e);
-    };
-           
-    win.show();
-    return result;
-}
-
 function choose_from_array_indd (myArray, propToList, dialogTitle) 
 {
     var result = null;
@@ -485,52 +450,6 @@ function choose_from_array_indd (myArray, propToList, dialogTitle)
 
     } catch (e) {
         alert(e);
-    };
-           
-    win.show();
-    return result;
-}
-
-function choose_multiple_from_array (myArray, propToList, dialogTitle)
-{
-    var result = null;
-    
-    var win = new Window('dialog', dialogTitle || 'Please choose:');
-    win.spacing = 4;
-    
-    var rdPnl = win.add('panel', undefined, '');
-    var okGrp = win.add('group', undefined, '');
-
-    var i,
-        maxI,
-        listEntry;
-
-    for (i = 0, maxI = myArray.length; i < maxI; i += 1) 
-    {
-        listEntry = propToList ? myArray[i][propToList].toString() : myArray[i].toString();
-        rdPnl[i] = rdPnl.add("checkbox", [25, 25, 250, 50], listEntry.toString());
-        rdPnl[i].value = false;
-    };
-
-    okGrp.yes = okGrp.add('button', undefined, 'Ok');
-    okGrp.no =  okGrp.add('button', undefined, 'Abbrechen');
-
-    okGrp.yes.onClick = function () {
-
-        var i, maxI, retArray = [], chkbx;
-        for (i=0, maxI = rdPnl.children.length; i<maxI; i+=1) {
-            chkbx = rdPnl.children[i];
-            if(chkbx.value) {
-                retArray.push(myArray[i]);
-            }
-        }
-        win.close();
-        result = retArray;
-    };
-
-    okGrp.no.onClick = function() {
-        result = null;
-        win.close();
     };
            
     win.show();

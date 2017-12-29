@@ -76,8 +76,29 @@ BaseAI.prototype.get_items_on_layer = function (items, layer_name)
     return itemsOnLayer;
 };
 
-function SepAI (doc) {
+function MonoSpot (name) 
+{
+    this.name = name;
+    this.spot;
+    this.pathItems = [];
+    this.bounds = [];
+    this.area = 0;
+    this.isUB = false;
+    this.sqpt2sqcm = new UnitValue(1,'pt').as('cm') * new UnitValue(1,'pt').as('cm');
+}
 
+MonoSpot.prototype.add_pathItem = function (pI) {
+    this.pathItems.push(pI);
+    this.area += pI.area*this.sqpt2sqcm;
+    var gB = pI.geometricBounds;
+    if(gB[0] < this.bounds[0]) this.bounds[0] = gB[0];
+    if(gB[1] > this.bounds[1]) this.bounds[1] = gB[1];
+    if(gB[2] > this.bounds[2]) this.bounds[2] = gB[2];
+    if(gB[3] < this.bounds[3]) this.bounds[3] = gB[3];
+};
+
+function SepAI (doc) {
+    BaseAI.call(this);
     this.doc = doc;
     this.spots = [];
     this.pathItems = this.get_items_on_layer(this.doc.pathItems, 'Motiv');
@@ -96,16 +117,8 @@ function SepAI (doc) {
 }
 
 SepAI.prototype = Object.create(BaseAI.prototype);
+SepAI.prototype.constructor = SepAI;
 
-function MonoSpot (name) {
-    this.name = name;
-    this.spot;
-    this.pathItems = [];
-    this.bounds = [];
-    this.area = 0;
-    this.isUB = false;
-    this.sqpt2sqcm = new UnitValue(1,'pt').as('cm') * new UnitValue(1,'pt').as('cm');
-}
 
 SepAI.prototype.check = function (items) 
 {
@@ -206,15 +219,6 @@ bounds ->  0     2
 values ->  -     +
               -
 */  
-MonoSpot.prototype.add_pathItem = function (pI) {
-    this.pathItems.push(pI);
-    this.area += pI.area*this.sqpt2sqcm;
-    var gB = pI.geometricBounds;
-    if(gB[0] < this.bounds[0]) this.bounds[0] = gB[0];
-    if(gB[1] > this.bounds[1]) this.bounds[1] = gB[1];
-    if(gB[2] > this.bounds[2]) this.bounds[2] = gB[2];
-    if(gB[3] < this.bounds[3]) this.bounds[3] = gB[3];
-};
 
 SepAI.prototype.sort_by_spotColor = function (pIs) 
 {
