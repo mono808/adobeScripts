@@ -6,8 +6,8 @@
     };
 }
 
-function BaseAI (doc) {
-    this.doc = doc;
+function BaseAI (initDoc) {
+    this.doc = initDoc;
 }
 
 BaseAI.prototype.recursive_delete_layer = function (ly) 
@@ -76,6 +76,15 @@ BaseAI.prototype.get_items_on_layer = function (items, layer_name)
     return itemsOnLayer;
 };
 
+
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+
+MonoSpot
+
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
 function MonoSpot (name) 
 {
     this.name = name;
@@ -97,9 +106,17 @@ MonoSpot.prototype.add_pathItem = function (pI) {
     if(gB[3] < this.bounds[3]) this.bounds[3] = gB[3];
 };
 
-function SepAI (doc) {
-    BaseAI.call(this);
-    this.doc = doc;
+
+
+/*/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+
+SepAI
+
+///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////*/
+function SepAI (initDoc) {
+    BaseAI.call(this, initDoc);
     this.spots = [];
     this.pathItems = this.get_items_on_layer(this.doc.pathItems, 'Motiv');
     this.rasterItems = this.get_items_on_layer(this.doc.rasterItems, 'Motiv');
@@ -115,10 +132,8 @@ function SepAI (doc) {
     this.spots = [];
     this.sqpt2sqcm = new UnitValue(1,'pt').as('cm') * new UnitValue(1,'pt').as('cm');
 }
-
 SepAI.prototype = Object.create(BaseAI.prototype);
 SepAI.prototype.constructor = SepAI;
-
 
 SepAI.prototype.check = function (items) 
 {
@@ -187,6 +202,10 @@ SepAI.prototype.check = function (items)
 
 SepAI.prototype.get_totalArea = function () 
 {
+    //               1                    +
+    //   bounds:  0     2     values:  -     +
+    //               3                    -        
+
     var totalBounds = [];
     var initialized = false;
 
@@ -211,30 +230,21 @@ SepAI.prototype.get_totalArea = function ()
     this.totalBounds = totalBounds;
     this.totalArea = totalArea * this.sqpt2sqcm;
 };
-/*
-              1
-bounds ->  0     2
-              3
-              +
-values ->  -     +
-              -
-*/  
 
 SepAI.prototype.sort_by_spotColor = function (pIs) 
 {
     var i = pIs.length-1;
-    var pI, monoSpot, fC, j;
     while(i >= 0) {
-        pI = pIs[i];        
-        monoSpot = null;
+        var pI = pIs[i];        
+        var monoSpot = null;
 
         if(!pI.filled)  {
             i--;
             continue;
         }
 
-        fC = pI.fillColor;
-        for (j = 0; j < this.spots.length; j++) {
+        var fC = pI.fillColor;
+        for (var j = 0; j < this.spots.length; j++) {
             if(this.spots[j].spot.name == fC.spot.name) {
                 monoSpot = this.spots[j];
                 break;
@@ -246,7 +256,7 @@ SepAI.prototype.sort_by_spotColor = function (pIs)
             monoSpot.spot = fC.spot;
             monoSpot.bounds = pI.geometricBounds;
             
-            if(this.ubRegEx.test(fC.spot.name)) monoSpot.isUB = true;
+            if(fC.spot.name.search(this.ubRegEx) > -1) monoSpot.isUB = true;
             
             this.spots.push(monoSpot);
         }
@@ -433,10 +443,11 @@ SepAI.prototype.rename_pantone_colors = function ()
     }
 };
 
-SepAI.prototype.get_wxh = function () {
+SepAI.prototype.get_wxh = function () 
+{
     var doc = app.activeDocument;
-    w = new UnitValue (doc.width, 'pt');
-    h = new UnitValue (doc.height, 'pt');
+    var w = new UnitValue (doc.width, 'pt');
+    var h = new UnitValue (doc.height, 'pt');
     return w.as('mm').toFixed(0) + 'x' + h.as('mm').toFixed(0);
 };
 
@@ -479,76 +490,4 @@ SepAI.prototype.change_spot_to_process_colors2 = function ()
             pathI.fillColor = mySwatch.color;
         } while (j--);
     }
-};
-
-SepAI.prototype.areaCalc = 
-{
-    colorAreas : {},
-    f : Number(0.352778*0.352778/100), //squarepoints to mm² to cm²
-
-    add : function (pI) 
-    {
-        var validName = pI.fillColor.spot.name.replace(/[^a-z0-9]/gi, '_').toLowerCase(),
-            cAs = this.colorAreas;
-
-        if(cAs.hasOwnProperty(validName)) {
-            cAs[validName] -= pI.area;
-        } else {
-            cAs[validName] = 0;
-            cAs[validName] -= pI.area;
-        }
-    },
-
-    report_all : function() 
-    {
-        var cAs = this.colorAreas,
-            cA,
-            cmAs = {},
-            i,                                            
-            totalArea = 0;
-        for(i in cAs) {
-            if(cAs.propertyIsEnumerable(i)){                    
-                cA = cAs[i];
-                totalArea += cA;
-                cA = Number((cA*this.f).toFixed(0));
-                $.writeln('Color ' + i + ' has an area of: ' + cA + ' cm²');
-                cAs[i] = cA;
-            }
-        }
-        totalArea = Number((totalArea*this.f).toFixed(0));
-        cAs['totalArea'] = totalArea;
-        $.writeln('Total area is: ' + totalArea + ' cm²');
-        return cAs;
-    },
-
-    get_area : function (color) 
-    {
-        var validName = pI.fillColor.spot.name.replace(/[^a-z0-9]/gi, '_').toLowerCase(),
-            cAs = this.colorAreas;
-        if(cAs.propertyIsEnumerable(validName)) {
-            cA = cAs[validName];
-            cA = Number((cA*this.f).toFixed(0));
-            $.writeln('Color ' + validName + ' has an area of: ' + cA + ' cm²');
-            return cA;
-        } else {
-            $.writeln('Color ' + validName + ' not found, area: 0 cm²');
-            return 0;
-        }
-    },
-
-    get_total : function() 
-    {
-        var i, cA, totalArea = 0,
-            cAs = this.colorAreas;
-        for(i in cAs) {
-            if(cAs.propertyIsEnumerable(i)) {
-                cA = cAs[i]
-                totalArea += cA;
-            }
-        }
-
-        totalArea = Number((totalArea*factor).toFixed(0));
-        $.writeln('Total coverage = ' + totalArea + ' cm²');
-        return totalArea;
-    },
 };

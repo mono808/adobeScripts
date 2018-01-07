@@ -1,4 +1,6 @@
-﻿function ButtonList () {
+﻿function ButtonList (title, text) {
+    this.title = title || 'monos ButtonList';
+    this.text = text || 'Please choose one of the options:';
     this.create_names_array = function (array, propertyToList) {            
         var names = [];
         for(var i = 0; i < array.length; i++) {
@@ -25,7 +27,9 @@
         }
         
         var selected;
-        var w = new Window ('dialog {text: "Quick select", alignChildren: "fill"}');
+        var w = new Window ('dialog', this.title);
+        w.alignChildren = "fill";
+        w.add('statictext', undefined, this.text, {multiline: true});
 
         var pnl = w.add('panel');
         for (var i = 0; i < names.length; i++) {

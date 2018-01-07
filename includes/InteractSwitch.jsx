@@ -1,7 +1,5 @@
 function InteractSwitch () {
-
     this.oldSetting = {};
-
 };
 
 InteractSwitch.prototype.set = function(what2Show) {            

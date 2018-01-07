@@ -96,6 +96,7 @@
         // druckdaten
         p.sepAi             = p.ddSD  + p.printTag + '_Print.ai';
         p.sepDCS2           = p.ddSD  + p.printTag + '_Print.eps';
+        p.sepPs             = p.ddSD  + p.printTag + '_Print.eps';
         p.sd                = p.ddSD  + p.printTag + '_Print.ai';
         p.dta               = p.ddDTA + p.printTag + '_Print.pdf';
         p.flx               = p.ddFLX + p.printTag + '_Print.ai';

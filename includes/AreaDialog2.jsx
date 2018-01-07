@@ -1,5 +1,4 @@
-﻿
-function AreaDialog (spotChans, totalArea) {
+﻿function AreaDialog (spotChans, totalArea) {
     this.vthTab = {
         32 : 0.00721,
         43 : 0.00530,
@@ -29,8 +28,6 @@ function AreaDialog (spotChans, totalArea) {
     this.spotChans = spotChans;
     this.totalArea = totalArea;
 }
-
-
 
 AreaDialog.prototype.tab_to_list = function (obj) 
 {

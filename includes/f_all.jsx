@@ -207,23 +207,15 @@
     //wf = workingfolder, newName = name of the duplicated folder
     duplicateFolder : function (wf, destination, newName, refFile) 
     {
-        var dupedFolder = new Folder(destination.absoluteURI + '/' + newName),
-            tempFolder;
-
-        var FilesFolders = wf.getFiles('*.*'),
-            FileFolder,
-            files2move = [],
-            myFile,
-            dupedFile,
-            folders2move = [],            
-            myFolder,
-            filesCool = true,
-            i,
-            maxI;
+        var dupedFolder = new Folder(destination.absoluteURI + '/' + newName);
+        var FilesFolders = wf.getFiles('*.*');
+        var files2move = [];
+        var folders2move = [];
+        var filesCool = true;
 
         // create containing folder if it doesn't yet exist
         if (!dupedFolder.parent.exists) {
-            tempFolder = new Folder(dupedFolder.parent);
+            var tempFolder = new Folder(dupedFolder.parent);
             tempFolder.create();
         };
         dupedFolder.create();
@@ -232,8 +224,8 @@
         //if wf does not contain the current client art file
         //mark all contained files and folders for moving
         if (wf.fullName !== refFile.path) {
-            for (i = 0, maxI = FilesFolders.length; i < maxI; i += 1) {
-                FileFolder = FilesFolders[i];
+            for (var i = 0, maxI = FilesFolders.length; i < maxI; i += 1) {
+                var FileFolder = FilesFolders[i];
                 if (FileFolder instanceof File) {
                     files2move.push(FileFolder);
                 } else if (FileFolder instanceof Folder) {
@@ -245,8 +237,8 @@
         //only select this specific art file and all folders for moving
         //prevents all other client files from being moved to the new design folder
         } else if (wf.fullName === refFile.path) {
-            for (i = 0, maxI = FilesFolders.length; i < maxI; i += 1) {
-                FileFolder = FilesFolders[i];
+            for (var i = 0, maxI = FilesFolders.length; i < maxI; i += 1) {
+                var FileFolder = FilesFolders[i];
                 if (FileFolder instanceof File && FileFolder.fullName === refFile.fullName) {
                     files2move.push(FileFolder);
                 } else if (FileFolder instanceof Folder) {
@@ -256,9 +248,9 @@
         }
 
         //move all selected files to duplicated folder
-        for (i = 0, maxI = files2move.length; i < maxI; i += 1) {
-            myFile = files2move[i];
-            dupedFile = new File (dupedFolder.absoluteURI + '/' + myFile.name);
+        for (var i = 0, maxI = files2move.length; i < maxI; i += 1) {
+            var myFile = files2move[i];
+            var dupedFile = new File (dupedFolder.absoluteURI + '/' + myFile.name);
             // remove the source file, if copied successfully
             if (myFile.copy(dupedFile)) {
                 myFile.remove();
@@ -270,8 +262,8 @@
         };
 
         // recursive duplicate the selected folders
-        for (i = 0, maxI = folders2move.length; i < maxI; i += 1) {
-            myFolder = folders2move[i];
+        for (var i = 0, maxI = folders2move.length; i < maxI; i += 1) {
+            var myFolder = folders2move[i];
             f_all.duplicateFolder(myFolder, dupedFolder, myFolder.name, refFile);
         }
 
@@ -384,7 +376,7 @@
     
     choose_from_array : function (myArray, propToList, dialogTitle)
     {
-        var btnList = new ButtonList;
+        var btnList = new ButtonList();
         var retval = btnList.show_dialog(myArray, propToList, dialogTitle);
         return retval ? retval : null;
     },

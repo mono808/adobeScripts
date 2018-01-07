@@ -1,5 +1,6 @@
-﻿#include '/c/capri-links/scripts/includes/rE.jsx'
-#include '/c/capri-links/scripts/includes/LastFolders.jsxinc'
+﻿#include './rE.jsx'
+#include './LastFolders.jsxinc'
+#include './f_all.jsx'
 
 function Job (ref, fullExtract, nachdruckMoeglich) 
 {
