@@ -230,10 +230,11 @@ Job.prototype.get_nfo_from_filepath = function (fldr)
     
     var match = jobFolder.displayName.match(rE.jobNameNew);
     match = match ? match : jobFolder.displayName.match(rE.jobNameOld);
+    match = match ? match : jobFolder.displayName.match(rE.jobNr);
     
     var nfo = {};
     nfo.refNr   = match[1];
-    nfo.shop    = match[2] == 'wme' ? 'wme' : 'cs';
+    nfo.shop    = match[2].indexOf('wm') != -1 ? 'wme' : 'cs';
     nfo.jobName = match[3] ? match[3] : undefined;
     nfo.folder  = jobFolder;
     nfo.client  = jobFolder.parent.displayName;
