@@ -1,6 +1,39 @@
 ﻿#include './InteractSwitch.jsx'
 //#include 'BaseDoc.jsx'
 
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function(searchElement /*, fromIndex*/) {
+    'use strict';
+    if (this == null) {
+      throw new TypeError('Array.prototype.includes called on null or undefined');
+    }
+    
+    var O = Object(this);
+    var len = parseInt(O.length, 10) || 0;
+    if (len === 0) {
+      return false;
+    }
+    var n = parseInt(arguments[1], 10) || 0;
+    var k;
+    if (n >= 0) {
+      k = n;
+    } else {
+      k = len + n;
+      if (k < 0) {k = 0;}
+    }
+    var currentElement;
+    while (k < len) {
+      currentElement = O[k];
+      if (searchElement === currentElement ||
+         (searchElement !== searchElement && currentElement !== currentElement)) { // NaN !== NaN
+        return true;
+      }
+      k++;
+    }
+    return false;
+  };
+}
+
 if(typeof Object.prototype.create !== 'function') {
     Object.prototype.create = function(o) {
         var F = function () {}
@@ -242,12 +275,18 @@ BaseDocPS.prototype.check_for_pantone = function () {
     return pantoneChannels;
 };
 
-BaseDocPS.prototype.get_spot_channels = function () {
+BaseDocPS.prototype.get_spot_channels = function (visibleOnly) {
     var spotChans = [];
     for (var i = 0, maxI = this.doc.channels.length; i<maxI; i++) {
     	var chan = this.doc.channels[i];
         if (chan.kind === ChannelType.SPOTCOLOR) {
-            spotChans.push(chan);
+            if(visibleOnly) {
+                if(chan.visible) {
+                    spotChans.push(chan);
+                }
+            } else {
+                spotChans.push(chan);
+            }
         };
     }
     return spotChans;
@@ -386,6 +425,23 @@ BaseDocPS.prototype.create_tee_channel = function () {
     return chan;
 };
 
+BaseDoc.prototype.delete_hidden_channels = function () {
+    for (var i = this.doc.channels.length-1; i >= 0; i--) {
+        if(!this.doc.channels[i].visible) {
+            this.doc.channels[i].remove();
+        }
+    }
+};
+
+BaseDoc.prototype.get_active_channels = function () {
+    var activeChannels = [];
+    for (var i = 0; i < this.doc.channels.length; i++) {
+        if(this.doc.channels[i].visible) {
+            activeChannels.push(this.doc.channels[i].name);
+        }
+    }
+    return activeChannels;
+}
 
 /*//////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -812,8 +868,12 @@ PreviewDocPS.prototype.create_layers_from_channels = function (chans) {
    and use the created selection to make a layermask for the merged rgb image*/
 PreviewDocPS.prototype.create_merged_doc = function (saveFile) {
     this.baseDoc = new BaseDocPS(this.doc);
+    var activeChannels = this.get_active_channels();
+
     this.doc = this.doc.duplicate();
     this.doc.selection.deselect;  
+
+    //this.delete_hidden_channels();
 
     var spotChans = this.get_spot_channels();
     if(spotChans.length < 1) {
@@ -874,7 +934,9 @@ PreviewDocPS.prototype.create_merged_doc = function (saveFile) {
 
 	/*merge all spotchans into the rgb chans*/
     for (var i = 0; i < spotChans.length; i++) {
-        spotChans[i].merge();
+        var spotChan = spotChans[i];
+        if(activeChannels.includes(spotChan.name))
+            spotChan.merge();
     }
 
     /*use the stored selection to create a mask for the artlayer*/

@@ -34,8 +34,8 @@ function main () {
     var saveFile = pm.file('previewPs');
     var preview = new PreviewDocPS(app.activeDocument, style, saveFile);
     app.refresh();
-    if(Window.confirm ('Doc ok?', false, 'Check Document')) preview.doc.close();
-    app.activeDocument = baseDoc.doc;
+    //if(Window.confirm ('Doc ok?', false, 'Check Document')) preview.doc.close();
+    //app.activeDocument = baseDoc.doc;
 
     //var saveFile = pm.file('previewPs');
     //var preview = new PreviewDocPS(app.activeDocument, 'layered');
