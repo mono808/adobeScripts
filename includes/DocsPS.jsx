@@ -761,6 +761,7 @@ SepDocPS.prototype.get_raster_settings = function () {
 
 SepDocPS.prototype.create_doc = function (saveFile) {
 	var baseDoc = new BaseDocPS(this.doc);
+    var activeChannels = this.get_active_channels();
     baseDoc.save_doc(baseDoc.doc.fullName);
     this.doc = this.doc.duplicate();
     this.doc.selection.deselect();
@@ -782,8 +783,15 @@ SepDocPS.prototype.create_doc = function (saveFile) {
     this.recolor_white_spotchannels();
 
 	/*make all chans visible for easy visual checking*/
-    for (var i = 0; i < this.doc.channels.length; i++) {
-    	this.doc.channels[i].visible = true;
+    /*remove deactived channels*/
+
+    for (var i = this.doc.channels.length-1; i >= 0; i--) {
+        var chan = this.doc.channels[i];
+    	if(activeChannels.includes(chan.name)) {
+            chan.visible = true;
+        } else {
+            chan.remove();
+        }
     }
 
    /*check the chan histgrams to reveal channels that are not properly bitmapped or halftoned*/ 
