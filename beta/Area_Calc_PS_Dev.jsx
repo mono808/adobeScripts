@@ -1,4 +1,4 @@
-﻿#target illustrator
+﻿#target Photoshop
 function check_histogram (chan) 
 {
     var visState = chan.visible;
@@ -67,13 +67,13 @@ function main (report)
     var report = check_ink_coverage(myDoc);
     
     
-    if(!sep.check()) return;
+    if(!report) return;
     
     //sort pathItems by spotcolor, putting them into indivdual "spot arrays"
-    sep.sort_by_spotColor(sep.pathItems);
+    //sep.sort_by_spotColor(sep.pathItems);
 
-    sep.get_totalArea();
-    var inkDialog = new AreaDialog(sep.spots, sep.totalArea).create_win().show();
+    //sep.get_totalArea();
+    var inkDialog = new AreaDialog(report.spotChannels, report.totalArea).create_win().show();
 
 }
 
