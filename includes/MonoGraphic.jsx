@@ -177,19 +177,19 @@
                 break;
 
                 case 'FLK' :
-                case 'FLX' : return 'Folie XY';
+                case 'FLX' : return ['Folie XY'];
                 break;
 
-                case 'SUB' : return 'CYMK / Foto';
+                case 'SUB' : return ['CYMK / Foto'];
                 break;
                 
-                case 'DTG' : return 'CMYK-Digitaldruck';
+                case 'DTG' : return ['CMYK-Digitaldruck]'];
                 break;
                 
-                case 'STK' : return 'Garn XY'
+                case 'STK' : return ['Garn XY'];
                 break;
                 
-                default : return 'nach Abbildung';
+                default : return ['nach Abbildung'];
             }
         },
 
