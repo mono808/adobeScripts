@@ -147,7 +147,7 @@ function main() {
 	}
 
 	var docSize = {
-		w : 426,
+		w : 424,
 		h : 1024
 	}
 
