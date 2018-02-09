@@ -107,6 +107,10 @@
             }
         },
 
+        get_side : function () {
+            return side;
+        },
+
         get_width : function () {
             return ref.geometricBounds[3] - ref.geometricBounds[1];
         },

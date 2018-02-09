@@ -25,6 +25,29 @@
         Unterleger : 'Vordruck'
     };
 
+    this.posOrder = {
+        lBrust      : 1,
+        rBrust      : 1,
+        Brust       : 1,
+        Front       : 1,
+        Vorderseite : 1,
+        lArm        : 1,
+        Beutel      : 1,
+        BeutelAA    : 1,
+        BeutelA     : 1,
+        rArm        : 2,
+        Ruecken     : 2,
+        Rücken      : 2,
+        Rückseite   : 2,
+        Rueckseite  : 2,            
+        Nacken      : 2,
+        neckIn      : 2,
+        neckOut     : 2,
+        Schulter    : 2,
+        Back        : 2,
+        BeutelB     : 2
+    };
+
     this.side = {
         lBrust      : 'Front',
         rBrust      : 'Front',

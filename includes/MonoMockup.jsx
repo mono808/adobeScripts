@@ -459,6 +459,8 @@ MonoMockup.prototype.add_preview_page = function ()
 MonoMockup.prototype.get_monoGraphics = function (myPage,myLayer)
 {
     var myGraphics = [];
+    var mN = new MonoNamer();
+    
     for (var g = 0; g < myPage.allGraphics.length; g++) 
     {  
         var placedGraphic = myPage.allGraphics[g];
@@ -468,9 +470,8 @@ MonoMockup.prototype.get_monoGraphics = function (myPage,myLayer)
         }
     }
     
-    myGraphics.sort(function(a,b) {
-        var mN = new MonoNamer();
-        return mN.name_side(a.side) - mN.name_side(b.side);
+    myGraphics.sort(function(a,b) {        
+        return mN.name('posOrder', a.get_side()) > mN.name('posOrder', b.get_side());
     });
 
     return myGraphics;
