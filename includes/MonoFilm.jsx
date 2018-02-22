@@ -550,13 +550,17 @@ MonoFilm.prototype.get_all_spotColors = function ()
     return spots;
 };
 
-MonoFilm.prototype.get_spotNames = function () 
+MonoFilm.prototype.get_spotNames = function (longNames) 
 {
     var spots = this.get_all_spotColors();
     var names = [];
+    var mN = new MonoNamer();
     for (var i = 0; i < spots.length; i++) {
-        names.push(spots[i].name.replace(/\s/g, '\xa0'));
+        var colorName = longNames ? mN.name('color', spots[i].name) : spots[i].name;
+        colorName = colorName.replace(/\s/g, '\xa0');
+        names.push(colorName);
     }
+
     return names;
 };
 

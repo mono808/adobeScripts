@@ -165,7 +165,7 @@
             }
         },
 
-        get_colors : function () {
+        get_colors : function (longNames) {
             if(!jobFolder) jobFolder = check_folder(myFolder);
             if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
             if(!monoPrint.tech) return ['nach Abbildung'];
@@ -174,7 +174,7 @@
                 case 'SD' :
                     if(monoPrint.film) {
                         var monoFilm = new MonoFilm(monoPrint.film);
-                        var spotNames = monoFilm.get_spotNames();
+                        var spotNames = monoFilm.get_spotNames(longNames);
                         monoFilm.filmDoc.close(SaveOptions.no);
                         return spotNames;
                     }

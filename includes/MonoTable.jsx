@@ -188,7 +188,7 @@
     var read_monoGraphic = function (monoGraphic) {
         var rC = {};
         var monoNamer = new MonoNamer();
-        var colors = monoGraphic.get_colors();
+        var colors = monoGraphic.get_colors(true);
         
         rC.textilName = monoGraphic.get_textil_name();
         rC.textilColor = monoGraphic.get_textil_color();

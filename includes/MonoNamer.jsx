@@ -15,14 +15,15 @@
     };
 
     this.color = {
-        'UB+White' : 'Vordruck, Weiß',
-        UL         : 'Vordruck',    
+        'Weiß1+2'  : 'Vordruck, Weiß'
         'UB+'      : 'Vordruck, Weiß',
+        'UB+White' : 'Vordruck, Weiß',
+        UL         : 'Vordruck',
         White      : 'Weiß',
         sisBlack   : 'Schwarz',
         Silber     : 'Silber 1, Silber 2',
         Gold       : 'Gold 1, Gold 2',
-        Unterleger : 'Vordruck'
+        Unterleger : 'Vordruck',
     };
 
     this.posOrder = {
