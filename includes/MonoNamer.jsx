@@ -15,7 +15,7 @@
     };
 
     this.color = {
-        'Weiß1+2'  : 'Vordruck, Weiß'
+        'Weiß1+2'  : 'Vordruck, Weiß',
         'UB+'      : 'Vordruck, Weiß',
         'UB+White' : 'Vordruck, Weiß',
         UL         : 'Vordruck',
