@@ -310,12 +310,9 @@ MonoFilm.prototype.add_jobInfo = function (job)
 
     var printId = mN.name('printId', job.nfo.printId);
     
-    var textLines = [];
-    textLines[0] = job.nfo.client + ' | ' + job.nfo.jobNr;
-    textLines[1] = 'Job:\xa0' + job.nfo.jobName + ' | Druck:\xa0' + printId;
-    textLines[2] = this.sep.get_width() + 'x' + this.sep.get_height() + 'mm | ' + $.getenv('USERNAME');
-
-    var jobString = textLines.join(' | ');
+    var jobString = '';
+    jobString += job.nfo.client + ' | ' + job.nfo.jobNr + '_' + job.nfo.jobName + '\n';
+    jobString += 'Druck:\xa0' + printId + ' | ' + this.sep.get_width() + 'x' + this.sep.get_height() + 'mm | ' + $.getenv('USERNAME');
 
     infoTF.contents += jobString;
     
