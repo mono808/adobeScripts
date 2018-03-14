@@ -57,6 +57,7 @@
             return images;
         },
 
+        //FIXME: dont touch fixed layers
         choose_graphicLayers : function (myImages)
         {            
             for (var i = 0; i < myImages.length; i++) {
