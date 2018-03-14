@@ -121,6 +121,10 @@ BaseDoc.prototype.get_saveFile = function (sourceFile, search, replace, extensio
 	return saveFile;
 };
 
+BaseDoc.prototype.get_totalArea = function() {
+    return this.doc.width.as('cm') * this.doc.height.as('cm');
+};
+
 /*////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -451,9 +455,9 @@ SepDocPS
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-function SepDocPS (initDoc, saveFile) {
+function SepDocPS (initDoc, createDoc, saveFile) {
 	BaseDocPS.call(this, initDoc);
-	this.doc = this.create_doc(saveFile ? saveFile : undefined);
+	if(createDoc) this.doc = this.create_doc(saveFile);
 }
 SepDocPS.prototype = Object.create(BaseDocPS.prototype);
 SepDocPS.prototype.constructor = SepDocPS;
@@ -762,7 +766,7 @@ SepDocPS.prototype.get_raster_settings = function () {
 SepDocPS.prototype.create_doc = function (saveFile) {
 	var baseDoc = new BaseDocPS(this.doc);
     var activeChannels = this.get_active_channels();
-    baseDoc.save_doc(baseDoc.doc.fullName);
+    //baseDoc.save_doc(baseDoc.doc.fullName);
     this.doc = this.doc.duplicate();
     this.doc.selection.deselect();
 
@@ -800,11 +804,11 @@ SepDocPS.prototype.create_doc = function (saveFile) {
 
     //var dimensions = get_width_and_height (this.doc);
     
-    if(!saveFile) {
-        var tag = '_SD_Print';
-        var saveFile = change_filename(this.doc.fullName, ['_SD_Working', tag], '.eps');        
-        saveFile = saveFile.saveDlg();
-    }
+//~     if(!saveFile) {
+//~         var tag = '_SD_Print';
+//~         var saveFile = change_filename(this.doc.fullName, ['_SD_Working', tag], '.eps');        
+//~         saveFile = saveFile.saveDlg();
+//~     }
     
     if(saveFile) this.save_dcs2(saveFile);
     

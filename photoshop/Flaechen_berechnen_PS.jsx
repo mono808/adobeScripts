@@ -5,18 +5,19 @@
 #includepath '/c/repos/adobeScripts1/includes/'
 #include 'augment_objects.jsx'
 #include 'universal_functions.jsx'
-#include 'photoshop_functions.jsx'
-#include 'statics.jsx'
-#include 'variables.jsx'
+#include 'DocsPS.jsx'
+#include 'AreaDialog2.jsx'
 
 function main() {
 
     var myDoc = app.activeDocument;
-    var report = check_ink_coverage(myDoc);
+    var sepDoc = new SepDocPS(myDoc);
+    var report = sepDoc.get_histogram_reports(myDoc);
+    var totalArea = sepDoc.get_totalArea();
 
-    $.writeln('Totalfläche: ' + report.totalArea);
-
-    show_dialog(report);
+    //$.writeln('Totalfläche: ' + report.totalArea);
+    var inkDialog = new AreaDialog(report, totalArea).create_win().show();
+    //show_dialog(report);
 }
 
 main();
