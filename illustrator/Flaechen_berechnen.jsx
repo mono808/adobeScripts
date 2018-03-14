@@ -6,7 +6,7 @@ function main (report)
     #include 'Job.jsx'
     #include 'Pathmaker.jsx'
     #include 'SepAI.jsx'
-    #include 'AreaDialog2.jsx'
+    #include 'AreaDialog.jsx'
 
     //var job = new Job(null, true, false);
     

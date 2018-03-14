@@ -60,7 +60,7 @@ function main (report)
 {
 
     #includepath '/c/repos/adobeScripts1/includes'
-    #include 'AreaDialog2.jsx'
+    #include 'AreaDialog.jsx'
 
 
     var myDoc = app.activeDocument;

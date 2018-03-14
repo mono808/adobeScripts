@@ -1,5 +1,4 @@
-﻿
-function AreaDialog (report) {
+﻿function AreaDialog (spotChans, totalArea) {
     this.vthTab = {
         32 : 0.00721,
         43 : 0.00530,
@@ -26,7 +25,8 @@ function AreaDialog (report) {
 
     this.windowName = "Farbrechner";
     this.win = null;
-    this.report = report;
+    this.spotChans = spotChans;
+    this.totalArea = totalArea;
 }
 
 AreaDialog.prototype.tab_to_list = function (obj) 
@@ -49,14 +49,14 @@ AreaDialog.prototype.create_win = function (windowName)
 
     win.calc_all = function () 
     {
-        for (var i = 0; i < report.spotChannels.length; i++) {
+        for (var i = 0; i < that.spotChans.length; i++) {
             this.calculate_line(i);
         }
     };
 
     win.calculate_line = function (i) 
     {
-        var area = that.report.spotChannels[i].area;
+        var area = Math.abs(that.spotChans[i].area);
         var tex = this.findElement("texDrop").selection.text;
         var run = Number(this.findElement("runEdit").text);
         var screen = this.findElement ("screenDrop" + (i)).selection.text;
@@ -104,8 +104,8 @@ AreaDialog.prototype.create_win = function (windowName)
             var okBtn = btnGrp.add("button {text:'Ok', name:'Ok'}");            
             var cclBtn = btnGrp.add("button {text: 'Cancel', name:'Cancel'}");
             
-        for ( var i = 0; i < this.report.spotChannels.length; i+=1) {
-            var spotChan = this.report.spotChannels[i];
+        for ( var i = 0; i < this.spotChans.length; i+=1) {
+            var spotChan = this.spotChans[i];
             
             var nameText = nameGrp.add("statictext",undefined, spotChan.name, {});
             nameText.preferredSize.height = 25; 
@@ -114,12 +114,12 @@ AreaDialog.prototype.create_win = function (windowName)
             
             var areaText = areaGrp.add("statictext", undefined, "", {characters: 9, name:"areaText"+i});
             areaText.preferredSize.height = 25; 
-            areaText.text = (spotChan.area).toFixed(1);
+            areaText.text = Math.abs(spotChan.area).toFixed(1);
             areaText.text += ' cm²';
 
             var covText = covGrp.add("statictext", undefined, "", {characters: 6, name:"covText"+i});
             covText.preferredSize.height = 25;
-            covText.text = ((spotChan.area / this.report.totalArea)*100).toFixed(0);
+            covText.text = Math.abs((spotChan.area / this.totalArea)*100).toFixed(0);
             covText.text += ' %';
 
             var ubCheck = ubGrp.add("checkbox", undefined, "", {name:"ubCheck"+i});
@@ -153,12 +153,11 @@ AreaDialog.prototype.create_win = function (windowName)
         }
 
         okBtn.onClick = function() {
-            for (var i = 0; i < that.report.spotChannels.length; i++) {
-                var spotChan = that.report.spotChannels[i];
+            for (var i = 0; i < that.spotChans.length; i++) {
+                var spotChan = that.spotChans[i];
                 spotChan.screen = screenGrp.children[i+1].selection.text;
                 spotChan.inkVolume = inkGrp.children[i+1].text;
             }
-            retval = report;
             win.close();
         };
     

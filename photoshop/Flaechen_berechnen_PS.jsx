@@ -6,7 +6,7 @@
 #include 'augment_objects.jsx'
 #include 'universal_functions.jsx'
 #include 'DocsPS.jsx'
-#include 'AreaDialog2.jsx'
+#include 'AreaDialog.jsx'
 
 function main() {
 

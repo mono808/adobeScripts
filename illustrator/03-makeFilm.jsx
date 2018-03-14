@@ -9,7 +9,7 @@ function main (report)
     #include 'Job.jsx'
     #include 'Pathmaker.jsx'
     #include 'SepAI.jsx'
-    #include 'AreaDialog2.jsx'
+    #include 'AreaDialog.jsx'
 
     var job = new Job(null, true, false);
     
@@ -37,7 +37,7 @@ function main (report)
     f_all.send_sep_to_indesign(sepFile, sepPos);
 
     sep.get_totalArea();
-    var inkDialog = new AreaDialog(sep.spots, sep.totalArea).create_win().show();
+    //var inkDialog = new AreaDialog(sep.spots, sep.totalArea).create_win().show();
 
     //create a print preview for use in mockups (no spotcolors, no underbase)
     sep.delete_underbase2();
