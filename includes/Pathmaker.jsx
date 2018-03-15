@@ -62,7 +62,7 @@
 
     var set_nfo = function (input) {
 
-        if(input.folder.constructor.name == 'Folder') {Folder.current = input.folder}
+        if(input.folder && input.folder.constructor.name == 'Folder') {Folder.current = input.folder}
         for(var p in input) {
             if(input.hasOwnProperty(p) && input[p]) {
                 nfo[p] = input[p];
