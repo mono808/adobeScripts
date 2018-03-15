@@ -295,6 +295,7 @@ MonoFilm.prototype.create_text_frame = function (layer,frameName)
     return tF;
 };
 
+//FIXME: when no jobInfo available, use sep filename as info
 MonoFilm.prototype.add_jobInfo = function (job)
 {
 
@@ -307,12 +308,16 @@ MonoFilm.prototype.add_jobInfo = function (job)
        
     infoText.fillColor = this.colors.reg;
     infoText.hyphenation = false;
-
-    var printId = mN.name('printId', job.nfo.printId);
-    
+      
     var jobString = '';
-    jobString += job.nfo.client + ' | ' + job.nfo.jobNr + '_' + job.nfo.jobName + '\n';
-    jobString += 'Druck:\xa0' + printId + ' | ' + this.sep.get_width() + 'x' + this.sep.get_height() + 'mm | ' + $.getenv('USERNAME');
+    if(job.nfo.client && job.nfo.jobNr && job.nfo.jobName && job.nfo.printId) {
+        var printId = mN.name('printId', job.nfo.printId);
+        jobString += job.nfo.client + ' | ' + job.nfo.jobNr + '_' + job.nfo.jobName + '\n' + printId;
+    } else {
+        jobString += this.sep.name.substring(0, this.sep.name.lastIndexOf('.'));
+    }
+        
+    jobString += ' | ' + this.sep.get_width() + 'x' + this.sep.get_height() + 'mm | ' + $.getenv('USERNAME');
 
     infoTF.contents += jobString;
     
