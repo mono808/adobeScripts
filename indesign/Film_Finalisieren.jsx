@@ -27,7 +27,7 @@ function main () {
 
     monoFilm.add_jobInfo (job);
 
-    monoFilm.add_spotInfo2 ();
+    monoFilm.add_spotInfo_numbered ();
     
     monoFilm.position_textFrames();
     

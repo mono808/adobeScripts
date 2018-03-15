@@ -10,6 +10,7 @@ function main () {
     #include 'InteractSwitch.jsx'
     #include 'ButtonList.jsx'
 
+    //FIXME: does not work when not in a standard job folder
     var job = new Job(app.activeDocument, true);
     var pm = new Pathmaker(job.nfo);
 

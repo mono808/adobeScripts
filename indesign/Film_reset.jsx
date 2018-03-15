@@ -30,7 +30,7 @@ function main () {
 
     //monoFilm.add_spotInfo_numbered ();
 
-    monoFilm.add_spotInfo2 ();
+    monoFilm.add_spotInfo_numbered ();
     
     monoFilm.position_textFrames();
     
