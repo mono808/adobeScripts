@@ -255,7 +255,16 @@ MonoFilm.prototype.get_sep = function ()
     }    
 };
 
-MonoFilm.prototype.add_marks = function () 
+MonoFilm.prototype.add_centermarks = function () 
+{    
+    if(!this.type) this.get_sep_type();
+    
+    var passerFab = new PasserFab(this.type, this.vLine.location, this.sep);
+    passerFab.add_centerMarks();   
+
+};
+
+MonoFilm.prototype.add_regmarks = function () 
 {    
     if(!this.type) this.get_sep_type();
     
@@ -266,8 +275,7 @@ MonoFilm.prototype.add_marks = function ()
     }
 
     var passerFab = new PasserFab(this.type, this.vLine.location, this.sep);
-    passerFab.add_centerMarks();
-    
+        
     if(regMarks && regMarks.length > 0 && this.get_all_spotColors().length > 1) {
         passerFab.add_regMarks(regMarks);
     }
@@ -295,7 +303,7 @@ MonoFilm.prototype.create_text_frame = function (layer,frameName)
     return tF;
 };
 
-//FIXME: when no jobInfo available, use sep filename as info
+
 MonoFilm.prototype.add_jobInfo = function (job)
 {
 

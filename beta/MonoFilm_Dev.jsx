@@ -33,7 +33,7 @@ function main () {
     var job = new Job(null, false);
     var pm = new Pathmaker(job.nfo);
 
-    monoFilm.add_marks ();
+    monoFilm.add_centermarks ();
 
     monoFilm.add_jobInfo (job);
 

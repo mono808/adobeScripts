@@ -23,7 +23,7 @@ function main () {
 
     var monoFilm = new MonoFilm(app.activeDocument);
     
-    monoFilm.add_marks ();
+    monoFilm.add_centermarks ();
 
     monoFilm.add_jobInfo (job);
 

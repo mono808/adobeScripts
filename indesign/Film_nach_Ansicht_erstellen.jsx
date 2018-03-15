@@ -31,7 +31,7 @@ function main () {
         monoFilm.create_template();
         monoFilm.place_sep(monoGraphic.get_file('print'), monoGraphic.get_width(), monoGraphic.get_height(), monoGraphic.get_displacement());
         monoFilm.get_sep_type();
-        monoFilm.add_marks();
+        monoFilm.add_centermarks();
         monoFilm.add_spotInfo2();
         monoFilm.add_jobInfo(job);
         monoFilm.position_textFrames();
