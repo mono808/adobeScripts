@@ -5,7 +5,7 @@
 #includepath '/c/repos/adobeScripts1/includes/'
 #include 'augment_objects.jsx'
 #include 'universal_functions.jsx'
-#include 'DocsPS.jsx'
+#include 'SepDocPS.jsx'
 #include 'AreaDialog.jsx'
 
 function main() {
