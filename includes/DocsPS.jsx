@@ -7,7 +7,7 @@ if (!Array.prototype.includes) {
     if (this == null) {
       throw new TypeError('Array.prototype.includes called on null or undefined');
     }
-    
+
     var O = Object(this);
     var len = parseInt(O.length, 10) || 0;
     if (len === 0) {
@@ -38,7 +38,7 @@ if(typeof Object.prototype.create !== 'function') {
     Object.prototype.create = function(o) {
         var F = function () {}
         F.prototype = o;
-        return new F();     
+        return new F();
     };
 }
 
@@ -49,7 +49,7 @@ function BaseDoc (initDoc) {
 BaseDoc.prototype.save_doc = function (dest, saveOps, close, showDialog) {
 
     var saveFile = dest instanceof File ? dest : new File(dest);
-    
+
     if (!saveFile.parent.exists) {
         var saveFolder = new Folder(saveFile.parent)
         saveFolder.create();
@@ -60,7 +60,7 @@ BaseDoc.prototype.save_doc = function (dest, saveOps, close, showDialog) {
     try {
         switch (app.name) {
             case 'Adobe Illustrator' :
-                this.doc.saveAs(saveFile, saveOps);      
+                this.doc.saveAs(saveFile, saveOps);
             break;
             case 'Adobe InDesign' :
                 this.doc.save (saveFile);
@@ -69,7 +69,7 @@ BaseDoc.prototype.save_doc = function (dest, saveOps, close, showDialog) {
                 this.doc.saveAs(saveFile, saveOps);
             break;
         }
-        if(close) this.doc.close();       
+        if(close) this.doc.close();
         return true;
     } catch(e) {
         alert(e);
@@ -85,16 +85,16 @@ BaseDoc.prototype.change_filename = function (sourceFile, addString, ext) {
     if(addString && addString.constructor.name == 'Array') {
         newName = newName.replace(addString[0],addString[1]);
     } else {
-        newName += addString;  
+        newName += addString;
     }
 
     if(ext.indexOf('.') < 0) {
-        newName += '.';    
-    }    
+        newName += '.';
+    }
     newName += ext;
-    
+
     var newFile = new File(sourceFile.parent + '/' + newName);
-    
+
     return newFile;
 };
 
@@ -103,7 +103,7 @@ BaseDoc.prototype.get_saveFile = function (sourceFile, search, replace, extensio
 	var oldExtension = oldName.substring(oldName.lastIndexOf('.')+1, oldName.length);
 	var newName = oldName.substring(0,oldName.lastIndexOf('.'));
 	var folder = sourceFile.parent;
-	
+
 	if(newName.search(search) != -1) {
 		newName = newName.replace(search, replace);
 	} else {
@@ -124,6 +124,31 @@ BaseDoc.prototype.get_saveFile = function (sourceFile, search, replace, extensio
 BaseDoc.prototype.get_totalArea = function() {
     return this.doc.width.as('cm') * this.doc.height.as('cm');
 };
+
+BaseDoc.prototype.place_on_film = function (sepFile, pos) {
+
+    var blankoFilmScript = File('/c/repos/adobeScripts1/indesign/Film_Blanko.jsx');
+    var finalizeScript = File('/c/repos/adobeScripts1/indesign/Film_Finalisieren.jsx');
+
+    indesign.executeScriptFile(blankoFilmScript);
+
+    var myArgs = {};
+    myArgs.sep = sepFile;
+    myArgs.x = pos && pos.x ? pos.x.as('mm') : null;
+    myArgs.y = pos && pos.y ? pos.y.as('mm') : null;
+
+    var bt = new BridgeTalk;
+    bt.target = 'Indesign';
+    bt.body = f_all.bt_position_sep_on_film.toSource() + "(" + myArgs.toSource() + ");";
+    bt.onResult = function( inBT ) { $.writeln(inBT.body) };
+    bt.onError = function( inBT ) { $.writeln(inBT.body) };
+    bt.send(0);
+
+    indesign.executeScriptFile(finalizeScript);
+
+    return;
+};
+
 
 /*////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,10 +174,10 @@ BaseDocPS.prototype.remove_component_channels = function () {
     };
     return this.doc;
 };
-    
+
 BaseDocPS.prototype.remove_alpha_channels = function (containTeeChannel) {
     var teeNames = /^(t|tee|shirt|tasche|beutel)$/i;
-    var i = this.doc.channels.length-1;   
+    var i = this.doc.channels.length-1;
     do{
         var chan = this.doc.channels[i];
         if(chan.kind === ChannelType.MASKEDAREA || chan.kind === ChannelType.SELECTEDAREA) {
@@ -227,7 +252,7 @@ BaseDocPS.prototype.add_Grey_channel = function () {
     white.red = 255;
     white.green = 255;
     white.blue = 255;
-       
+
     var chan = this.doc.channels.add();
     chan.name = 'Grey';
     chan.kind = ChannelType.SPOTCOLOR;
@@ -235,7 +260,7 @@ BaseDocPS.prototype.add_Grey_channel = function () {
     this.doc.selection.fill(white);
     this.doc.activeChannels = [chan];
     this.move_channel_to_index(1);
-    
+
     this.doc.changeMode(ChangeMode.GRAYSCALE);
     var bgLayer = this.doc.artLayers[0];
     bgLayer.isBackgroundLayer = false;
@@ -255,12 +280,12 @@ BaseDocPS.prototype.add_RGB_channels = function () {
 };
 
 BaseDocPS.prototype.check_for_pantone = function () {
-        
+
     var check;
     var pantoneChannels = [];
-    
+
     var i = this.doc.channels.length-1;
-    do {    
+    do {
         var chan = this.doc.channels[i];
         if (chan.kind !== ChannelType.COMPONENT){
             try { check = chan.color; }
@@ -275,7 +300,7 @@ BaseDocPS.prototype.check_for_pantone = function () {
     } catch(e) {
         this.reset_colors();
     }
-                   
+
     return pantoneChannels;
 };
 
@@ -319,17 +344,17 @@ BaseDocPS.prototype.make_layer_mask = function (maskType) {
 BaseDocPS.prototype.check_histogram = function (chan) {
     var visState = chan.visible;
     if(!visState) {chan.visible = true;}
-    
+
     var hg = chan.histogram;
     var totalPixels = chan.parent.width.as('px') * chan.parent.height.as('px');
     var totalArea = chan.parent.width.as('cm') * chan.parent.height.as('cm');
     var i = 254;
     // blackness = overall darkness of the channel = ink coverage on press
     // 100% black pixel -> darkness +1, 50% black pixel -> darkness +0.5
-    // hg[0] -> amount of 100% black pixels    
+    // hg[0] -> amount of 100% black pixels
     var blackness = hg[0];
     var greyPixels = 0;
-    
+
     do {
         blackness += hg[i]*((255-i)/255);
         greyPixels += hg[i]; //counting greyPixels to check if channel is bitmapped -> only black/white pixels
@@ -361,7 +386,7 @@ BaseDocPS.prototype.find_tee_channel = function () {
             confirmStr += 'The Channel "';
             confirmStr += chan.name;
             confirmStr += '" looks like the t-shirt channel.\n Is this correct?';
-            
+
             if(Window.confirm(confirmStr)) {
             	return chan;
             }
@@ -370,9 +395,9 @@ BaseDocPS.prototype.find_tee_channel = function () {
 };
 
 BaseDocPS.prototype.check_for_tee_channel= function () {
-    var iaSwitch = new InteractSwitch();    
+    var iaSwitch = new InteractSwitch();
     iaSwitch.set('all');
-    
+
     for (var i = this.doc.channels.length - 1; i >= 0; i--) {
         var chan = this.doc.channels[i];
         rep = this.check_histogram(chan);
@@ -381,7 +406,7 @@ BaseDocPS.prototype.check_for_tee_channel= function () {
             confirmStr += 'The Channel "';
             confirmStr += chan.name;
             confirmStr += '" looks like the t-shirt channel.\n Do you want to remove it for film output?';
-            
+
             if(Window.confirm(confirmStr)) {
                 return chan;
             }
@@ -393,18 +418,18 @@ BaseDocPS.prototype.check_for_tee_channel= function () {
 
 BaseDocPS.prototype.create_tee_channel = function () {
     if(!Window.confirm('T-Shirt Kanal erstellen?')) return null;
-                
+
     var oldForegroundColor = app.foregroundColor;
     var oldActiveChans = this.doc.activeChannels;
-    
+
     //reset_colors();
-    
+
     var visChans = [];
     for(var i = 0, maxI = this.doc.channels.length; i < maxI; i++) {
         var visChan = this.doc.channels[i];
         if(visChan.visible) visChans.push(visChan);
     }
-    
+
     //this.doc.activeChannels = this.doc.componentChannels;
     app.showColorPicker();
     var myColor = app.foregroundColor;
@@ -413,18 +438,18 @@ BaseDocPS.prototype.create_tee_channel = function () {
     chan.kind = ChannelType.SPOTCOLOR;
     chan.color = myColor;
     chan.opacity = 100;
-    
+
     if(this.doc.componentChannels.length < 1) {
         this.add_RGB_channels ();
     }
 
     this.move_channel_to_index(this.doc.componentChannels.length+1);
 
-    this.doc.activeChannels = oldActiveChans; 
+    this.doc.activeChannels = oldActiveChans;
     for(var i = 0; i < visChans.length; i++) {
         visChans[i].visible = true;
     }
-      
+
     app.foregroundColor = oldForegroundColor;
     return chan;
 };
@@ -463,11 +488,13 @@ SepDocPS.prototype = Object.create(BaseDocPS.prototype);
 SepDocPS.prototype.constructor = SepDocPS;
 
 SepDocPS.prototype.get_guide_location = function () {
+    var defaultPos = {
+        x : new UnitValue(this.doc.width.value/2*-1, 'mm'),
+        y : new UnitValue(80, 'mm')
+    };
+
     if(this.doc.guides.length > 0 && this.doc.guides.length < 3) {
-        var defaultPos = {
-        	x : new UnitValue(this.doc.width.value/2*-1, 'mm'),
-        	y : new UnitValue(80, 'mm')
-        };       
+
         var guidePos = {};
         var hasVerticalGuide = false;
 
@@ -522,7 +549,7 @@ SepDocPS.prototype.recolor_white_spotchannels = function () {
                 chanColor.hsb.brightness = 100;
                 chanColor.hsb.hue = 210;
                 chanColor.hsb.saturation = 20;
-                chan.color = chanColor;                    
+                chan.color = chanColor;
             }
         }
     }
@@ -531,7 +558,7 @@ SepDocPS.prototype.recolor_white_spotchannels = function () {
 
 SepDocPS.prototype.rename_cmyk = function () {
     var forbiddenNames = /^(Cyan|Magenta|Yellow|Gelb|Black|Schwarz)$/i;
-    var renamedChans = [];    
+    var renamedChans = [];
     var i = this.doc.channels.length-1;
     do {
         var chan = this.doc.channels[i];
@@ -543,7 +570,7 @@ SepDocPS.prototype.rename_cmyk = function () {
             }
         }
     }while(i--)
-    
+
     if(renamedChans.length > 0) {
         var alertString = 'Reserved Channel-Names have been renamed:\r'
         for(i = 0; i < renamedChans.length; i+=2) {
@@ -597,11 +624,11 @@ SepDocPS.prototype.save_dcs2 = function (saveFile) {
 };
 
 SepDocPS.prototype.get_histogram_reports = function () {
-    
+
     var oldUnits = app.preferences.rulerUnits;
     app.preferences.rulerUnits = Units.PIXELS;
-    
-    var histogramReports = [];   
+
+    var histogramReports = [];
     for(var i=0, maxI = this.doc.channels.length; i < maxI; i+=1) {
         var chan = this.doc.channels[i];
         if(chan.kind == ChannelType.SPOTCOLOR) {
@@ -618,13 +645,13 @@ SepDocPS.prototype.show_histogramReport_dialog = function (reports) {
     var w = new Window("dialog", 'Channels Report');
     w.orientation = 'column';
 
-        var tablePnl = w.add('panel');        
+        var tablePnl = w.add('panel');
         tablePnl.orientation = 'row'
 
             var nameGrp = tablePnl.add('group');
             nameGrp.orientation = 'column';
             nameGrp.add('statictext',undefined, 'Channel Name:');
-            
+
             var covGrp = tablePnl.add('group');
             covGrp.orientation = 'column';
             covGrp.add('statictext',undefined, 'Ink Coverage:');
@@ -632,7 +659,7 @@ SepDocPS.prototype.show_histogramReport_dialog = function (reports) {
             var areaGrp = tablePnl.add('group');
             areaGrp.orientation = 'column';
             areaGrp.add('statictext',undefined, 'Ink Area:');
-            
+
             var bitGrp = tablePnl.add('group');
             bitGrp.orientation = 'column';
             bitGrp.add('statictext',undefined, 'Is 1bit:');
@@ -658,7 +685,7 @@ SepDocPS.prototype.show_histogramReport_dialog = function (reports) {
             var cclBtn = btnGrp.add('button', undefined, 'Cancel');
             okBtn.onClick = function() {
                 retval = true;
-                w.close();                
+                w.close();
             };
             cclBtn.onClick = function() {
                 retval = false;
@@ -771,7 +798,7 @@ SepDocPS.prototype.create_doc = function (saveFile) {
     this.doc.selection.deselect();
 
     var iaSwitch = new InteractSwitch();
-    iaSwitch.set('none');   
+    iaSwitch.set('none');
 
     if (this.doc.componentChannels.length > 0) {
         this.remove_component_channels();
@@ -798,20 +825,20 @@ SepDocPS.prototype.create_doc = function (saveFile) {
         }
     }
 
-   /*check the chan histgrams to reveal channels that are not properly bitmapped or halftoned*/ 
+   /*check the chan histgrams to reveal channels that are not properly bitmapped or halftoned*/
     var histogramReports = this.get_histogram_reports();
     var isOk = this.show_histogramReport_dialog(histogramReports);
 
     //var dimensions = get_width_and_height (this.doc);
-    
+
 //~     if(!saveFile) {
 //~         var tag = '_SD_Print';
-//~         var saveFile = change_filename(this.doc.fullName, ['_SD_Working', tag], '.eps');        
+//~         var saveFile = change_filename(this.doc.fullName, ['_SD_Working', tag], '.eps');
 //~         saveFile = saveFile.saveDlg();
 //~     }
-    
+
     if(saveFile) this.save_dcs2(saveFile);
-    
+
     iaSwitch.reset();
     return this.doc;
 };
@@ -853,16 +880,16 @@ PreviewDocPS.prototype.create_layers_from_channels = function (chans) {
     } catch(e) {
         var bgLayer = this.doc.artLayers[0];
     };
-    
+
     bgLayer.isBackgroundLayer = false;
     this.doc.selection.selectAll();
     this.doc.selection.clear();
-       
+
     for (var i = 0; i < chans.length; i++) {
         var chan = chans[i];
         this.doc.activeChannels = [chan];
         this.doc.selection.load(chan);
-        
+
         var spotLayer = this.doc.artLayers.add();
         this.doc.activeLayer = spotLayer;
         this.doc.selection.fill(chan.color);
@@ -883,7 +910,7 @@ PreviewDocPS.prototype.create_merged_doc = function (saveFile) {
     var activeChannels = this.get_active_channels();
 
     this.doc = this.doc.duplicate();
-    this.doc.selection.deselect;  
+    this.doc.selection.deselect;
 
     //this.delete_hidden_channels();
 
@@ -901,22 +928,22 @@ PreviewDocPS.prototype.create_merged_doc = function (saveFile) {
     }
 
     var spotChans = this.get_spot_channels();
-    
+
     /*create a combined selection from all spotChannels*/
     var selection = this.doc.selection;
     for (var i = 0; i < spotChans.length; i++) {
         var chan = spotChans[i];
         /*extending a selection works only with an existing selection*/
         try {
-            var test = selection.bounds; 
-            selection.load(chan,SelectionType.EXTEND, false); 
+            var test = selection.bounds;
+            selection.load(chan,SelectionType.EXTEND, false);
 
         /*if there is no selection, REPLACE the empty selection with selection from channel*/
-        } catch(e) {                 
+        } catch(e) {
             selection.load(chan,SelectionType.REPLACE, false);
         }
     }
-    
+
     if(!teeChan) {
         var teeChan = this.create_tee_channel();
     }
@@ -928,15 +955,15 @@ PreviewDocPS.prototype.create_merged_doc = function (saveFile) {
     this.remove_alpha_channels();
 
     /*save the selection in an alpha channel*/
-    var maskChan = this.doc.channels.add();   
+    var maskChan = this.doc.channels.add();
     maskChan.kind = ChannelType.MASKEDAREA;
     maskChan.name = 'myMask';
-    
+
     selection.store(maskChan,SelectionType.REPLACE);
     selection.deselect();
 
 	/*add rgb channels if none are present*/
-    if (this.doc.mode != DocumentMode.RGB) { 
+    if (this.doc.mode != DocumentMode.RGB) {
         if (this.doc.componentChannels.length >= 1) {
             this.doc.changeMode(ChangeMode.RGB);
         } else {
@@ -964,7 +991,7 @@ PreviewDocPS.prototype.create_merged_doc = function (saveFile) {
     selection.deselect();
 
 	/*if no saveFile is provided, use same name and folder as sourceDoc with new extension*/
-    if(!saveFile) {    	
+    if(!saveFile) {
     	var search = '/_(Working|Print|Druck|Sep|Preview)/i';
     	var replace = '_Preview';
     	var saveFile = this.get_saveFile(this.baseDoc.doc.fullName, search, replace, 'psd');
@@ -987,7 +1014,7 @@ PreviewDocPS.prototype.create_layered_doc = function (saveFile) {
         this.add_RGB_channels();
     }
 
-	this.doc.flatten();    
+	this.doc.flatten();
 
     var teeChan = this.find_tee_channel();
     if(teeChan) teeChan.remove();
@@ -996,10 +1023,10 @@ PreviewDocPS.prototype.create_layered_doc = function (saveFile) {
 
     var spotChans = this.get_spot_channels();
     this.create_layers_from_channels(spotChans);
-        
+
     this.doc.artLayers.getByName('Ebene 0').remove();
 
-    if(!saveFile) {    	
+    if(!saveFile) {
     	var search = '/_(Working|Print|Druck|Sep|Preview)/i';
     	var replace = '_Preview';
     	var saveFile = this.get_saveFile(this.baseDoc.doc.fullName, search, replace, 'psd');

@@ -1,9 +1,38 @@
 ﻿#target photoshop
 
+var remove_component_channels = function () 
+{
+    var doc = activeDocument,
+        i,
+        chan;
+
+    if (doc.DocumentMode = DocumentMode.CMYK || doc.DocumentMode = DocumentMode.RGB || doc.DocumentMode = DocumentMode.GRAYSCALE) {
+        doc.activeChannels = doc.componentChannels;
+        for (i = doc.componentChannels.length-1; i >= 0; i-=1) {
+            chan = doc.channels[i];
+            chan.remove();
+        };
+    };
+};
+
+var activate_all_channels = function () 
+{
+    var doc = app.activeDocument,
+        allChans = [],
+        i,
+        maxI,
+        chan;
+
+    for(i = 0, maxI = doc.channels.length; i < maxI; i += 1) {
+        chan = doc.channels[i];
+        allChans.push(chan);
+    }
+    doc.activeChannels = allChans;
+};
+
 function rastern() {
    
     #includepath '/c/repos/adobeScripts1/includes/' 
-    #include 'f_ps.jsx'
     #include 'f_all.jsx'
 
     var settings = get_raster_settings();
@@ -22,10 +51,10 @@ function rastern() {
     interDoc.name = 'InterDoc';
     
     // remove Alphachannels and return color of Shirt-Channel    
-    var teeColor = f_ps.remove_alpha_channels(interDoc);
+    //var teeColor = remove_alpha_channels(interDoc);
     
     // remove component channels not needed for halftoning
-    f_ps.remove_component_channels(interDoc);
+    remove_component_channels(interDoc);
                  
     // activate first channel only
     var destDoc = interDoc.duplicate();
@@ -95,7 +124,7 @@ function rastern() {
         add_tee_channel(destDoc, teeColor);
     }
 
-    f_ps.activate_all_channels();
+    activate_all_channels();
 
     var saveFile = get_save_file(srcDoc, settings);
     destDoc.saveAs(saveFile);
@@ -106,7 +135,28 @@ function rastern() {
     // ---------------------------------------------------------
     // Functions
     // ---------------------------------------------------------
-    
+
+    function move_channel_to_index (idx) 
+    {
+        try {
+            var idmove = charIDToTypeID( "move" );
+            var desc3 = new ActionDescriptor();
+            var idnull = charIDToTypeID( "null" );
+            var ref2 = new ActionReference();
+            var idChnl = charIDToTypeID( "Chnl" );
+            var idOrdn = charIDToTypeID( "Ordn" );
+            var idTrgt = charIDToTypeID( "Trgt" );
+            ref2.putEnumerated( idChnl, idOrdn, idTrgt );
+            desc3.putReference( idnull, ref2 );
+            var idT = charIDToTypeID( "T   " );
+            var ref3 = new ActionReference();
+            var idChnl = charIDToTypeID( "Chnl" );
+            ref3.putIndex( idChnl, idx );
+            desc3.putReference( idT, ref3 );
+            executeAction( idmove, desc3, DialogModes.NO );
+        } catch (e) {};
+    }
+
     function add_tee_channel(doc, teeColor) {
         app.activeDocument = doc;
         var teeChan = doc.channels.add(),       
@@ -124,7 +174,7 @@ function rastern() {
         doc.selection.selectAll();
         doc.selection.fill(fillColor);
         doc.selection.deselect();
-        f_ps.move_channel_to_index(1);
+        move_channel_to_index(1);
     }
 
     function get_save_file(srcDoc, settings) { 

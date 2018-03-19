@@ -6,8 +6,8 @@
 
     validateString : function (str) {
         var rE, ret1;
-        rE = /[^a-zA-Z0-9-äöüÄÖÜ]/g;            
-        ret1 = str.replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/Ä/g,"Ae").replace(/Ö/g,"Oe").replace(/Ü/g,"Ue").replace(/ß/g,"ss").replace('_', '-').replace(rE, '');        
+        rE = /[^a-zA-Z0-9-äöüÄÖÜ]/g;
+        ret1 = str.replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/Ä/g,"Ae").replace(/Ö/g,"Oe").replace(/Ü/g,"Ue").replace(/ß/g,"ss").replace('_', '-').replace(rE, '');
         return ret1;
     },
 
@@ -20,7 +20,7 @@
         }
     },
 
-    bt_position_sep_on_film : function (serializedmyArgs) 
+    bt_position_sep_on_film : function (serializedmyArgs)
     {
         function centerOnPage (itemRef)
         {
@@ -29,13 +29,13 @@
             var myDoc = app.activeDocument;
             var pWidth = myDoc.documentPreferences.pageWidth;
             var pHeight = myDoc.documentPreferences.pageHeight;
-            
+
             var centerCoor = {};
             centerCoor.x = pWidth/2 - iWidth /2;
             centerCoor.y = pHeight/2 - iHeight /2;
             itemRef.parent.move( [centerCoor.x, centerCoor.y] );
         }
-    
+
         function positionSep (x,y)
         {
             var doc = app.activeDocument;
@@ -50,9 +50,9 @@
         var sepLayer = iDoc.layers.item('motivEbene');
         var sepRef = myPage.place(myArgs.sep);
         var mySep = iDoc.layers.item('motivEbene').allGraphics[0];
-        
+
         iDoc.activeLayer = sepLayer;
-        
+
         if (myArgs.x != null && myArgs.y != null) {
             positionSep(myArgs.x, myArgs.y);
             return 'Sep placed according to PlacementInfos';
@@ -61,22 +61,22 @@
             return 'Sep centered on Page';
         }
     },
-        
-    send_sep_to_indesign : function (sepFile, pos) 
+
+    send_sep_to_indesign : function (sepFile, pos)
     {
         var blankoFilmScript = File('/c/repos/adobeScripts1/indesign/Film_Blanko.jsx');
         var finalizeScript = File('/c/repos/adobeScripts1/indesign/Film_Finalisieren.jsx');
 
         indesign.executeScriptFile(blankoFilmScript);
-        
+
         var myArgs = {};
         myArgs.sep = sepFile;
         myArgs.x = pos && pos.x ? pos.x.as('mm') : null;
         myArgs.y = pos && pos.y ? pos.y.as('mm') : null;
 
         var bt = new BridgeTalk;
-        bt.target = 'Indesign';        
-        bt.body = f_all.bt_position_sep_on_film.toSource() + "(" + myArgs.toSource() + ");";      
+        bt.target = 'Indesign';
+        bt.body = f_all.bt_position_sep_on_film.toSource() + "(" + myArgs.toSource() + ");";
         bt.onResult = function( inBT ) { $.writeln(inBT.body) };
         bt.onError = function( inBT ) { $.writeln(inBT.body) };
         bt.send(0);
@@ -86,41 +86,41 @@
         return;
     },
 
-    read_file : function (aFile) 
+    read_file : function (aFile)
     {
         if(aFile && aFile instanceof File) {
             aFile.open('r', undefined, undefined);
-            aFile.encoding = "UTF-8";      
+            aFile.encoding = "UTF-8";
             aFile.lineFeed = "Windows";
             return aFile.read();
         }
     },
 
-    typeOf : function (v) 
+    typeOf : function (v)
     {
         var ret=typeof(v);
         if (ret!="object") {
             return ret;
         } else if(v==null) {
-            return "null";  
+            return "null";
         } else {
-            return Object.prototype.toString.call(v).slice(8,-1);       
+            return Object.prototype.toString.call(v).slice(8,-1);
         }
     },
-    
-    get_kuerzel : function () 
+
+    get_kuerzel : function ()
     {
         var username = $.getenv('USERNAME');
-        
+
         if(username.indexOf('.') > 0) {
             // if username contains . make kuerzel from username jan.untiedt -> JU
-            return (username.split('.')[0][0] + username.split('.')[1][0]).toUpperCase();        
+            return (username.split('.')[0][0] + username.split('.')[1][0]).toUpperCase();
         } else {
             return username;
         }
     },
-    
-    saveFile : function (dest, saveOps, close, showDialog) 
+
+    saveFile : function (dest, saveOps, close, showDialog)
     {
 
         var saveDoc = app.activeDocument;
@@ -130,7 +130,7 @@
         } else {
             var saveFile =  new File(dest);
         }
-        
+
         if (!saveFile.parent.exists) {
             var saveFolder = new Folder(saveFile.parent)
             saveFolder.create();
@@ -141,7 +141,7 @@
         try {
             switch (app.name) {
                 case 'Adobe Illustrator' :
-                    saveDoc.saveAs(saveFile, saveOps);      
+                    saveDoc.saveAs(saveFile, saveOps);
                 break;
                 case 'Adobe InDesign' :
                     saveDoc.save (saveFile);
@@ -159,15 +159,15 @@
             return false;
         }
     },
-    
-    openFile : function (source) 
+
+    openFile : function (source)
     {
         var sourceFile = new File (source);
         var fileRef = app.open (sourceFile);
         return fileRef;
     },
-    
-    startDistiller : function () 
+
+    startDistiller : function ()
     {
         var dist10 = File('/c/Program Files (x86)/Adobe/Acrobat 10.0/Acrobat/acrodist.exe'),
             dist11 = File('/c/Program Files (x86)/Adobe/Acrobat 11.0/Acrobat/acrodist.exe');
@@ -181,14 +181,14 @@
             distApp = dist11;
         }
 
-        if(distApp && distApp.execute()) {        
+        if(distApp && distApp.execute()) {
             $.sleep(1000);
             switch (app.name) {
 
                 case 'Adobe Illustrator' :
-                    BridgeTalk.bringToFront('illustrator');       
+                    BridgeTalk.bringToFront('illustrator');
                 break;
-                
+
                 case 'Adobe InDesign' :
                     app.activate();
                 break;
@@ -205,7 +205,7 @@
     },
 
     //wf = workingfolder, newName = name of the duplicated folder
-    duplicateFolder : function (wf, destination, newName, refFile) 
+    duplicateFolder : function (wf, destination, newName, refFile)
     {
         var dupedFolder = new Folder(destination.absoluteURI + '/' + newName);
         var FilesFolders = wf.getFiles('*.*');
@@ -233,7 +233,7 @@
                 }
             }
 
-        //if wf DOES contain the current client art file -> normally Kundendaten      
+        //if wf DOES contain the current client art file -> normally Kundendaten
         //only select this specific art file and all folders for moving
         //prevents all other client files from being moved to the new design folder
         } else if (wf.fullName === refFile.path) {
@@ -269,7 +269,7 @@
 
         //if all contained files copied fine and nothing left in the directory, delete it
         //otherwise leave as is
-        if(filesCool && (wf.getFiles('*.*').length === 0)) {            
+        if(filesCool && (wf.getFiles('*.*').length === 0)) {
             $.writeln(wf.name + ' was ' + (wf.remove() ? '' : 'NOT ') + 'removed!');
         } else if (wf.getFiles('*.*').length > 0) {
             $.writeln(wf.name + ' still contains files, folder not removed');
@@ -277,11 +277,11 @@
             $.writeln('Sth went wrong moving the files, ' + wf.name + ' was not removed');
         };
     },
-    
-    copy_file_via_bridgeTalk : function (sourceFile, destFolder, deleteSource) 
+
+    copy_file_via_bridgeTalk : function (sourceFile, destFolder, deleteSource)
     {
-        
-        function done ( err, data ) 
+
+        function done ( err, data )
         {
             if ( err ) {
                 alert(data);
@@ -318,14 +318,14 @@
             if (!args.dest.exists) {args.dest.create()};
 
             var tries = 0;
-            while(!args.src.copy(destFile)) 
+            while(!args.src.copy(destFile))
             {
                 if(tries > 5) {return "Datei : "+ destFile.displayName + " ist da, konnte aber nicht kopiert werden. Ist die Datei am Zielort evtl. noch geöffnet?";}
                 tries+=1;
                 $.sleep(3000);
             }
 
-            if(args.delsource) 
+            if(args.delsource)
             {
                 args.src.remove();
                 args.src = null;
@@ -360,20 +360,20 @@
 
         //for debugging, execute function directly without bridgetalk
         // alert(copyFile(myArgs.toSource()));
-        
+
         if(myArgs.src && myArgs.dest)
         {
             var bt = new BridgeTalk;
-            bt.target = 'estoolkit';            
+            bt.target = 'estoolkit';
             bt.body = copyFile.toSource() + "(" + myArgs.toSource() + ");";
-            bt.onResult = function( inBT ) { done( null, inBT.body ); };       
+            bt.onResult = function( inBT ) { done( null, inBT.body ); };
             bt.onError = function( inBT ) { done( 1, inBT.body ); };
             bt.send(0);
         }
 
         return;
     },
-    
+
     choose_from_array : function (myArray, propToList, dialogTitle)
     {
         var btnList = new ButtonList();
@@ -387,7 +387,7 @@
 };
 
 function ButtonList () {
-    this.create_names_array = function (array, propertyToList) {            
+    this.create_names_array = function (array, propertyToList) {
         var names = [];
         for(var i = 0; i < array.length; i++) {
             names.push(array[i][propertyToList]);
@@ -397,7 +397,7 @@ function ButtonList () {
 
     this.get_member = function (haystack, needle, propertyToCheck) {
         for (var i = 0; i < haystack.length; i++) {
-            var val = propertyToCheck ? haystack[i][propertyToCheck] : haystack[i];                   
+            var val = propertyToCheck ? haystack[i][propertyToCheck] : haystack[i];
             if( val == needle) {
                 return haystack[i];
             }
@@ -411,7 +411,7 @@ function ButtonList () {
         } else {
             var names = array;
         }
-        
+
         var selected;
         var w = new Window ('dialog', dialogTitle);
         w.alignChildren = "fill";
@@ -433,9 +433,9 @@ function ButtonList () {
                 }
             }
         }
-        
+
         w.close();
-    }    
+    }
 }
 
 

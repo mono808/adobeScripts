@@ -2,7 +2,7 @@
 function main () {
 
     #includepath '/c/repos/adobeScripts1/includes/'
-    #include 'DocsPS.jsx'
+    #include 'SepDocPS.jsx'
     #include 'Job.jsx'
     #include 'JobFolder.jsx'
     #include 'Pathmaker.jsx'
@@ -19,11 +19,11 @@ function main () {
     iaSwitch.set('none');
 
     var saveFile = pm.file('sepPs');
-    var sep = new SepDocPS(app.activeDocument, saveFile);
+    var sep = new SepDocPS(app.activeDocument, true, saveFile);
     app.refresh();
     //if(Window.confirm ('Doc ok?', false, 'Check Document')) sep.doc.close();
     app.activeDocument = baseDoc.doc;
-    
+
     // var styles = ['merged', 'layered'];
 
     // var infoText = 'Please choose the style of the PreviewFile:\r\r';
@@ -44,5 +44,6 @@ function main () {
     //app.activeDocument = baseDoc.doc;
 
     iaSwitch.reset();
+
 }
 main();
