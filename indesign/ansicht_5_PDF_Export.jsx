@@ -17,7 +17,7 @@ function main () {
     var saveFile = new File(myFolder + '/' + saveName + '.pdf');
 
     var docScale = myDoc.documentPreferences.pageWidth/ 297;
-    var resolution = docScale > 4.5 ? 48 : resolution;
+    var resolution = docScale > 4.5 ? 48 : 72;
 
     var myFlattenerPresetName = "mockupFlattener";
 
@@ -30,8 +30,8 @@ function main () {
     {
       name:myFlattenerPresetName,
       rasterVectorBalance: 0,
-      lineArtAndTextResolution: resolution,
-      gradientAndMeshResolution: resolution,
+      lineArtAndTextResolution: resolution*2.5,
+      gradientAndMeshResolution: resolution*2.5,
       convertAllTextToOutlines: true,
       convertAllStrokesToOutlines: true,
       clipComplexRegions: true
