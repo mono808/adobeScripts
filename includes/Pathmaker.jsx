@@ -126,6 +126,13 @@
         else {return null;}
     };
 
+    var create_containing_folder = function (myFile) {
+        if (!myFile.parent.exists) {
+            var containingFolder = new Folder(myFile.parent)
+            containingFolder.create();
+        };
+    };
+
     if(initNfo) set_nfo(initNfo);
 
 
@@ -145,8 +152,13 @@
         {
             if(nfoInput) set_nfo(nfoInput);
             var resolved_path = get_path(shortHand);
-            if(resolved_path) {return new File(resolved_path)}
-            else {return null}
+            if(resolved_path) {
+                var myFile = new File(resolved_path);
+                create_containing_folder(myFile);
+                return myFile;
+            } else {
+                return null;
+            }
         },
 
         path : function (shortHand, nfoInput) 
