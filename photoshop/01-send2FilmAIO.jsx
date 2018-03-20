@@ -29,13 +29,13 @@ function main() {
     var iaSwitch = new InteractSwitch();
     iaSwitch.set('none');
 
-    // var saveFile = pm.file('sepPs');
-    // var sep = new SepDocPS(app.activeDocument, true, saveFile);
+    var saveFile = pm.file('sepPs');
+    var sep = new SepDocPS(app.activeDocument, true, saveFile);
 
-    // sep.pos = sep.get_guide_location();
-    // sep.place_on_film(saveFile, sep.pos);
+    sep.pos = sep.get_guide_location();
+    sep.place_on_film(saveFile, sep.pos);
 
-    // sep.doc.close();
+    sep.doc.close();
 
     //---------------------------------------------------------------------
     // create the preview file
