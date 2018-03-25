@@ -75,7 +75,11 @@
 
                 var layerNames = [];
                 for (var j = 0; j < gLO.graphicLayers.length; j++) {
-                    layerNames.push(gLO.graphicLayers.item(j).name);
+                        
+                    if(!gLO.graphicLayers.item(j).name.match(fixedLayers)) { 
+                        layerNames.push(gLO.graphicLayers.item(j).name);
+                    }
+                    //layerNames.push(gLO.graphicLayers.item(j).name);
                     //$.writeln('j-gL ' + j + ': '  + gLO.graphicLayers.item(j).name + ' myImage ID: ' + myImage.id);
                 }
 
@@ -84,21 +88,31 @@
                 for(var k = 0, maxK = gLO.graphicLayers.length; k < maxK; k += 1) {
                     var gLO = rect.graphics.item(0).graphicLayerOptions;
                     var gL = gLO.graphicLayers.item(k);
-                    
+                                       
                     if(!gL.isValid) continue;
                     if(this.get_member(selectedLayerNames, gL.name)) {
                         gL.currentVisibility = true;
                     } else {
-                        gL.currentVisibility = false;                       
+                        if(!gL.name.match(fixedLayers))
+                            gL.currentVisibility = false;
                     }
                 }
             }
         },
 
-        filter_graphicLayers : function (gLayers) {
+        is_adjustable_graphicLayer : function (layer) {
+
+            if(!layer.name.match(fixedLayers) && !layer.locked) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        filter_graphicLayers_BKP : function (layer) {
             var filteredLayers = [];
             for (var i = 0; i < gLayers.length; i++) {
-                if(!gLayers[i].name.match(fixedLayers)) {
+                if(!gLayers[i].name.match(fixedLayers) && !gLayers[i].locked) {
                     filteredLayers.push(gLayers[i]);
                 }
             }
