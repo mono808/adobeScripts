@@ -12,6 +12,17 @@ baseDocPS.remove_component_channels = function () {
     return this.doc;
 };
 
+baseDocPS.choose_saveFile = function (myDoc)
+{
+    try {
+        var check = myDoc.fullName;
+        return myDoc.fullName;
+    } catch(e) {
+        var saveFile = new Folder($.getenv("csroot")+"\\kundendaten").selectDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');
+        return saveFile;
+    }
+}
+
 baseDocPS.remove_alpha_channels = function (containTeeChannel) {
     var teeNames = /^(t|tee|shirt|tasche|beutel)$/i;
     var i = this.doc.channels.length-1;

@@ -2,9 +2,7 @@
 function main () {
 
     #includepath '/c/repos/adobeScripts1/includes/'
-    #include 'BaseDoc.jsx'
-    #include 'BaseDocPS.jsx'
-    #include 'SepDocPS.jsx'
+    #include 'DtgDocPS.jsx'
     #include 'Job.jsx'
     #include 'JobFolder.jsx'
     #include 'Pathmaker.jsx'
