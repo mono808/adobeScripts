@@ -28,6 +28,7 @@ function main() {
     iaSwitch.set('none');
 
     var saveFile = pm.file('sepPs');
+<<<<<<< HEAD
     var sepObj = Object.create(sepDocPS)
     sepObj.startDoc = app.activeDocument;
     sepObj.make(saveFile);
@@ -38,6 +39,14 @@ function main() {
     app.activeDocument = sepObj.startDoc;
     //sepObj.doc.close();
 
+=======
+    var sep = new SepDocPS(app.activeDocument, true, saveFile);
+
+    sep.pos = sep.get_guide_location();
+    sep.place_on_film(saveFile, sep.pos);
+
+    sep.doc.close();
+>>>>>>> 4d1c6352b9ea0460fc984fa118a1a176ac428316
 
     //---------------------------------------------------------------------
     // create the preview file
