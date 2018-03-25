@@ -1,33 +1,47 @@
 ﻿#include './BaseDocPS.jsx'
-/*///////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
+#include './ButtonList.jsx'
 
-PreviewDocPS
+var previewDocPS = Object.create(baseDocPS);
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////*/
-
-function PreviewDocPS (initDoc, style, saveFile) {
-	BaseDocPS.call(this, initDoc);
-    this.saveOps = new PhotoshopSaveOptions ();
-    with(this.saveOps) {
-        alphaChannels = false;
-        spotColors = false;
-        layers = true;
-        embedColorProfile = true;
-    }
-	switch(style) {
-		case 'merged' : this.create_merged_doc (saveFile ? saveFile : undefined);
-		break;
-		case 'layered': this.create_layered_doc(saveFile ? saveFile : undefined);
-		break;
-		default :       this.create_layered_doc(saveFile ? saveFile : undefined);
-	}
+previewDocPS.saveOps = new PhotoshopSaveOptions ();
+with(previewDocPS.saveOps) {
+    alphaChannels = false;
+    spotColors = false;
+    layers = true;
+    embedColorProfile = true;
 }
-PreviewDocPS.prototype = Object.create(BaseDocPS.prototype);
-PreviewDocPS.prototype.constructor = PreviewDocPS;
 
-PreviewDocPS.prototype.create_layers_from_channels = function (chans) {
+previewDocPS.make = function (saveFile, previewStyle) {
+
+    this.doc = this.startDoc.duplicate();
+
+    var styles = ['merged', 'layered'];
+
+    var infoText = 'Please choose the style of the PreviewFile:\r\r';
+    infoText += 'Layered -> SpotChannels are displayed as Layers, all colors are 100% opaque\r\r';
+    infoText += 'Merged  -> SpotChannels are merged to flat RGB File, better opacity simulation';
+    var style = previewStyle || new ButtonList('Choose Preview Style', infoText).show_dialog(styles);
+
+	switch(previewStyle) {
+		case 'merged' : this.create_merged_doc ();
+		break;
+		case 'layered': this.create_layered_doc();
+		break;
+		default :       this.create_layered_doc();
+	}
+
+	/*if no saveFile is provided, use same name and folder as sourceDoc with new extension*/
+    if(!saveFile) {
+    	var search = '/_(Working|Print|Druck|Sep|Preview)/i';
+    	var replace = '_Preview';
+    	var saveFile = this.get_saveFile(this.startDoc.doc.fullName, search, replace, 'psd');
+        this.save_doc(saveFile, this.saveOps, false, true);
+	} else if (saveFile instanceof File) {
+        this.save_doc(saveFile, this.saveOps, false, false);
+    }
+}
+
+previewDocPS.create_layers_from_channels = function (chans) {
     try {
         var bgLayer = this.doc.artLayers.getByName('Hintergrund');
     } catch(e) {
@@ -58,11 +72,9 @@ PreviewDocPS.prototype.create_layers_from_channels = function (chans) {
 /* creates a combined selection from all spotchannels
    then merge all spotchannels including t-shirt channel into rgb
    and use the created selection to make a layermask for the merged rgb image*/
-PreviewDocPS.prototype.create_merged_doc = function (saveFile) {
-    this.baseDoc = new BaseDocPS(this.doc);
-    var activeChannels = this.get_active_channels();
+previewDocPS.create_merged_doc = function () {
 
-    this.doc = this.doc.duplicate();
+    var activeChannels = this.get_active_channels();
     this.doc.selection.deselect;
 
     //this.delete_hidden_channels();
@@ -144,23 +156,10 @@ PreviewDocPS.prototype.create_merged_doc = function (saveFile) {
     maskChan.remove();
     selection.deselect();
 
-	/*if no saveFile is provided, use same name and folder as sourceDoc with new extension*/
-    if(!saveFile) {
-    	var search = '/_(Working|Print|Druck|Sep|Preview)/i';
-    	var replace = '_Preview';
-    	var saveFile = this.get_saveFile(this.baseDoc.doc.fullName, search, replace, 'psd');
-        this.save_doc(saveFile, this.saveOps, false, true);
-	} else if (saveFile instanceof File) {
-        this.save_doc(saveFile, this.saveOps, false, false);
-    }
-
-    return this;
+    return this.doc;
 };
 
-PreviewDocPS.prototype.create_layered_doc = function (saveFile) {
-
-    this.baseDoc = new BaseDocPS(this.doc);
-    this.doc = this.doc.duplicate();
+previewDocPS.create_layered_doc = function () {
 
     if (this.doc.componentChannels.length > 0) {
         this.doc.changeMode(ChangeMode.RGB);
@@ -180,14 +179,5 @@ PreviewDocPS.prototype.create_layered_doc = function (saveFile) {
 
     this.doc.artLayers.getByName('Ebene 0').remove();
 
-    if(!saveFile) {
-    	var search = '/_(Working|Print|Druck|Sep|Preview)/i';
-    	var replace = '_Preview';
-    	var saveFile = this.get_saveFile(this.baseDoc.doc.fullName, search, replace, 'psd');
-        this.save_doc(saveFile, this.saveOps, false, true);
-	} else if (saveFile instanceof File) {
-        this.save_doc(saveFile, this.saveOps, false, false);
-    }
-
-	return this;
+	return this.doc;
 };
