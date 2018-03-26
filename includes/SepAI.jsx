@@ -2,7 +2,7 @@
     Object.prototype.create = function(o) {
         var F = function () {}
         F.prototype = o;
-        return new F();     
+        return new F();
     };
 }
 
@@ -10,11 +10,11 @@ function BaseAI (initDoc) {
     this.doc = initDoc;
 }
 
-BaseAI.prototype.recursive_delete_layer = function (ly) 
+BaseAI.prototype.recursive_delete_layer = function (ly)
 {
     ly.locked = false;
     ly.visible = true;
-    
+
     if(ly.layers.length > 0) {
         var i = ly.layers.length-1;
         do {
@@ -23,7 +23,7 @@ BaseAI.prototype.recursive_delete_layer = function (ly)
         } while (i--);
     }
 
-    if(ly.pageItems.length > 0) {         
+    if(ly.pageItems.length > 0) {
         var j = ly.pageItems.length-1;
         do {
             var pI = ly.pageItems[j];
@@ -35,7 +35,7 @@ BaseAI.prototype.recursive_delete_layer = function (ly)
     ly.remove();
 };
 
-BaseAI.prototype.delete_layer = function (layer_name) 
+BaseAI.prototype.delete_layer = function (layer_name)
 {
     try {
         var l = this.doc.layers.getByName(layer_name);
@@ -46,21 +46,21 @@ BaseAI.prototype.delete_layer = function (layer_name)
     }
 };
 
-BaseAI.prototype.fit_artboard_to_art = function (artlayer_name) 
+BaseAI.prototype.fit_artboard_to_art = function (artlayer_name)
 {
     var artLayer = this.doc.layers.getByName(artlayer_name);
-    var selection = [];        
+    var selection = [];
 
     var i = artLayer.pageItems.length-1;
     do {
         selection.push(artLayer.pageItems[i]);
     } while (i--);
-    
+
     this.doc.selection = selection;
     this.doc.fitArtboardToSelectedArt(0);
 };
 
-BaseAI.prototype.get_items_on_layer = function (items, layer_name) 
+BaseAI.prototype.get_items_on_layer = function (items, layer_name)
 {
     var itemsOnLayer = [];
     var l = this.doc.layers.getByName(layer_name);
@@ -85,7 +85,7 @@ MonoSpot
 
 ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////*/
-function MonoSpot (name) 
+function MonoSpot (name)
 {
     this.name = name;
     this.spot;
@@ -117,28 +117,28 @@ SepAI
 /////////////////////////////////////////////////////////////////////////////////*/
 function SepAI (initDoc) {
     BaseAI.call(this, initDoc);
-    this.spots = [];
-    this.pathItems = this.get_items_on_layer(this.doc.pathItems, 'Motiv');
-    this.rasterItems = this.get_items_on_layer(this.doc.rasterItems, 'Motiv');
-    this.ubRegEx = /^(UB|UL|Unterleger|Vordruck|UB-Grey)$/i;
-    this.pantoneTxt = new File('/c/capri-links/Scripts2/pantones.txt');
-    
     this.saveOpts = new IllustratorSaveOptions();
     with(this.saveOpts) {
         compatibility = Compatibility.ILLUSTRATOR16;
         embedICCProfile = true;
         pdfCompatible = true;
     }
+
+    this.spots = [];
+    this.pathItems = this.get_items_on_layer(this.doc.pathItems, 'Motiv');
+    this.rasterItems = this.get_items_on_layer(this.doc.rasterItems, 'Motiv');
+    this.ubRegEx = /^(UB|UL|Unterleger|Vordruck|UB-Grey)$/i;
+    this.pantoneTxt = new File('/c/repos/adobescripts1/pantones.txt');
     this.spots = [];
     this.sqpt2sqcm = new UnitValue(1,'pt').as('cm') * new UnitValue(1,'pt').as('cm');
 }
 SepAI.prototype = Object.create(BaseAI.prototype);
 SepAI.prototype.constructor = SepAI;
 
-SepAI.prototype.check = function (items) 
+SepAI.prototype.check = function (items)
 {
     //separationReport
-    var suspItems = { 
+    var suspItems = {
         nonSpotFills : [],
         nonSpotStrokes : [],
         spotStrokes : [],
@@ -161,7 +161,7 @@ SepAI.prototype.check = function (items)
                     if(pI.stroked && pI.strokeColor.constructor.name === 'SpotColor') {
                         suspItems.spotStrokes.push(pI);
                     }
-                break;                       
+                break;
                 case 'SpotColor' :
                     // if pI has a stroke and is filled with sth. other than underbase spotcolor
                     // check the stroke too
@@ -182,29 +182,29 @@ SepAI.prototype.check = function (items)
 
     if( suspItems.nonSpotFills.length > 0 ||
         suspItems.nonSpotStrokes.length > 0 ||
-        suspItems.spotStrokes.length > 0 ) 
+        suspItems.spotStrokes.length > 0 )
     {
         var cfStr = 'Separation enthält:\n\n';
-        if(suspItems.nonSpotFills.length > 0)   cfStr += suspItems.nonSpotFills.length + ' PathItems with NONSPOT FILL\n';        
+        if(suspItems.nonSpotFills.length > 0)   cfStr += suspItems.nonSpotFills.length + ' PathItems with NONSPOT FILL\n';
         if(suspItems.nonSpotStrokes.length > 0) cfStr += suspItems.nonSpotStrokes.length + ' PathItems with NONSPOT STROKE\n';
         if(suspItems.spotStrokes.length > 0)    cfStr += suspItems.spotStrokes.length + ' PathItems with SPOT STROKES\n';
         cfStr += '\nContinue?';
-        
+
         if(Window.confirm(cfStr)){
             return true;
         } else {
             return false;
         }
     }
-    
-    return true;    
+
+    return true;
 };
 
-SepAI.prototype.get_totalArea = function () 
+SepAI.prototype.get_totalArea = function ()
 {
     //               1                    +
     //   bounds:  0     2     values:  -     +
-    //               3                    -        
+    //               3                    -
 
     var totalBounds = [];
     var initialized = false;
@@ -231,11 +231,11 @@ SepAI.prototype.get_totalArea = function ()
     this.totalArea = totalArea * this.sqpt2sqcm;
 };
 
-SepAI.prototype.sort_by_spotColor = function (pIs) 
+SepAI.prototype.sort_by_spotColor = function (pIs)
 {
     var i = pIs.length-1;
     while(i >= 0) {
-        var pI = pIs[i];        
+        var pI = pIs[i];
         var monoSpot = null;
 
         if(!pI.filled)  {
@@ -255,9 +255,9 @@ SepAI.prototype.sort_by_spotColor = function (pIs)
             monoSpot = new MonoSpot(fC.spot.name);
             monoSpot.spot = fC.spot;
             monoSpot.bounds = pI.geometricBounds;
-            
+
             if(fC.spot.name.search(this.ubRegEx) > -1) monoSpot.isUB = true;
-            
+
             this.spots.push(monoSpot);
         }
 
@@ -266,11 +266,11 @@ SepAI.prototype.sort_by_spotColor = function (pIs)
     }
 };
 
-SepAI.prototype.delete_underbase2 = function () 
+SepAI.prototype.delete_underbase2 = function ()
 {
     var doc = this.doc;
     var removeFlag = false;
-    for (var i = 0; i < this.spots.length; i++) {        
+    for (var i = 0; i < this.spots.length; i++) {
         if(this.ubRegEx.test(this.spots[i].spot.name)) {
             var ubSpot = this.spots.splice(i,1)[0];
             var j = ubSpot.pathItems.length-1;
@@ -290,20 +290,20 @@ SepAI.prototype.get_sep_coordinates = function ()
         xRef = doc.pageItems.getByName('xLine').position[0],
         yRef = doc.pageItems.getByName('yLine').position[1],
         dist = {};
-    
+
     dist.x = UnitValue((abRect[0] - xRef), 'pt');
     dist.y = UnitValue((yRef - abRect[1]), 'pt');
     return dist;
 };
 
-SepAI.prototype.change_fillColor = function (itemsToCheck, oldSpot, newSpot) 
+SepAI.prototype.change_fillColor = function (itemsToCheck, oldSpot, newSpot)
 {
     var tempColor = new SpotColor();
     tempColor.spot = newSpot;
 
     var i = itemsToCheck.length-1;
     var pI, tintValue, remainingItems = [];
-    
+
     do {
         var pI = itemsToCheck[i];
         if (pI.fillColor.spot === oldSpot) {
@@ -322,26 +322,26 @@ SepAI.prototype.create_colored_blob = function (spotColor)
 {
     app.redraw();
     var tempColor = new SpotColor();
-        
+
     try {
         var cP = this.doc.activeView.centerPoint;
         var zf = this.doc.activeView.zoom;
-        var size = 500/zf;            
+        var size = 500/zf;
     } catch (e) {
         var cP = [0,0];
         var zf = 1;
         var size = 500/zf;
         $.writeln('Illu PARMED, again... =/');
-    }   
+    }
     var blob = this.doc.pathItems.ellipse(cP[1]+size/2,  cP[0]-size/2,  size,  size);
-    
+
     tempColor.spot = spotColor;
     blob.fillColor = tempColor;
     blob.stroked = false;
     return blob;
 };
 
-SepAI.prototype.ask_user_for_new_colorname = function  (spotColor, txtName) 
+SepAI.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
 {
     var blob = this.create_colored_blob(spotColor);
     var presetStr = txtName ? txtName : 'Farbe X';
@@ -351,7 +351,7 @@ SepAI.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
     return newName + ' ';
 };
 
-SepAI.prototype.get_pantone_txt = function (panNr) 
+SepAI.prototype.get_pantone_txt = function (panNr)
 {
     var check = panNr.match(/\d{3,4}/);
     if(check.length > 0) {
@@ -370,9 +370,9 @@ SepAI.prototype.get_pantone_txt = function (panNr)
             for(var i=0, maxI = splitStr.length; i < maxI; i+=1) {
                 if(splitStr[i].indexOf('=') > -1) {
                     var aColorArr = splitStr[i].split('=');
-                    panArr[aColorArr[0]] = aColorArr[1];                
+                    panArr[aColorArr[0]] = aColorArr[1];
                 }
-            }            
+            }
 
             read_file.close();
             return panArr[nr];
@@ -388,12 +388,12 @@ SepAI.prototype.add_to_pantone_txt = function (pantoneStr)
     var nArr = pS.match(/\d{3,4}/);
     var nr = nArr[nArr.length-1];
     var appendStr = '\n';
-        
+
     appendStr += nr;
     appendStr += '=';
     appendStr += color;
 
-    var out; 
+    var out;
     if (append_file !== '') {
         out = append_file.open('a', undefined, undefined);
         append_file.encoding = "UTF-8";
@@ -412,13 +412,13 @@ SepAI.prototype.add_to_pantone_txt = function (pantoneStr)
     }
 };
 
-SepAI.prototype.rename_pantone_colors = function () 
+SepAI.prototype.rename_pantone_colors = function ()
 {
     var panSpots = []; //spotcolors with default PANTONE name
-    
+
     for (var i = 0, maxI = this.doc.spots.length; i < maxI; i+=1) {
         var spot = this.doc.spots[i];
-        if(spot.name.indexOf('PANTONE') > -1) { 
+        if(spot.name.indexOf('PANTONE') > -1) {
             spot.name = spot.name.replace('PANTONE ', '');
             panSpots.push(spot);
         }
@@ -429,7 +429,7 @@ SepAI.prototype.rename_pantone_colors = function ()
     for (var i = 0, maxI = panSpots.length; i < maxI; i+=1) {
         var panSpot = panSpots[i];
         var panNr = nrOnlyRE.exec(panSpot.name);
-        
+
         // if stripped spotName contains only sth like 574 C, let user name the color
         if (panNr && panNr.length > 0) {
             var txtName = this.get_pantone_txt(panNr[0]);
@@ -443,7 +443,7 @@ SepAI.prototype.rename_pantone_colors = function ()
     }
 };
 
-SepAI.prototype.get_wxh = function () 
+SepAI.prototype.get_wxh = function ()
 {
     var doc = app.activeDocument;
     var w = new UnitValue (doc.width, 'pt');
@@ -451,7 +451,7 @@ SepAI.prototype.get_wxh = function ()
     return w.as('mm').toFixed(0) + 'x' + h.as('mm').toFixed(0);
 };
 
-SepAI.prototype.get_swatch = function (mySpot) 
+SepAI.prototype.get_swatch = function (mySpot)
 {
     for (var i = 0; i < this.doc.swatches.length; i++) {
         var swatch = this.doc.swatches[i];
@@ -461,15 +461,15 @@ SepAI.prototype.get_swatch = function (mySpot)
     }
 };
 
-SepAI.prototype.change_spot_to_process_colors2 = function () 
+SepAI.prototype.change_spot_to_process_colors2 = function ()
 {
     for (var i = 0; i < this.spots.length; i++) {
         var monoSpot = this.spots[i];
         var mySwatch = this.get_swatch(monoSpot.spot);
         var oldColor = mySwatch.color.spot.color;
-        switch(oldColor.constructor.name) 
+        switch(oldColor.constructor.name)
         {
-            case 'RGBColor' : 
+            case 'RGBColor' :
                 var newColor = new RGBColor();
                 newColor.red = oldColor.red;
                 newColor.green = oldColor.green;
