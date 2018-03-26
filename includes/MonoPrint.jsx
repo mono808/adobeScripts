@@ -27,7 +27,7 @@
 
 	this.choose_file_manually = function (promptString) {
 		var tempFile = File(baseFolder).openDlg(promptString);
-		if(tempFile.exists) {
+		if(tempFile && tempFile.exists) {
 			return tempFile
 		} else {
 			return null;
