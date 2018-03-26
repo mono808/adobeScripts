@@ -151,7 +151,7 @@
 
     var add_id_column = function () {
         if(myTable.columns.length < 9) {
-            var colWidth = 10 * docScale;
+            var colWidth = 13 * docScale;
             myTable.columns.lastItem().width -= colWidth;
             var idCol = myTable.columns.add(LocationOptions.AT_END, undefined, {width:colWidth});
             var colIndex = idCol.index;
@@ -393,6 +393,9 @@
             }
 
             var myRow = get_row_by_id(newContents.id);
+            if(!myRow) update_row_id (newContents.id);
+            var myRow = get_row_by_id(newContents.id);
+            
             if(myRow) {
                 var oldContents = read_nfo_from_row(myRow);
                 newContents.stand = update_standString(newContents, oldContents);
