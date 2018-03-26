@@ -25,11 +25,11 @@ function main () {
     var monoGraphics = monoMockup.get_monoGraphics(myPage, monoMockup.layers.prints);
     
 	var monoTable = new MonoTable(myPage);
-	monoTable.create_table(myPage, true);
+	//monoTable.create_table(myPage, true);
    
-    for(var i = 0; i < monoGraphics.length; i++) {
-        monoTable.add_row(monoGraphics[i]);
-    }
+//~     for(var i = 0; i < monoGraphics.length; i++) {
+//~         monoTable.add_row(monoGraphics[i]);
+//~     }
 
     //monoTable.update_stand(monoGraphics[0]);
     //monoTable.update_row(monoGraphics[1], false);

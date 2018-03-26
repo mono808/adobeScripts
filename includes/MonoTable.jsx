@@ -1,11 +1,12 @@
 ﻿function MonoTable (initPage) {
-    
+
     var init = function (myPage) {
         if(myPage) {
             myDoc = myPage.parent.parent;
             myLayer = myDoc.layers.itemByName('Infos');
             docScale = myDoc.documentPreferences.pageWidth/ 297;
             myTable = get_table(myPage);
+            if(myTable.columns.length < 9) add_id_column();
         }
     };
 
@@ -13,7 +14,7 @@
         var myTable = myColumn.parent;
         var deltaW = myColumn.width - newWidth;
         myColumn.width = newWidth;
-        
+
         var getIndex = function (myColumn) {
             for (var i = 0, maxI = myColumn.parent.columns.length; i < maxI; i+=1) {
                 if(myTable.columns.item(i) === myColumn) {
@@ -43,20 +44,20 @@
     };
 
     var create_table = function (myPage) {
-        
+
         myTable = get_table(myPage);
         if(myTable && myTable.name)myTable.remove();
-        
+
         var tFBounds = myDoc.masterSpreads.item('A-FixedStuff').pageItems.item('printTabFrame').geometricBounds;
         var myTF = myPage.textFrames.add({geometricBounds:tFBounds, itemLayer:myLayer, name: 'printTableFrame'});
-        
-        myTF.textFramePreferences.verticalJustification = VerticalJustification.CENTER_ALIGN; 
+
+        myTF.textFramePreferences.verticalJustification = VerticalJustification.CENTER_ALIGN;
         myTF.contents = tableInitString;
         myTF.texts.item(0).convertToTable();
         myTable = myTF.tables.item(0);
         myTable.name = 'filmInfosTable';
 
-    
+
         return myTable;
     };
 
@@ -67,25 +68,27 @@
         }
         return total;
     };
-    
+
     var style_table = function (myTable) {
         var headerRow = myTable.rows.item(0);
-        headerRow.rowType = RowTypes.HEADER_ROW;
+        if(headerRow.rowType != RowTypes.HEADER_ROW)
+            headerRow.rowType = RowTypes.HEADER_ROW;
+
         headerRow.cells.everyItem().appliedCellStyle = myDoc.cellStyles.item('headerCellStyle');
 
-        myTable.appliedTableStyle = myDoc.tableStyles.item('defaultTStyle');        
+        myTable.appliedTableStyle = myDoc.tableStyles.item('defaultTStyle');
         myTable.alternatingFills = AlternatingFillsTypes.ALTERNATING_ROWS;
-        
+
         var totalWidth = myTable.parent.geometricBounds[3]-myTable.parent.geometricBounds[1];
         switch (docScale) {
             case 4.5 : // for bags
                 var columnWidths = [6, 12, 15, 10, 10, 15, 10, 22, 5];
                 break;
-                        
+
             default :  //for shirts
                 var columnWidths = [6, 14, 15, 10, 10, 17, 10, 22, 5];
         }
-        
+
         var sum = sum_array(columnWidths);
         for(var i = 0; i < columnWidths.length; i++) {
             if(columnWidths[i] != undefined) {
@@ -143,7 +146,22 @@
             return updatedString;
         } else {
             return oldRC.stand.replace(/\d{1,2}\.?,?5?/, stand);
-        }        
+        }
+    };
+
+    var add_id_column = function () {
+        if(myTable.columns.length < 9) {
+            var colWidth = 10 * docScale;
+            myTable.columns.lastItem().width -= colWidth;
+            var idCol = myTable.columns.add(LocationOptions.AT_END, undefined, {width:colWidth});
+            var colIndex = idCol.index;
+
+            myTable.rows[0].cells.item(colIndex).contents = 'Id:';
+
+            for (var i=1, len=myTable.rows.length; i < len ; i++) {
+              myTable.rows[i].cells.item(colIndex).contents = i.toString();
+            };
+        }
     };
 
     var write_nfo_to_row = function (myRow, rowContents) {
@@ -159,10 +177,10 @@
                         myCell.contents = rowContents[p].toString();
                     } else {
                         $.writeln('could not write to cell: ' + p);
-                    }               
+                    }
                 }
             }
-        }        
+        }
     };
 
     var read_nfo_from_row = function (myRow) {
@@ -189,7 +207,7 @@
         var rC = {};
         var monoNamer = new MonoNamer();
         var colors = monoGraphic.get_colors(true);
-        
+
         rC.textilName = monoGraphic.get_textil_name();
         rC.textilColor = monoGraphic.get_textil_color();
         rC.printId = monoNamer.name('printId', monoGraphic.get_printId());
@@ -231,7 +249,7 @@
             rC.textilColor = win.textilPanel.color.text;
             rC.run = win.textilPanel.run.text;
             rC.beidseitig = win.textilPanel.beidseitig.value;
-            rC.hinweis = win.textilPanel.hinweis.text != 'Hinweise' ? win.textilPanel.hinweis.text : null;                
+            rC.hinweis = win.textilPanel.hinweis.text != 'Hinweise' ? win.textilPanel.hinweis.text : null;
             win.close();
         };
 
@@ -248,7 +266,7 @@
         for (var i = 0; i < rows.length; i++) {
             radio_group.add ("radiobutton", undefined, rows[i].cells.item(columnOrder['id']).contents);
         }
-        
+
         w.add ("button", undefined, "OK");
         // set dialog defaults
         radio_group.children[0].value = true;
@@ -289,12 +307,13 @@
         colors : 7,
         id: 8
     };
-    
+
     var myDoc;
     var myLayer;
     var docScale;
     var myTable;
-    var tableInitString = 'Menge:\tArtikel:\tFarbe(n):\tPosition:\tBreite (mm):\tDruckstand:\tVerfahren:\tDruckfarben:\tId:\r';
+    var headerCols = ['Menge:', 'Artikel:','Farbe(n):', 'Position:', 'Breite (mm):', 'Druckstand:', 'Verfahren:', 'Druckfarben:', 'Id:'];
+    var tableInitString = headerCols.join('\t') + '\r';
     var lastRowContents;
 
     if(initPage && initPage.constructor.name == 'Page') init(initPage);
@@ -315,20 +334,20 @@
             if(lastRowContents && lastRowContents.beidseitig) {
                 rowContents.run = '';
                 rowContents.textilName = '';
-                rowContents.textilColor = ''; 
+                rowContents.textilColor = '';
             } else {
                 rowContents = get_user_input(rowContents);
             }
-            
+
             rowContents.stand = make_standString (rowContents);
-            
+
             var lastRow = myTable.rows.lastItem();
             if(lastRow.contents.join('') == '') {
                 var myRow = lastRow;
-            } else {                
+            } else {
                 var myRow = myTable.rows.add(LocationOptions.AT_END, undefined, {name:monoGraphic.get_id()});
             }
-            
+
             write_nfo_to_row(myRow, rowContents);
             lastRowContents = rowContents;
         },
@@ -346,13 +365,13 @@
         update_stand : function (monoGraphic) {
             if(!myTable) return null;
             if(!monoGraphic) return null;
-            
-            var id = monoGraphic.get_id();            
-            
+
+            var id = monoGraphic.get_id();
+
             var myRow = get_row_by_id(id);
             if(!myRow) {myRow = update_row_id(id);}
             if(!myRow) return;
-            
+
             var oldContents = read_nfo_from_row(myRow);
             var rC = {
                 height : monoGraphic.get_height().toFixed(0),
@@ -360,7 +379,7 @@
                 stand : monoGraphic.get_stand(),
             };
             rC.stand = update_standString(rC, oldContents);
-            
+
             myRow.cells.item(columnOrder['stand']).contents = rC.stand;
             myRow.cells.item(columnOrder['width']).contents = rC.width;
         },
