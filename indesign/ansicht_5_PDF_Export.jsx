@@ -29,7 +29,7 @@ function main () {
     var myFlattenerPreset = app.flattenerPresets.add(
     {
       name:myFlattenerPresetName,
-      rasterVectorBalance: 0,
+      rasterVectorBalance: 15,
       lineArtAndTextResolution: resolution*2.5,
       gradientAndMeshResolution: resolution*2.5,
       convertAllTextToOutlines: true,
