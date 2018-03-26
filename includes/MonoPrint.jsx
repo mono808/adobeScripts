@@ -25,6 +25,17 @@
 		return this.jobFolder.working.getFiles(tag);
 	};
 
+	this.choose_file_manually = function (promptString) {
+		var tempFile = File(baseFolder).openDlg(promptString);
+		if(tempFile.exists) {
+			return tempFile
+		} else {
+			return null;
+		}
+	};
+
+	
+
 	var baseFolder = baseFolder;
 	var tagRegEx = /^([a-z0-9äüöß-]+)_(\d{1,3}x\d{1,3})?_?(SD|DTA|DTG|SUB|FLX|FLK|STK)_?(print|druck|sep|working|preview|film)?\.[a-z]{2,3}$/i;
     // 817A15-012_[Logo2Z-14cm_Front]_Sep
@@ -36,9 +47,13 @@
     var printsFolder = this.tech ? 'druckdaten-' + this.tech : 'druckdaten';
 
 	this.print   = this.get_tagged_files(printsFolder, this.tag + '_*');
-    if(!this.print) this.print = aFile;
+    if(!this.print) this.print = this.choose_file_manually('Choose PrintFile to ' + aFile.name);
     
 	this.preview = this.get_tagged_files('previews', this.tag+'_Preview.*');
+	if(!this.preview) this.preview = this.choose_file_manually('Choose PreviewFile to ' + aFile.name);
+
 	this.film    = this.get_tagged_files('druckdaten-sd', '*'+this.tag+'_Film.indd');
+	if(!this.film) this.film = this.choose_file_manually('Choose Film.indd to ' + aFile.name);
+    
 	this.working = this.get_tagged_files('working', this.tag+'_Working.*');
 }
