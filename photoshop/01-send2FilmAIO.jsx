@@ -24,24 +24,37 @@ function main() {
     var originalRulerUnits = app.preferences.rulerUnits;
     app.preferences.rulerUnits = Units.MM;
 
-    var baseDoc = new BaseDocPS(app.activeDocument);
-
     var iaSwitch = new InteractSwitch();
     iaSwitch.set('none');
 
     var saveFile = pm.file('sepPs');
+<<<<<<< HEAD
+    var sepObj = Object.create(sepDocPS)
+    sepObj.startDoc = app.activeDocument;
+    sepObj.make(saveFile);
+
+    sepObj.pos = sepObj.get_guide_location();
+    sepObj.place_on_film(saveFile, sepObj.pos);
+
+    app.activeDocument = sepObj.startDoc;
+    //sepObj.doc.close();
+
+=======
     var sep = new SepDocPS(app.activeDocument, true, saveFile);
 
     sep.pos = sep.get_guide_location();
     sep.place_on_film(saveFile, sep.pos);
 
     sep.doc.close();
+>>>>>>> 4d1c6352b9ea0460fc984fa118a1a176ac428316
 
     //---------------------------------------------------------------------
     // create the preview file
 
     var saveFile = pm.file('previewPs');
-    var preview = new PreviewDocPS(baseDoc.doc, 'merged', saveFile);
+    var previewObj = Object.create(previewDocPS);
+    previewObj.startDoc = app.activeDocument;
+    previewObj.make(saveFile);
 
     app.preferences.rulerUnits = originalRulerUnits;
 }

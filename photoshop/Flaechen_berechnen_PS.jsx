@@ -11,7 +11,9 @@
 function main() {
 
     var myDoc = app.activeDocument;
-    var sepDoc = new SepDocPS(myDoc);
+    var sepDoc = Object.create(sepDocPS);
+    sepDoc.startDoc = app.activeDocument;
+    
     var report = sepDoc.get_histogram_reports(myDoc);
     var totalArea = sepDoc.get_totalArea();
 

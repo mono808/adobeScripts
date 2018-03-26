@@ -13,16 +13,16 @@ function main () {
     var job = new Job(app.activeDocument, true);
     var pm = new Pathmaker(job.nfo);
 
-    var baseDoc = new BaseDocPS(app.activeDocument);
-
     var iaSwitch = new InteractSwitch();
     iaSwitch.set('none');
 
     var saveFile = pm.file('sepPs');
-    var sep = new SepDocPS(app.activeDocument, true, saveFile);
+    var sepObj = Object.create(sepDocPS)
+    sepObj.startDoc = app.activeDocument;
+    sepObj.make(saveFile);
     app.refresh();
     //if(Window.confirm ('Doc ok?', false, 'Check Document')) sep.doc.close();
-    app.activeDocument = baseDoc.doc;
+    app.activeDocument = sepObj.startDoc;
 
     // var styles = ['merged', 'layered'];
 

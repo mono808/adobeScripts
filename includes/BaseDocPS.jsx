@@ -1,19 +1,7 @@
 ﻿#include './BaseDoc.jsx'
-/*////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////
+var baseDocPS = Object.create(baseDoc);
 
-BaseDocPS
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////*/
-
-function BaseDocPS (initDoc) {
-	BaseDoc.call(this, initDoc);
-}
-BaseDocPS.prototype = Object.create(BaseDoc.prototype);
-BaseDocPS.prototype.constructor = BaseDocPS;
-
-BaseDocPS.prototype.remove_component_channels = function () {
+baseDocPS.remove_component_channels = function () {
     if (this.doc.componentChannels.length > 0) {
         this.doc.activeChannels = this.doc.componentChannels;
         for (var i = this.doc.componentChannels.length-1; i >= 0; i-=1) {
@@ -24,7 +12,18 @@ BaseDocPS.prototype.remove_component_channels = function () {
     return this.doc;
 };
 
-BaseDocPS.prototype.remove_alpha_channels = function (containTeeChannel) {
+baseDocPS.choose_saveFile = function (myDoc)
+{
+    try {
+        var check = myDoc.fullName;
+        return myDoc.fullName;
+    } catch(e) {
+        var saveFile = new Folder($.getenv("csroot")+"\\kundendaten").selectDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');
+        return saveFile;
+    }
+}
+
+baseDocPS.remove_alpha_channels = function (containTeeChannel) {
     var teeNames = /^(t|tee|shirt|tasche|beutel)$/i;
     var i = this.doc.channels.length-1;
     do{
@@ -43,7 +42,7 @@ BaseDocPS.prototype.remove_alpha_channels = function (containTeeChannel) {
     return teeColor;
 };
 
-BaseDocPS.prototype.reset_colors = function () {
+baseDocPS.reset_colors = function () {
     var idRset = charIDToTypeID( "Rset" );
     var desc1 = new ActionDescriptor();
     var idnull = charIDToTypeID( "null" );
@@ -55,7 +54,7 @@ BaseDocPS.prototype.reset_colors = function () {
     executeAction( idRset, desc1, DialogModes.NO );
 };
 
-BaseDocPS.prototype.move_channel_to_index = function (idx) {
+baseDocPS.move_channel_to_index = function (idx) {
     try {
         var idmove = charIDToTypeID( "move" );
         var desc3 = new ActionDescriptor();
@@ -75,7 +74,7 @@ BaseDocPS.prototype.move_channel_to_index = function (idx) {
     } catch (e) {alert(e)};
 };
 
-BaseDocPS.prototype.activate_all_channels = function () {
+baseDocPS.activate_all_channels = function () {
  	var allChans = [];
     for(var i = 0, maxI = this.doc.channels.length; i < maxI; i += 1) {
         var chan = this.doc.channels[i];
@@ -86,7 +85,7 @@ BaseDocPS.prototype.activate_all_channels = function () {
     return this.doc;
 };
 
-BaseDocPS.prototype.add_Grey_channel = function () {
+baseDocPS.add_Grey_channel = function () {
 
     var white = new RGBColor();
     white.red = 255;
@@ -111,7 +110,7 @@ BaseDocPS.prototype.add_Grey_channel = function () {
     return this;
 };
 
-BaseDocPS.prototype.add_RGB_channels = function () {
+baseDocPS.add_RGB_channels = function () {
     var activeChans = this.doc.activeChannels;
     this.add_Grey_channel();
     this.doc.changeMode(ChangeMode.RGB);
@@ -119,7 +118,7 @@ BaseDocPS.prototype.add_RGB_channels = function () {
     return this.doc;
 };
 
-BaseDocPS.prototype.check_for_pantone = function () {
+baseDocPS.check_for_pantone = function () {
 
     var check;
     var pantoneChannels = [];
@@ -144,7 +143,7 @@ BaseDocPS.prototype.check_for_pantone = function () {
     return pantoneChannels;
 };
 
-BaseDocPS.prototype.get_spot_channels = function (visibleOnly) {
+baseDocPS.get_spot_channels = function (visibleOnly) {
     var spotChans = [];
     for (var i = 0, maxI = this.doc.channels.length; i<maxI; i++) {
     	var chan = this.doc.channels[i];
@@ -161,7 +160,7 @@ BaseDocPS.prototype.get_spot_channels = function (visibleOnly) {
     return spotChans;
 };
 
-BaseDocPS.prototype.trim_doc = function () {
+baseDocPS.trim_doc = function () {
     var trims = ['TOPLEFT', 'BOTTOMRIGHT', 'NOE'];
     var trim = f_all.choose_from_array(trims, undefined, 'Bild zuschneiden?');
     if(trim != 'NOE') {
@@ -170,7 +169,7 @@ BaseDocPS.prototype.trim_doc = function () {
     return this.doc;
 };
 
-BaseDocPS.prototype.make_layer_mask = function (maskType) {
+baseDocPS.make_layer_mask = function (maskType) {
     if( maskType == undefined) maskType = 'RvlS';
     var desc140 = new ActionDescriptor();
         desc140.putClass( charIDToTypeID('Nw  '), charIDToTypeID('Chnl') );
@@ -181,7 +180,7 @@ BaseDocPS.prototype.make_layer_mask = function (maskType) {
     executeAction( charIDToTypeID('Mk  '), desc140, DialogModes.NO );
 };
 
-BaseDocPS.prototype.check_histogram = function (chan) {
+baseDocPS.check_histogram = function (chan) {
     var visState = chan.visible;
     if(!visState) {chan.visible = true;}
 
@@ -213,7 +212,7 @@ BaseDocPS.prototype.check_histogram = function (chan) {
     };
 };
 
-BaseDocPS.prototype.find_tee_channel = function () {
+baseDocPS.find_tee_channel = function () {
 	var teeNames = /^(t|tee|shirt|tasche|beutel)$/i;
 
     for (var i = this.doc.componentChannels.length, maxI = this.doc.channels.length; i < maxI; i++) {
@@ -234,7 +233,7 @@ BaseDocPS.prototype.find_tee_channel = function () {
     }
 };
 
-BaseDocPS.prototype.check_for_tee_channel= function () {
+baseDocPS.check_for_tee_channel= function () {
     var iaSwitch = new InteractSwitch();
     iaSwitch.set('all');
 
@@ -256,7 +255,7 @@ BaseDocPS.prototype.check_for_tee_channel= function () {
     return false;
 };
 
-BaseDocPS.prototype.create_tee_channel = function () {
+baseDocPS.create_tee_channel = function () {
     if(!Window.confirm('T-Shirt Kanal erstellen?')) return null;
 
     var oldForegroundColor = app.foregroundColor;
@@ -296,7 +295,7 @@ BaseDocPS.prototype.create_tee_channel = function () {
     return teeChan;
 };
 
-BaseDocPS.prototype.delete_hidden_channels = function () {
+baseDocPS.delete_hidden_channels = function () {
     for (var i = this.doc.channels.length-1; i >= 0; i--) {
         if(!this.doc.channels[i].visible) {
             this.doc.channels[i].remove();
@@ -304,7 +303,7 @@ BaseDocPS.prototype.delete_hidden_channels = function () {
     }
 };
 
-BaseDocPS.prototype.get_active_channels = function () {
+baseDocPS.get_active_channels = function () {
     var activeChannels = [];
     for (var i = 0; i < this.doc.channels.length; i++) {
         if(this.doc.channels[i].visible) {

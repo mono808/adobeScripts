@@ -1,4 +1,4 @@
-#include './BaseDocPS.jsx'
+﻿#include './BaseDocPS.jsx'
 /*//////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -7,14 +7,10 @@ SepDocPS
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-function SepDocPS (initDoc, createDoc, saveFile) {
-	BaseDocPS.call(this, initDoc);
-	if(createDoc) this.doc = this.create_doc(saveFile);
-}
-SepDocPS.prototype = Object.create(BaseDocPS.prototype);
-SepDocPS.prototype.constructor = SepDocPS;
 
-SepDocPS.prototype.get_guide_location = function () {
+var sepDocPS = Object.create(baseDocPS);
+
+sepDocPS.get_guide_location = function () {
     var defaultPos = {
         x : new UnitValue(this.doc.width.value/2*-1, 'mm'),
         y : new UnitValue(80, 'mm')
@@ -49,7 +45,7 @@ SepDocPS.prototype.get_guide_location = function () {
     }
 };
 
-SepDocPS.prototype.recolor_white_spotchannels = function () {
+sepDocPS.recolor_white_spotchannels = function () {
 
     var ubNames = /^(Unterleger|UL|UB|Underbase|Weiß1|Vordruck)$/i;
     var w1Names = /^(Weiß|White|Weiß2|HL)$/i;
@@ -83,7 +79,7 @@ SepDocPS.prototype.recolor_white_spotchannels = function () {
     return this.doc;
 };
 
-SepDocPS.prototype.rename_cmyk = function () {
+sepDocPS.rename_cmyk = function () {
     var forbiddenNames = /^(Cyan|Magenta|Yellow|Gelb|Black|Schwarz)$/i;
     var renamedChans = [];
     var i = this.doc.channels.length-1;
@@ -108,7 +104,7 @@ SepDocPS.prototype.rename_cmyk = function () {
     return renamedChans;
 };
 
-SepDocPS.prototype.save_dcs2 = function (saveFile) {
+sepDocPS.save_dcs2 = function (saveFile) {
     var idsave = charIDToTypeID( "save" );
         var desc2 = new ActionDescriptor();
         var idAs = charIDToTypeID( "As  " );
@@ -150,7 +146,7 @@ SepDocPS.prototype.save_dcs2 = function (saveFile) {
     executeAction( idsave, desc2, DialogModes.NO );
 };
 
-SepDocPS.prototype.get_histogram_reports = function () {
+sepDocPS.get_histogram_reports = function () {
 
     var oldUnits = app.preferences.rulerUnits;
     app.preferences.rulerUnits = Units.PIXELS;
@@ -167,7 +163,7 @@ SepDocPS.prototype.get_histogram_reports = function () {
     return histogramReports;
 };
 
-SepDocPS.prototype.show_histogramReport_dialog = function (reports) {
+sepDocPS.show_histogramReport_dialog = function (reports) {
     var retval = false;
     var w = new Window("dialog", 'Channels Report');
     w.orientation = 'column';
@@ -223,7 +219,7 @@ SepDocPS.prototype.show_histogramReport_dialog = function (reports) {
     return retval;
 };
 
-SepDocPS.prototype.get_raster_settings = function () {
+sepDocPS.get_raster_settings = function () {
 
     var bmpConvert = {
         Round : 'BitmapHalfToneType.ROUND',
@@ -317,11 +313,11 @@ SepDocPS.prototype.get_raster_settings = function () {
     return result;
 };
 
-SepDocPS.prototype.create_doc = function (saveFile) {
-	var baseDoc = new BaseDocPS(this.doc);
+sepDocPS.make = function (saveFile) {
+
+    this.doc = this.startDoc.duplicate();
+    
     var activeChannels = this.get_active_channels();
-    //baseDoc.save_doc(baseDoc.doc.fullName);
-    this.doc = this.doc.duplicate();
     this.doc.selection.deselect();
 
     var iaSwitch = new InteractSwitch();
@@ -369,4 +365,3 @@ SepDocPS.prototype.create_doc = function (saveFile) {
     iaSwitch.reset();
     return this.doc;
 };
-

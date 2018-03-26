@@ -1,5 +1,4 @@
 ﻿#include './InteractSwitch.jsx'
-//#include 'BaseDoc.jsx'
 
 if (!Array.prototype.includes) {
   Array.prototype.includes = function(searchElement /*, fromIndex*/) {
@@ -42,11 +41,11 @@ if(typeof Object.prototype.create !== 'function') {
     };
 }
 
-function BaseDoc (initDoc) {
-	this.doc = initDoc;
-}
+var baseDoc = {
+    doc : null
+};
 
-BaseDoc.prototype.get_width_and_height = function () {
+baseDoc.get_width_and_height = function () {
 
     var dimensions = {};
     dimensions.width = this.doc.width.as('mm');
@@ -55,7 +54,7 @@ BaseDoc.prototype.get_width_and_height = function () {
     return dimensions;
 };
 
-BaseDoc.prototype.save_doc = function (dest, saveOps, close, showDialog) {
+baseDoc.save_doc = function (dest, saveOps, close, showDialog) {
 
     var saveFile = dest instanceof File ? dest : new File(dest);
 
@@ -64,7 +63,7 @@ BaseDoc.prototype.save_doc = function (dest, saveOps, close, showDialog) {
         saveFolder.create();
     };
 
-    if(showDialog) saveFile = saveFile.saveDlg('Please check Filename');
+    if (showDialog) saveFile = saveFile.saveDlg('Please check Filename');
 
     try {
         switch (app.name) {
@@ -78,15 +77,15 @@ BaseDoc.prototype.save_doc = function (dest, saveOps, close, showDialog) {
                 this.doc.saveAs(saveFile, saveOps);
             break;
         }
-        if(close) this.doc.close();
-        return true;
+        if (close) this.doc.close();
+        return saveFile;
     } catch(e) {
         alert(e);
-        return false;
+        return null;
     }
 };
 
-BaseDoc.prototype.change_filename = function (sourceFile, addString, ext) {
+baseDoc.change_filename = function (sourceFile, addString, ext) {
     var oldName, newName = '';
     oldName = sourceFile.name;
     newName += oldName.substring(0,oldName.lastIndexOf('.'));
@@ -107,17 +106,28 @@ BaseDoc.prototype.change_filename = function (sourceFile, addString, ext) {
     return newFile;
 };
 
-BaseDoc.prototype.get_saveFile = function (sourceFile, search, replace, extension) {
-	var oldName = sourceFile.name;
+baseDoc.get_saveName = function (sourceFile, searchFor, replaceWith, extension) {
+	if(sourceFile.constructor.name != 'File') throw new Error ('sourceFile not of type "File"');
+
+    var oldName = sourceFile.name;
 	var oldExtension = oldName.substring(oldName.lastIndexOf('.')+1, oldName.length);
 	var newName = oldName.substring(0,oldName.lastIndexOf('.'));
 	var folder = sourceFile.parent;
 
-	if(newName.search(search) != -1) {
-		newName = newName.replace(search, replace);
-	} else {
-		newName += replace;
-	}
+    if (newName.search(replaceWith) != -1) {
+        throw new Error('Filename already contains ' + replace);
+    }
+
+    var replacedIt = false;
+    for (var i=0, len=searchFor.length; i < len ; i++) {
+        if(newName.search(searchFor[i]) != -1) {
+            newName = newName.replace(searchFor[i], replaceWith);
+            replacedIt = true;
+            break;
+        }
+    };
+
+    if(!replacedIt) newName = '-' + replaceWith;
 
 	if(extension) {
 		newName += '.';
@@ -126,15 +136,14 @@ BaseDoc.prototype.get_saveFile = function (sourceFile, search, replace, extensio
 		newName += '.';
 		newName += oldExtension;
 	}
-	var saveFile = new File(folder + '/' + newName);
-	return saveFile;
+	return newName;
 };
 
-BaseDoc.prototype.get_totalArea = function() {
+baseDoc.get_totalArea = function() {
     return this.doc.width.as('cm') * this.doc.height.as('cm');
 };
 
-BaseDoc.prototype.place_on_film = function (sepFile, pos) {
+baseDoc.place_on_film = function (sepFile, pos) {
 
     var blankoFilmScript = File('/c/repos/adobeScripts1/indesign/Film_Blanko.jsx');
     var finalizeScript = File('/c/repos/adobeScripts1/indesign/Film_Finalisieren.jsx');

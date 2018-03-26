@@ -2,7 +2,7 @@
 function main () {
 
     #includepath '/c/repos/adobeScripts1/includes/'
-    #include 'DocsPS.jsx'
+    #include 'DtgDocPS.jsx'
     #include 'Job.jsx'
     #include 'JobFolder.jsx'
     #include 'Pathmaker.jsx'
@@ -13,12 +13,13 @@ function main () {
     var job = new Job(app.activeDocument, true);
     var pm = new Pathmaker(job.nfo);
 
-    var baseDoc = new BaseDocPS(app.activeDocument);
-
     var iaSwitch = new InteractSwitch();
     iaSwitch.set('none');
 
     var saveFile = pm.file('sepPs');
+    var mySepDoc = Object.create(sepDocPS);
+    mySepDoc.make(saveFile);
+    
     var sep = new SepDocPS(app.activeDocument, saveFile);
     app.refresh();
     //if(Window.confirm ('Doc ok?', false, 'Check Document')) sep.doc.close();
