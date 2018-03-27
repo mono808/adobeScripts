@@ -578,27 +578,36 @@ MonoFilm.prototype.position_textFrames = function ()
 {
     function move_item1_below_item2 (item1, item2, distance) 
     {
-        var xy = [item1.geometricBounds[1], item2.geometricBounds[2] + distance];
-        item1.move(xy);
+        var x = item2.geometricBounds[1];
+        var y = item2.geometricBounds[2] + distance;
+        item1.move([x,y]);
     }
 
     function move_item1_above_item2 (item1, item2, distance)
     {
         var item1Height = item1.geometricBounds[2] - item1.geometricBounds[0];
-        var xy = [item1.geometricBounds[1], item2.geometricBounds[0] - item1Height - distance];
-        item1.move(xy);
+        var x = item2.geometricBounds[1];
+        var y = item2.geometricBounds[0] - item1Height - distance;
+        item1.move([x,y]);
+    }
+
+    function move_item1_next_to_item2 (item1, item2, distance)
+    {
+        var x = item2.geometricBounds[3] + distance;
+        var y = item2.geometricBounds[0];
+        item1.move([x,y]);
     }
 
     var topMark = this.filmPage.pageItems.itemByName('topMark');
     var bottomMark = this.filmPage.pageItems.itemByName('bottomMark');
 
     if(this.type == 'Bags') {
-        move_item1_below_item2(this.spotsFrame, bottomMark, 1);
-        move_item1_below_item2(this.jobFrame, this.spotsFrame, 1);
+        move_item1_next_to_item2(this.spotsFrame, bottomMark, 10);
+        move_item1_below_item2(this.jobFrame, this.spotsFrame, 0.5);
 
     } else {
-        move_item1_above_item2(this.spotsFrame, topMark, 1);
-        move_item1_above_item2(this.jobFrame, this.spotsFrame, 1);
+        move_item1_next_to_item2(this.spotsFrame, topMark, 10);
+        move_item1_above_item2(this.jobFrame, this.spotsFrame, 0.5);
     }
 };
 
