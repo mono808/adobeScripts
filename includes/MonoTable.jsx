@@ -6,7 +6,7 @@
             myLayer = myDoc.layers.itemByName('Infos');
             docScale = myDoc.documentPreferences.pageWidth/ 297;
             myTable = get_table(myPage);
-            if(myTable.columns.length < 9) add_id_column();
+            if(myTable && myTable.columns.length < 9) add_id_column();
         }
     };
 
