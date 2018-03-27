@@ -39,8 +39,11 @@
 	var is_print = function (a) {
         var fileName = a.displayName;
 		if(!is_file(a)) return false;
-		if(fileName.match(/film\.(indd|pdf)/i)) return false;
-		return true;
+		if(fileName.match(/.?(\.(indd|pdf|idlk))/ig)) {
+            return false;
+        } else {
+            return true;
+        }
 	};
 
     var is_printFolder = function (a) {
