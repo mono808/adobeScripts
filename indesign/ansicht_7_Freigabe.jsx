@@ -168,7 +168,14 @@ function main() {
     }
 
     if(errors.length > 0) {
-        var alertStr = 'Druckgrößen in Ansicht weicht von Druckdaten ab / konnten nicht geprüft werden.\n\nTrotzdem weitermachen?';
+
+        var alertStr = 'Druckgrößen in Ansicht weicht von Druckdaten ab / konnten nicht geprüft werden:\r\r';
+        
+        for (var i=0, len=errors.length; i < len ; i++) {
+          alertStr += errors[i].get_printId() + '\r';
+        };
+        alertStr += '\rAbweichung ignorieren und weitermachen?';
+        
         if(!Window.confirm(alertStr)) return null;
     }
 
