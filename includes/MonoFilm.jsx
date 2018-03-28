@@ -601,14 +601,10 @@ MonoFilm.prototype.position_textFrames = function ()
     var topMark = this.filmPage.pageItems.itemByName('topMark');
     var bottomMark = this.filmPage.pageItems.itemByName('bottomMark');
 
-    if(this.type == 'Bags') {
-        move_item1_next_to_item2(this.spotsFrame, bottomMark, 10);
-        move_item1_below_item2(this.jobFrame, this.spotsFrame, 0.5);
+    var placeInfoNextTo = this.type == 'Bags' ? bottomMark : topMark;
 
-    } else {
-        move_item1_next_to_item2(this.spotsFrame, topMark, 10);
-        move_item1_above_item2(this.jobFrame, this.spotsFrame, 0.5);
-    }
+    move_item1_next_to_item2(this.jobFrame, placeInfoNextTo, 10);
+    move_item1_below_item2(this.spotsFrame, this.jobFrame, 0.5);
 };
 
 MonoFilm.prototype.select_all_printable_pageItems = function () 
