@@ -17,8 +17,9 @@ function main() {
     var job = new Job(app.activeDocument, true);
     var pm = new Pathmaker(job.nfo);
 
-    var baseDocPS = new BaseDocPS(app.activeDocument);
-    baseDocPS.save_doc(pm.file('workingPs'), save_ops.backupPS(), false,true);
+    var baseDoc = Object.create(baseDoc);
+    baseDoc.doc = app.activeDocument;
+    baseDoc.save_doc(pm.file('workingPs'), save_ops.backupPS(), false,true);
 
 };
 
