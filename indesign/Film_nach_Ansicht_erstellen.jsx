@@ -37,6 +37,7 @@ function main () {
         monoFilm.position_textFrames();
         monoFilm.resize_page();
         monoFilm.save(job);
+        monoFilm.print(job, true, false);
     }
 }
 

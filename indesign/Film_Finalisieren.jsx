@@ -35,6 +35,9 @@ function main () {
 
     monoFilm.save (job, true, false);
 
+    monoFilm.print(job, true, false);
+
+
 
 
 }
