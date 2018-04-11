@@ -17,7 +17,7 @@ function main () {
     var saveFile = new File(myFolder + '/' + saveName + '.pdf');
 
     var docScale = myDoc.documentPreferences.pageWidth/ 297;
-    var resolution = docScale > 4.5 ? 48 : 72;
+    var resolution = docScale > 4.5 ? 36 : 54;
 
     var myFlattenerPresetName = "mockupFlattener";
 
