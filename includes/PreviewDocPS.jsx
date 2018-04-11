@@ -20,7 +20,7 @@ previewDocPS.make = function (saveFile, previewStyle) {
     var infoText = 'Please choose the style of the PreviewFile:\r\r';
     infoText += 'Layered -> SpotChannels are displayed as Layers, all colors are 100% opaque\r\r';
     infoText += 'Merged  -> SpotChannels are merged to flat RGB File, better opacity simulation';
-    var style = previewStyle || new ButtonList('Choose Preview Style', infoText).show_dialog(styles);
+    var previewStyle = previewStyle || new ButtonList('Choose Preview Style', infoText).show_dialog(styles);
 
 	switch(previewStyle) {
 		case 'merged' : this.create_merged_doc ();

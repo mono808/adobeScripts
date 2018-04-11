@@ -115,7 +115,7 @@ baseDoc.get_saveName = function (sourceFile, searchFor, replaceWith, extension) 
 	var folder = sourceFile.parent;
 
     if (newName.search(replaceWith) != -1) {
-        throw new Error('Filename already contains ' + replace);
+        throw new Error('Filename already contains ' + replaceWith);
     }
 
     var replacedIt = false;
