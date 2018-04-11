@@ -281,6 +281,16 @@ MonoFilm.prototype.add_regmarks = function ()
     }
 };
 
+MonoFilm.prototype.create_regmark = function () 
+{    
+    var regMarks = [3];
+
+    var passerFab = new PasserFab(this.type, this.vLine.location, this.sep);
+        
+    passerFab.add_regMarks(regMarks);
+
+};
+
 MonoFilm.prototype.create_text_frame = function (layer,frameName)
 {
     var tfWidth = 120,
