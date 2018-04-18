@@ -68,10 +68,17 @@ function main () {
         thresholdToCompressMonochrome = resolution*2;
     }
 
-    try{myDoc.layers.item('Intern').visible = false;} catch(e){}
+    try{
+        myDoc.layers.item('Intern').visible = false;
+        myDoc.layers.item('HL').visible = false;
+    } catch(e){}
+    
     myDoc.exportFile(ExportFormat.pdfType, saveFile, false);
 
-    try{myDoc.layers.item('Intern').visible = true;} catch(e){}
+    try{
+        myDoc.layers.item('Intern').visible = true;
+        myDoc.layers.item('HL').visible = true;
+    } catch(e){}
 }
 
 function check() {
