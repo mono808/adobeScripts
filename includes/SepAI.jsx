@@ -244,19 +244,29 @@ SepAI.prototype.sort_by_spotColor = function (pIs)
         }
 
         var fC = pI.fillColor;
+        var mySpot;
+        
+        switch (fC.constructor.name) {
+            case 'SpotColor' : mySpot = fC.spot;
+            break;
+
+            case 'GradientColor' : mySpot = fC.gradient.gradientStops[0].color.spot;
+            break;
+        }
+
         for (var j = 0; j < this.spots.length; j++) {
-            if(this.spots[j].spot.name == fC.spot.name) {
+            if(this.spots[j].spot.name == mySpot.name) {
                 monoSpot = this.spots[j];
                 break;
             }
         }
 
         if(!monoSpot) {
-            monoSpot = new MonoSpot(fC.spot.name);
-            monoSpot.spot = fC.spot;
+            monoSpot = new MonoSpot(mySpot.name);
+            monoSpot.spot = mySpot;
             monoSpot.bounds = pI.geometricBounds;
 
-            if(fC.spot.name.search(this.ubRegEx) > -1) monoSpot.isUB = true;
+            if(mySpot.name.search(this.ubRegEx) > -1) monoSpot.isUB = true;
 
             this.spots.push(monoSpot);
         }
