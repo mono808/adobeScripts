@@ -21,8 +21,11 @@ function main () {
     var job = new Job(null, false);
     var pm = new Pathmaker(job.nfo);
 
-    var monoFilm = new MonoFilm(app.activeDocument);
-    
+    var myDoc = app.activeDocument;
+    var monoFilm = new MonoFilm(myDoc);
+
+    try{myDoc.layers.item('motivEbene').visible = false;} catch(e){}
+
     monoFilm.add_centermarks ();
 
     monoFilm.add_jobInfo (job);
@@ -32,6 +35,8 @@ function main () {
     monoFilm.position_textFrames();
     
     monoFilm.resize_page();
+
+    try{myDoc.layers.item('motivEbene').visible = true;} catch(e){}
 
     monoFilm.save (job, true, false);
 
