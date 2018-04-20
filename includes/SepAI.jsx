@@ -48,7 +48,9 @@ BaseAI.prototype.delete_layer = function (layer_name)
 
 BaseAI.prototype.fit_artboard_to_art = function (artlayer_name)
 {
-    var artLayer = this.doc.layers.getByName(artlayer_name);
+    try {var artLayer = this.doc.layers.getByName(artlayer_name)}
+    catch(e) {artLayer = this.doc.activeLayer}
+    
     var selection = [];
 
     var i = artLayer.pageItems.length-1;
@@ -63,7 +65,11 @@ BaseAI.prototype.fit_artboard_to_art = function (artlayer_name)
 BaseAI.prototype.get_items_on_layer = function (items, layer_name)
 {
     var itemsOnLayer = [];
-    var l = this.doc.layers.getByName(layer_name);
+    try {
+        var l = this.doc.layers.getByName(layer_name);
+    } catch(e) {
+        return itemsOnLayer;
+    }
 
     var item;
     var i = items.length-1;
