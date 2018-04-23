@@ -7,7 +7,7 @@ var rE = {
     printTag :      /([a-z0-9äüöß-]+)_([0-9]{1,3}x[0-9]{1,3})_(sd|flx|flk|dta|dtg|stk|sub)/i,
     printTag2 :     /([a-z0-9äüöß-]+)_(sd|flx|flk|dta|dtg|stk|sub)_(working|print|preview|druck|entwurf)/i,
     print_full:     /(\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d)_([a-z0-9äüöß-]+)_([a-z0-9äüöß-]+)/i,
-    jobNr:          /\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i,
+    jobNr:          /(\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d)/i,
     jobNrShort :    /\d{1,5}(wme|wm|ang|cs|a)\d\d/i,
     jobNrVeryShort: /\d{1,5}(W|A|C)/i,
     jobNameNew:     /(\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d)_(.*)/i,
