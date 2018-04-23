@@ -15,20 +15,20 @@ function main (report)
     #include 'save_Options.jsx'
 
     var job = new Job(null, true, false);
-    var pathmaker = new Pathmaker();
+    var pm = new Pathmaker();
 
     //-------------------------------------------------------
     var sep = new SepAI(app.activeDocument);
 
     sep.fit_artboard_to_art('Motiv');
 
-    job.nfo.wxh = sep.get_wxh();
+    //job.nfo.wxh = sep.get_wxh();
 
     sep.delete_layer('BG');
 
     sep.delete_layer('HilfsLayer');
     
-    var saveFile = pathmaker.file(job.nfo.tech.toLowerCase(), job.nfo);
+    var saveFile = pm.file(job.nfo.tech.toLowerCase(), job.nfo);
     f_all.saveFile (saveFile, save_ops.ai_sep(), false);
 }
 
