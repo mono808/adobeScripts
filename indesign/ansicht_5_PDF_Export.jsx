@@ -68,17 +68,13 @@ function main () {
         thresholdToCompressMonochrome = resolution*2;
     }
 
-    try{
-        myDoc.layers.item('Intern').visible = false;
-        myDoc.layers.item('HL').visible = false;
-    } catch(e){}
+
+    var layerToggle = f_id.layerToggle(['Intern', 'HL'])
+    layerToggle.hide();
     
     myDoc.exportFile(ExportFormat.pdfType, saveFile, false);
 
-    try{
-        myDoc.layers.item('Intern').visible = true;
-        myDoc.layers.item('HL').visible = true;
-    } catch(e){}
+    layerToggle.show();
 }
 
 function check() {

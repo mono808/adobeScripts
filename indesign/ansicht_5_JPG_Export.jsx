@@ -36,10 +36,14 @@ function main () {
         useDocumentBleeds = false; //	If true, uses the document's bleed settings in the exported JPEG.
     }
 
-    try{myDoc.layers.item('Intern').visible = false;} catch(e){}
+
+    var layerToggle = f_id.layerToggle(['Intern', 'HL'])
+    layerToggle.hide();
+    
     myDoc.exportFile(ExportFormat.JPG, saveFile, false);
 
-    try{myDoc.layers.item('Intern').visible = true;} catch(e){}
+    layerToggle.show();
+    
 }
 
 function check() {

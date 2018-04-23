@@ -400,5 +400,32 @@
             }
         }
         return null;
+    },
+
+    layerToggle : function (layernames) {
+        var oldSettings = {};
+
+        return {
+            hide : function () {
+                for (var i=0, len=layernames.length; i < len ; i++) {
+                    try{
+                        var l = app.activeDocument.layers.item(layernames[i]);
+                        oldSettings[layernames[i]] = l.visible;
+                        l.visible = false;
+                    } catch(e) {
+                        continue;
+                    }      
+                }
+            },
+            show : function () {
+                for (var i=0, len=layernames.length; i < len ; i++) {
+                    try{
+                        app.activeDocument.layers.item(layernames[i]).visible = oldSettings[layernames[i]];
+                    } catch(e) {
+                        continue;
+                    }
+                }
+            }
+        }
     }
 }

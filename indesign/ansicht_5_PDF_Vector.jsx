@@ -19,12 +19,13 @@ function main () {
     var distIn = new File(pm.path('ansichtIn') + myName + '.ps');
     var distOut = new File(pm.path('ansichtOut') + myName + '.pdf');
 
-    try{myDoc.layers.item('Intern').visible = false;} catch(e){}
-    try{myDoc.layers.item('HL').visible = false;} catch(e){}
+    var layerToggle = f_id.layerToggle(['Intern', 'HL'])
+    layerToggle.hide();
+
     f_id.print2PS(distIn, 'VectorMockup');
     
-    try{myDoc.layers.item('Intern').visible = true;} catch(e){}
-    try{myDoc.layers.item('HL').visible = false;} catch(e){}
+    layerToggle.show();
+
     f_all.saveFile(app.activeDocument.fullName, undefined, false);
     
     f_all.copy_file_via_bridgeTalk(distOut, myFolder, true);

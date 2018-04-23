@@ -18,12 +18,14 @@ function main () {
         
     var distIn = new File(pm.path('ansichtIn') + myName + '.ps');
     var distOut = new File(pm.path('ansichtOut') + myName + '.pdf');
+            
+    var layerToggle = f_id.layerToggle(['Intern', 'HL'])
+    layerToggle.hide();    
     
-    //hide internLayer
-    try{myDoc.layers.item('Intern').visible = false;} catch(e){}
     f_id.print2PS(distIn, 'PixelMockup');
     
-    try{myDoc.layers.item('Intern').visible = true;} catch(e){}
+    layerToggle.show();
+    
     f_all.saveFile(app.activeDocument.fullName, undefined, false);
     
     f_all.copy_file_via_bridgeTalk(distOut, myFolder, true);
