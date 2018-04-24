@@ -9,7 +9,7 @@ function main () {
     #include 'Pathmaker.jsx'
     #include 'save_Options.jsx'
 
-    //job.set_nfo(null, false);
+    var job = new Job(null,false);
     var pm = new Pathmaker();
     var myDoc = app.activeDocument;
     var myFilename = myDoc.fullName.displayName;
