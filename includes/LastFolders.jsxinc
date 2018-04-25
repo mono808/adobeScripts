@@ -4,6 +4,7 @@
     var fallback = $.getenv("computername") == "MONOTOWER" ? '/c/capri-stuff/' : '//caprishare/';
     var csroot = $.getenv("csroot") ? $.getenv("csroot") : fallback;
     var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
+    var maxFolder = 30;
     
     return {
         
@@ -25,8 +26,8 @@
                 // if not included, add to the front of the array
                 folders.unshift(fd);
                 
-                // remove the oldest folder if more the 10 are stored
-                if(folders.length > 10) {
+                // remove the oldest folder if maximum is reached
+                if(folders.length > maxFolder) {
                     folders.pop();
                 }
             }
