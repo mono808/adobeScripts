@@ -116,7 +116,8 @@
     };
 
     var make_standString = function (rC) {
-        var stand = (rC.stand + rC.height)<0 ? rC.stand-rC.height : rC.stand;
+        //var stand = (rC.stand + rC.height)<0 ? rC.stand-rC.height : rC.stand;
+        var stand = rC.stand;
         var roundedCM = roundHalf(stand*0.1);
         var standString = 'ca. ';
         if(stand > 0) {
@@ -129,7 +130,8 @@
     };
 
     var update_standString = function (rC, oldRC) {
-        var stand = (rC.stand + rC.height)<0 ? Math.abs(rC.height+rC.stand) : rC.stand;
+        //var stand = (rC.stand + rC.height)<0 ? Math.abs(rC.height+rC.stand) : rC.stand;
+        var stand = rC.stand;
         var roundedCM = roundHalf(stand*0.1);
         var match = oldRC.stand.match(/(ca\.)\s(\d{1,2}\.?,?5?)\s?(.+)/i);
 

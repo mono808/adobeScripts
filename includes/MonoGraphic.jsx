@@ -156,8 +156,11 @@
             } else if (side === 'Back') {
                 var y = yBack;
             }
-            
-            var virtualStand = ref.geometricBounds[0] - y;
+
+            //if the whole graphic is above the necklines, measure distance from the bottom of the graphic : otherwise measure from the top
+            var graphicY = ref.geometricBounds[2] < y ? ref.geometricBounds[2] : ref.geometricBounds[0];
+
+            var virtualStand = graphicY - y;
             if(virtualStand > 0 && docScale == 6.5) {
                 return adjust_for_shirts(virtualStand);
             } else {
