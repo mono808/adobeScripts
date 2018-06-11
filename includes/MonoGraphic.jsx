@@ -202,21 +202,22 @@
 
         check_size : function () {
             var placedWidth = this.get_width();
-            var sizesMatch;
+            var sizesMatch = false;
             if(!jobFolder) jobFolder = check_folder(myFolder);
             if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
-            switch(monoPrint.tech.toUpperCase()) {
-                case 'SD' :               
-                    if(monoPrint.film) {
-                        var monoFilm = new MonoFilm(monoPrint.film);
-                        var sepPos = monoFilm.get_sepPos();
-                        var sepWidth = monoFilm.get_sepWidth();
-                        monoFilm.filmDoc.close(SaveOptions.no);
-                        
-                        var sizesMatch = (placedWidth.toFixed(0) == sepWidth.toFixed(0));
-                    }
-                break;
-
+            if(monoPrint.tech) {
+                switch(monoPrint.tech.toUpperCase()) {
+                    case 'SD' :               
+                        if(monoPrint.film) {
+                            var monoFilm = new MonoFilm(monoPrint.film);
+                            var sepPos = monoFilm.get_sepPos();
+                            var sepWidth = monoFilm.get_sepWidth();
+                            monoFilm.filmDoc.close(SaveOptions.no);
+                            
+                            var sizesMatch = (placedWidth.toFixed(0) == sepWidth.toFixed(0));
+                        }
+                    break;
+                }
             }
             return sizesMatch;
         },
