@@ -112,6 +112,7 @@ function main() {
     #includepath '/c/repos/adobeScripts1/includes/'
     #include 'augment_objects.jsx'
     #include 'Job.jsx'
+    #include 'f_id.jsx'
     #include 'JobFolder.jsx'
     #include 'Pathmaker.jsx'
     #include 'MonoNamer.jsx'
@@ -148,6 +149,8 @@ function main() {
         var myFile = filesToPrint[i];
         if(myFile.displayName.match(/Ansicht\.indd/i)) {
             var monoMockup = new MonoMockup(app.open(myFile,true));
+            var layerToggle = f_id.layerToggle(['Intern']);
+            layerToggle.show();
             for (var j = 0; j < monoMockup.doc.pages.length; j++) {
                 var monoTable = new MonoTable(monoMockup.doc.pages[j]);
                 var pageRowContents = monoTable.read_rows();
