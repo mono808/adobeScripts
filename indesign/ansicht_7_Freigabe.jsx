@@ -163,8 +163,9 @@ function main() {
 
             for (var k = 0; k < monoGraphics.length; k++) {
                 var mG = monoGraphics[k];
-                if(!mG.check_size()) {   
-                    errors.push(mG);
+                var match = mG.check_size();
+                if(!match.size || !match.placement) {   
+                    errors.push({mG:mG, match: match});
                 }
             }
         }
@@ -172,11 +173,17 @@ function main() {
 
     if(errors.length > 0) {
 
-        var alertStr = 'Druckgrößen in Ansicht weicht von Druckdaten ab / konnten nicht geprüft werden:\r\r';
+        var alertStr = 'Ansicht weicht von Filmdaten ab oder diese konnten nicht geprüft werden:\r\r';
         
         for (var i=0, len=errors.length; i < len ; i++) {
-          alertStr += errors[i].get_printId() + '\r';
+          var e = errors[i];
+          alertStr += 'Motiv '
+          alertStr += e.mG.get_printId();
+          if(!e.match.size) alertStr += ': Größe abweichend'
+          if(!e.match.placement) alertStr += ': Platzierung abweichend'
+          alertStr += '\r';
         };
+        
         alertStr += '\rAbweichung ignorieren und weitermachen?';
         
         if(!Window.confirm(alertStr)) return null;
