@@ -3,7 +3,7 @@
 
 function toggle_standListener () 
 {   
-    #includepath '/c/repos/adobeScripts1/includes'
+    
     #include 'MonoGraphic.jsx'
     #include 'MonoTable.jsx'
     

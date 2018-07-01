@@ -2,7 +2,7 @@
 function main (report) 
 {
 
-    #includepath '/c/repos/adobeScripts1/includes'
+    
     #include 'Job.jsx'
     #include 'Pathmaker.jsx'
     #include 'SepAI.jsx'

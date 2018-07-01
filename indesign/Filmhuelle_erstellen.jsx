@@ -1,5 +1,5 @@
 ﻿#target indesign
-#includepath '/c/repos/adobeScripts1/includes'
+
 #include 'Job.jsx'
 #include 'JobFolder.jsx'
 #include 'MonoFilm.jsx'

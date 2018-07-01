@@ -4,7 +4,6 @@
 function main (report) 
 {
 
-    #includepath '/c/repos/adobeScripts1/includes'
     #include 'f_all.jsx'
     #include 'Job.jsx'
     #include 'Pathmaker.jsx'

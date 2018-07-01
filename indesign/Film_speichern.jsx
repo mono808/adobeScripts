@@ -1,6 +1,5 @@
 ﻿#target indesign
 
-#includepath '/c/capri-links/scripts2/includes'
 #include 'MonoFilm.jsx'
 #include 'MonoSep.jsx'
 #include 'statics.jsx'

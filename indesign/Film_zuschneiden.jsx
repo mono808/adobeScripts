@@ -1,6 +1,6 @@
 ﻿#target indesign
 
-#includepath '/c/repos/adobeScripts1/includes'
+
 #include 'augment_objects.jsx'
 #include 'MonoFilm.jsx'
 #include 'MonoSep.jsx'

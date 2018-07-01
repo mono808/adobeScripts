@@ -58,8 +58,7 @@ function check_ink_coverage (myDoc)
 
 function main (report) 
 {
-
-    #includepath '/c/repos/adobeScripts1/includes'
+    
     #include 'AreaDialog.jsx'
 
 
