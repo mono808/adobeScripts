@@ -2,7 +2,8 @@
     var csroot = $.getenv("csroot");
     var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
     var doc;
-    var fixedLayers = /(Shirt|Front|Back|Naht|Tasche|Beutel)$/i;
+    //var fixedLayers = /(Shirt|Front|Back|Naht|Tasche|Beutel)$/i;
+    var fixedLayers = /(Shirt|Naht|Tasche|Beutel)$/i;
         
     return {
         add_tex : function (targetDoc) {
