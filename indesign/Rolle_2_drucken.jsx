@@ -45,8 +45,9 @@ function main() {
     }
 
     function remove_pdfs (pdfs) {
+        var pcroot = $.getenv('pcroot');
         var removedCounter = 0,
-            filmOutRE = new RegExp(f_all.escapeRegExp('/c/capri-links/distiller/filme/out'), 'i');
+            filmOutRE = new RegExp(f_all.escapeRegExp(pcroot + '/distiller/filme/out'), 'i');
 
         var i, pdf, pdfFile;
             

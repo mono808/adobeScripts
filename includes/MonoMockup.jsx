@@ -561,8 +561,9 @@ MonoMockup.prototype.add_stand_listener = function (turnOn)
     var myPage = app.activeWindow.activePage;
     var l = doc.layers.item('Infos');
 
-    doc.removeEventListener("afterSelectionAttributeChanged", new File('/c/capri-links/scripts/includes/myStandListener.jsx'));
-    if(turnOn) doc.addEventListener("afterSelectionAttributeChanged", new File('/c/capri-links/scripts/includes/myStandListener.jsx'));
+    var includesFolder = $.getenv('JSINCLUDE');
+    doc.removeEventListener("afterSelectionAttributeChanged", new File(includesFolder + '/myStandListener.jsx'));
+    if(turnOn) doc.addEventListener("afterSelectionAttributeChanged", new File(includesFolder + '/myStandListener.jsx'));
 };
 
 MonoMockup.prototype.remove_stand_listener = function () 
@@ -571,7 +572,8 @@ MonoMockup.prototype.remove_stand_listener = function ()
     var myPage = app.activeWindow.activePage;
     var l = doc.layers.item('Infos');
 
-    doc.removeEventListener("afterSelectionAttributeChanged", new File('/c/capri-links/scripts/includes/myStandListener.jsx'));                
+    var includesFolder = $.getenv('JSINCLUDE');
+    doc.removeEventListener("afterSelectionAttributeChanged", new File(includesFolder + '/myStandListener.jsx'));                
 };
 
 

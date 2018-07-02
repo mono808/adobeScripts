@@ -74,14 +74,15 @@ function bt_position_sep_on_film (serializedmyArgs)
 
 function send_sep_to_indesign (sepFile, pos) 
 {
+    var pcroot = $.getenv('pcroot');
     var myArgs = {
         sep : sepFile,
         pos : {
             x : (pos && pos.x ? pos.x.as('mm') : null),
             y : (pos && pos.y ? pos.y.as('mm') : null),
         },
-        templateScript : new File('/c/capri-links/scripts2/indesign/Film_Blanko.jsx'),
-        filmScript :     new File('/c/capri-links/scripts2/indesign/Film_Reset.jsx')
+        templateScript : new File(pcroot + '/adobescripts/indesign/Film_Blanko.jsx'),
+        filmScript :     new File(pcroot + '/adobescripts/indesign/Film_Reset.jsx')
     };
 
     var bt = new BridgeTalk;

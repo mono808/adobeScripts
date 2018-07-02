@@ -55,7 +55,7 @@ function check () {
 
     if(!app.activeDocument) return false;
 
-    #include '/c/capri-links/scripts/includes/BaseDocPS.jsx'
+    #include 'BaseDocPS.jsx'
 
     var baseDoc = Object.create(baseDocPS);
     baseDoc.doc = app.activeDocument;
