@@ -420,7 +420,7 @@
             show : function () {
                 for (var i=0, len=layernames.length; i < len ; i++) {
                     try{
-                        app.activeDocument.layers.item(layernames[i]).visible = oldSettings[layernames[i]];
+                        app.activeDocument.layers.item(layernames[i]).visible = true;
                     } catch(e) {
                         continue;
                     }
