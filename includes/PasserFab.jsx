@@ -6,7 +6,7 @@
         circle : 4,
         dia1 : 10,
         dia2 : 10,
-        distance : 3,
+        distance : 2.5,
     };
     this.pictoScale = 0.75;
 
@@ -49,8 +49,8 @@ PasserFab.prototype.create_centerMark = function (xy, name)
     // create Kreuz
     var gLH,gVH;
     
-    gLH = this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y, x-pS.dia2/3, y, x+pS.dia2/3] });    
-    gLV = this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y-pS.dia2/2, x, y+pS.dia2/2, x] });
+    gLH = this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y, x-pS.dia2/2, y, x+pS.dia2/2] });    
+    gLV = this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y-pS.dia2/3, x, y+pS.dia2/3, x] });
     
     pGroup.push(gLH,gLV);
     centerMark = this.page.groups.add(pGroup);
@@ -114,7 +114,7 @@ PasserFab.prototype.create_pictoBags = function (centerMark)
     }
     var scale = this.pictoScale;
     pictogram.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [scale, scale]);
-    pictogram.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]+1]);
+    pictogram.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]]);
 
     return pictogram;
 };
@@ -135,7 +135,7 @@ PasserFab.prototype.create_pictoShirt = function (centerMark)
     }
     var scale = this.pictoScale;
     pictogram.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [scale, scale]);
-    pictogram.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]+1]);        
+    pictogram.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]]);        
     return pictogram;
 };
 
@@ -152,7 +152,7 @@ PasserFab.prototype.create_pictoNull = function (centerMark)
     myText.fillColor = this.regColor;
     myText.strokeColor = this.noColor;
                     
-    myTF.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]+2.5]);
+    myTF.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]]);
     return myTF;
 };
 
