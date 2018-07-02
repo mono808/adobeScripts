@@ -134,7 +134,7 @@ function SepAI (initDoc) {
     this.pathItems = this.get_items_on_layer(this.doc.pathItems, 'Motiv');
     this.rasterItems = this.get_items_on_layer(this.doc.rasterItems, 'Motiv');
     this.ubRegEx = /^(UB|UL|Unterleger|Vordruck|UB-Grey)$/i;
-    this.pantoneTxt = new File('/c/repos/adobescripts1/pantones.txt');
+    this.pantoneTxt = new File($.getenv('pcroot') + '/adobescripts/pantones.txt');
     this.spots = [];
     this.sqpt2sqcm = new UnitValue(1,'pt').as('cm') * new UnitValue(1,'pt').as('cm');
 }
