@@ -11,13 +11,15 @@
         140 : 0.00106
     };
     this.screenList = this.tab_to_list(this.vthTab);
+
+    this.usageFactor = 3.2;
     
-    this.texTab = {
-        XT : 1.5,
-        WM110 : 1.15,
-        Shirts : 1.3
+    this.rakelTab = {
+        '1-1' : 1,
+        '3-1' : 1.5,
+        '2-2' : 2
     }
-    this.texList = this.tab_to_list(this.texTab);
+    this.rakelList = this.tab_to_list(this.rakelTab);
 
     // kg per cm³ of ink
     this.toKG = 4.5/(3.79*1000);
@@ -57,14 +59,14 @@ AreaDialog.prototype.create_win = function (windowName)
     win.calculate_line = function (i) 
     {
         var area = Math.abs(that.spotChans[i].area);
-        var tex = this.findElement("texDrop").selection.text;
+        var rakel = this.findElement("rakelDrop").selection.text;
         var run = Number(this.findElement("runEdit").text);
+        var usage = Number(this.findElement("usageEdit").text);
         var screen = this.findElement ("screenDrop" + (i)).selection.text;
         var inkText = this.findElement ("inkText" + (i));
-        var isUnderbased = this.findElement ("ubCheck" + (i)).value;        
+        var isUnderbased = this.findElement ("ubCheck" + (i)).value;       
         
-        var volume = that.vthTab[screen] * area;
-        if(!isUnderbased) volume *= Number(that.texTab[tex]);
+        var volume = that.vthTab[screen] * area * Number(that.rakelTab[rakel]) * usage;
         var totalVol = volume * run;
         var weight = totalVol * that.toG;
         inkText.text = weight.toFixed(0);
@@ -72,12 +74,16 @@ AreaDialog.prototype.create_win = function (windowName)
 
         var jobGrp = win.add("group");
 
-            jobGrp.add("statictext {text:'Textil:'}");
-            var texDrop = jobGrp.add("dropdownlist", undefined, this.texList, {name:"texDrop"});
-            texDrop.selection = texDrop.items[0];
+            jobGrp.add("statictext {text:'Rakel:'}");
+            var rakelDrop = jobGrp.add("dropdownlist", undefined, this.rakelList, {name:"rakelDrop"});
+            rakelDrop.selection = rakelDrop.items[0];
 
             jobGrp.add("statictext {text:'Auflage:'}");
-            var runEdit = jobGrp.add("edittext", undefined, 50, {text:50,name:"runEdit"});
+            var runEdit = jobGrp.add("edittext", undefined, 50, {name:"runEdit"});
+            runEdit.preferredSize = [60,20];
+
+            jobGrp.add("statictext {text:'Verbrauchs-Faktor:'}");
+            var usageEdit = jobGrp.add("edittext", undefined, this.usageFactor, {name:"usageEdit"});
             runEdit.preferredSize = [60,20];
 
         var tablePnl = win.add("panel {orientation:'row', alignment:'fill'}");
@@ -147,8 +153,13 @@ AreaDialog.prototype.create_win = function (windowName)
 
         runEdit.onChange = function () {
             win.calc_all();
-        }            
-        texDrop.onChange = function () {
+        }  
+
+        usageEdit.onChange = function () {
+            win.calc_all();
+        }  
+
+        rakelDrop.onChange = function () {
             win.calc_all();
         }
 
