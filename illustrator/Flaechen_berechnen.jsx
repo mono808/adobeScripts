@@ -1,8 +1,7 @@
 ﻿#target illustrator
 function main (report) 
 {
-
-    
+   
     #include 'Job.jsx'
     #include 'Pathmaker.jsx'
     #include 'SepAI.jsx'

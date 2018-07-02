@@ -2,7 +2,7 @@
 
 function main() {
 
-    #includepath '/c/repos/adobeScripts1/includes/'
+     
     #include 'augment_objects.jsx'
     #include 'BaseDocPS.jsx'
     #include 'Job.jsx'

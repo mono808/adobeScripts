@@ -1,7 +1,7 @@
 ﻿#target indesign
 function main () {
     
-    #includepath '/c/repos/adobeScripts1/includes/'
+     
     #include 'Job.jsx'
     #include 'JobFolder.jsx'
     #include 'MonoPrint.jsx'

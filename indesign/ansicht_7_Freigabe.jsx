@@ -109,7 +109,7 @@ function show_wawi_string_dialog (rowContents, job)
 
 function main() {
     
-    #includepath '/c/repos/adobeScripts1/includes/'
+     
     #include 'augment_objects.jsx'
     #include 'Job.jsx'
     #include 'f_id.jsx'

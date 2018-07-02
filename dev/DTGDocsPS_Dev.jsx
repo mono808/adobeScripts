@@ -1,7 +1,7 @@
 ﻿#target photoshop
 function main () {
 
-    #includepath '/c/repos/adobeScripts1/includes/'
+     
     #include 'DTGDocPS.jsx'
     #include 'Job.jsx'
     #include 'JobFolder.jsx'

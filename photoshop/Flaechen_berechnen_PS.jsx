@@ -2,7 +2,7 @@
 #target photoshop-60.064
 //#targetengine "session"
 
-#includepath '/c/repos/adobeScripts1/includes/'
+ 
 #include 'augment_objects.jsx'
 #include 'universal_functions.jsx'
 #include 'SepDocPS.jsx'

@@ -2,7 +2,7 @@
 
 function main() {
 
-    #includepath '/c/repos/adobeScripts1/includes/'
+     
 	#include 'f_all.jsx'
 	#include 'Pathmaker.jsx'
 

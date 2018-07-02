@@ -1,7 +1,7 @@
 ﻿#target indesign
 function main () {
     
-    #includepath '/c/repos/adobeScripts1/includes/'
+     
     #include 'f_all.jsx'    
     #include 'save_Options.jsx'
     #include 'Job.jsx'

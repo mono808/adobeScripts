@@ -32,7 +32,7 @@ var activate_all_channels = function ()
 
 function rastern() {
    
-    #includepath '/c/repos/adobeScripts1/includes/' 
+      
     #include 'f_all.jsx'
 
     var settings = get_raster_settings();

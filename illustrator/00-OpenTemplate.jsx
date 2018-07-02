@@ -1,7 +1,6 @@
 ﻿#target illustrator
 function main ()
 {
-    #includepath '/c/repos/adobeScripts1/includes/'
     #include 'Pathmaker.jsx'
     #include 'Typeahead.jsx'
 
