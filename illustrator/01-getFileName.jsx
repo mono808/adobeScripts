@@ -1,9 +1,8 @@
 ﻿#target illustrator
 
 function main() {
-    
-    #includepath '/c/capri-links/scripts/includes'
-    #include 'f_all.jsx'
+
+    #include "f_all.jsx"
     #include 'Job.jsx'
     #include 'Pathmaker.jsx'
     #include 'MonoNamer.jsx'

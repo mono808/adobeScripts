@@ -1,8 +1,7 @@
 ﻿#target photoshop
 
 function main() {
-    
-    #includepath '/c/capri-links/scripts/includes'        
+           
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
     #include 'f_ps.jsx'

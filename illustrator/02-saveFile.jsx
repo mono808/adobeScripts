@@ -6,8 +6,6 @@ $.strict = true;
 
 function main (report) 
 {
-    
-    #includepath '/c/capri-links/scripts/includes'
     #include 'f_all.jsx'
     #include 'SepAI.jsx'
     #include 'Job.jsx'

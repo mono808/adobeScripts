@@ -1,6 +1,6 @@
 ﻿function Pathmaker (initNfo) {
     var csroot = Folder($.getenv("csroot")).fullName;
-    var pcroot = '/c/capri-links/';
+    var pcroot = Folder($.getenv("pcroot")).fullName;
     var nfo = {
         jobNr : '0000A17-014',
         jobName : 'JohnDoe',
@@ -24,13 +24,13 @@
     paths.rolleOut        = pcroot + '/distiller/filmrollen/out/';
     paths.rolleSaved      = pcroot + '/distiller/filmrollen/saved/';
 
-    paths.sc              = pcroot + '/scripts/';
-    paths.scriptsBT       = pcroot + '/scripts/bridgeTalk/';
-    paths.scriptsInc      = pcroot + '/scripts/includes/';
-    paths.scriptsIllu     = pcroot + '/scripts/illustrator/';
-    paths.scriptsIndd     = pcroot + '/scripts/indesign/';
-    paths.pantones        = pcroot + '/scripts/pantones.txt';
-    paths.scriptsPs       = pcroot + '/scripts/photoshop/';
+    paths.sc              = pcroot + '/adobescripts/';
+    paths.scriptsBT       = pcroot + '/adobescripts/bridgeTalk/';
+    paths.scriptsInc      = pcroot + '/adobescripts/includes/';
+    paths.scriptsIllu     = pcroot + '/adobescripts/illustrator/';
+    paths.scriptsIndd     = pcroot + '/adobescripts/indesign/';
+    paths.pantones        = pcroot + '/adobescripts/pantones.txt';
+    paths.scriptsPs       = pcroot + '/adobescripts/photoshop/';
     
     paths.kd              = csroot + '/kundendaten/';
     paths.b2b             = csroot + '/kundendaten/B2B/';
