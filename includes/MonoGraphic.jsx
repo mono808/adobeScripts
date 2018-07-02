@@ -203,7 +203,10 @@
         check_size : function () {
             var placedWidth = this.get_width();
             var placedX = this.get_displacement();
-            var sizesMatch = false;
+            var match = {
+                size: false,
+                placement: false
+            };
             if(!jobFolder) jobFolder = check_folder(myFolder);
             if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
             if(monoPrint.tech) {
@@ -213,8 +216,7 @@
                             var monoFilm = new MonoFilm(monoPrint.film);
                             var sepPos = monoFilm.get_sepPos();
                             var sepWidth = monoFilm.get_sepWidth();
-                            monoFilm.filmDoc.close(SaveOptions.no);
-                            var match = {}
+                            monoFilm.filmDoc.close(SaveOptions.no);                            
                             match.size = (Math.abs(placedWidth - sepWidth) < 1);
                             match.placement = (Math.abs(placedX - sepPos.deltaX) < 1);
                         }
