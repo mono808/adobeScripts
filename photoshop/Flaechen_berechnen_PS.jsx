@@ -10,11 +10,11 @@
 
 function main() {
 
-    var myDoc = app.activeDocument;
+    baseDoc.doc = app.activeDocument;
     var sepDoc = Object.create(sepDocPS);
     sepDoc.startDoc = app.activeDocument;
     
-    var report = sepDoc.get_histogram_reports(myDoc);
+    var report = sepDoc.get_histogram_reports(sepDoc);
     var totalArea = sepDoc.get_totalArea();
 
     //$.writeln('Totalfläche: ' + report.totalArea);
