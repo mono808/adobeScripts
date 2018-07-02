@@ -4,7 +4,7 @@
     var fallback = $.getenv("computername") == "MONOTOWER" ? '/c/capri-stuff/' : '//caprishare/';
     var csroot = $.getenv("csroot") ? $.getenv("csroot") : fallback;
     var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
-    var maxFolder = 30;
+    var maxFolder = 40;
     
     return {
         
