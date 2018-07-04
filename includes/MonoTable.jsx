@@ -213,7 +213,7 @@
         rC.textilName = monoGraphic.get_textil_name();
         rC.textilColor = monoGraphic.get_textil_color();
         rC.printId = monoNamer.name('printId', monoGraphic.get_printId());
-        rC.width = monoGraphic.get_width().toFixed(0);
+        rC.width = monoGraphic.get_width().toFixed(0) + ' x ' + monoGraphic.get_height().toFixed(0);
         rC.height = monoGraphic.get_height().toFixed(0);
         rC.stand = monoGraphic.get_stand();
         rC.tech = monoNamer.name('tech', monoGraphic.get_tech());
@@ -314,7 +314,7 @@
     var myLayer;
     var docScale;
     var myTable;
-    var headerCols = ['Menge:', 'Artikel:','Farbe(n):', 'Position:', 'Breite (mm):', 'Druckstand:', 'Verfahren:', 'Druckfarben:', 'Id:'];
+    var headerCols = ['Menge:', 'Artikel:','Farbe(n):', 'Position:', 'B x H (mm):', 'Druckstand:', 'Verfahren:', 'Druckfarben:', 'Id:'];
     var tableInitString = headerCols.join('\t') + '\r';
     var lastRowContents;
 
