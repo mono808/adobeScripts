@@ -542,16 +542,37 @@ MonoMockup.prototype.add_hinweis = function ()
 
     doc.activeLayer = internLayer;
 
+    try{
+        var tFBounds = doc.masterSpreads.item('A-FixedStuff').pageItems.item('hinweisFrame').geometricBounds;
+    } catch(e) {
+        var tFBounds = [400,400,1000,1000];
+    }
+
+    try {
+      var oStyle = doc.objectStyles.item('hinweisFrameStyle');
+      var check = oStyle.name;
+    } catch(e){
+      var oStyle = doc.objectStyles.item(0);
+    }
+
     try {
         myTF = myPage.textFrames.item('hinweisFrame');
         var check = myTF.name;
     } catch (e) {
-        var tFBounds = doc.masterSpreads.item('A-FixedStuff').pageItems.item('hinweisFrame').geometricBounds;
         var myTF = myPage.textFrames.add({geometricBounds:tFBounds, itemLayer:internLayer, name: 'hinweisFrame'});
-        myTF.appliedObjectStyle = doc.objectStyles.item('hinweisFrameStyle');
+        myTF.appliedObjectStyle = oStyle;
     }
+
     myTF.contents = hwStr;
-    myTF.paragraphs.item(0).applyParagraphStyle(doc.paragraphStyles.item('hinweisTextStyle'));
+
+    try {
+      var pStyle = doc.paragraphStyles.item('hinweisTextStyle');
+      var check = pStyle.name;
+    } catch(e){
+      var pStyle = doc.paragraphStyles.item(0)
+    }
+
+    myTF.paragraphs.item(0).applyParagraphStyle(pStyle);
     return myTF;
 };
 
