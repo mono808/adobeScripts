@@ -37,8 +37,16 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich)
 
     switch(ref.constructor.name) {
         case 'Document' :
-            //if(!ref.saved) return null;
-            ref = ref.fullName;        
+            try{
+                ref = ref.fullName;  
+            } catch (e) {
+                var startFile = Folder($.getenv('csroot') + '/Kundendaten');
+                var saveFile = startFile.saveDlg ('Speicherort wählen'); 
+                //ref.saveAs(saveFile);
+                ref = saveFile;
+            }
+            
+                  
         
         case 'File' :
             //this.nfo.file = ref;
