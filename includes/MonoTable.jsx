@@ -377,7 +377,7 @@
             var oldContents = read_nfo_from_row(myRow);
             var rC = {
                 height : monoGraphic.get_height().toFixed(0),
-                width : monoGraphic.get_width().toFixed(0),
+                width : monoGraphic.get_width().toFixed(0) + ' x ' + monoGraphic.get_height().toFixed(0),
                 stand : monoGraphic.get_stand(),
             };
             rC.stand = update_standString(rC, oldContents);
