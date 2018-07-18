@@ -48,10 +48,10 @@
 
 
 
-	var tagRegEx = /^([a-z0-9äüöß-]+)_(\d{1,3}x\d{1,3})?_?(SD|DTA|DTG|SUB|FLX|FLK|STK)_?(print|druck|sep|working|preview|film)?\.[a-z]{2,3}$/i;
+	var tagRegEx = /^([a-z0-9äüöß-]+)_(\d{1,3}x\d{1,3})?_?(SD|DTA|DTG|SUB|FLX|FLO|STK)_?(print|druck|sep|working|preview|film)?\.[a-z]{2,3}$/i;
     var tag15 = /(\d{1,5}(wme|ang|cs|a)\d\d-0\d\d)_\[([a-z0-9äüöß-]+)_([a-z0-9äüöß-]+)\]_(sep|film|entwurf)/i;
-    var tag16 = /([a-z0-9äüöß-]+)_([0-9]{1,3}x[0-9]{1,3})_(sd|flx|flk|dta|dtg|stk|sub)/i;
-    var tag17 = /([a-z0-9äüöß-]+)_(sd|flx|flk|dta|dtg|stk|sub)_(working|print|preview|druck|entwurf)/i;
+    var tag16 = /([a-z0-9äüöß-]+)_([0-9]{1,3}x[0-9]{1,3})_(sd|flx|flo|dta|dtg|stk|sub)/i;
+    var tag17 = /([a-z0-9äüöß-]+)_(sd|flx|flo|dta|dtg|stk|sub)_(working|print|preview|druck|entwurf)/i;
 	
     this.tag = this.get_tag(aFile);
     if(printsFolder == undefined) var printsFolder = this.tech ? 'druckdaten-' + this.tech : 'druckdaten';

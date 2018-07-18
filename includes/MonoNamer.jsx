@@ -85,7 +85,7 @@
     this.tech = {
         SD   : 'Siebdruck',
         FLX  : 'Flexdruck',
-        FLK  : 'Flockdruck',
+        FLO  : 'Flockdruck',
         SUB  : 'Sublimationsdruck',
         DTAX : 'Digital-Flexdruck',
         DTAK : 'Digital-Flockdruck',

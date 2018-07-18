@@ -314,7 +314,7 @@
     var myLayer;
     var docScale;
     var myTable;
-    var headerCols = ['Menge:', 'Artikel:','Farbe(n):', 'Position:', 'B x H (mm):', 'Druckstand:', 'Verfahren:', 'Druckfarben:', 'Id:'];
+    var headerCols = ['Menge:', 'Artikel:','Farbe(n):', 'Position:', 'Druck: B x H (mm)', 'Druckstand:', 'Verfahren:', 'Druckfarben:', 'Id:'];
     var tableInitString = headerCols.join('\t') + '\r';
     var lastRowContents;
 

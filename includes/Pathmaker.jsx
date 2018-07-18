@@ -53,7 +53,7 @@
     paths.ddSD            = './Druckdaten-SD/';
     paths.ddDTA           = './Druckdaten-DTA/';
     paths.ddDTG           = './Druckdaten-DTG/';
-    paths.ddFLK           = './Druckdaten-FLK/';
+    paths.ddFLO           = './Druckdaten-FLO/';
     paths.ddFLX           = './Druckdaten-FLX/';
     paths.ddSTK           = './Druckdaten-STK/';
     paths.ddSUB           = './Druckdaten-SUB/';
@@ -100,7 +100,7 @@
         p.sd                = p.ddSD  + p.printTag + '_Print.ai';
         p.dta               = p.ddDTA + p.printTag + '_Print.pdf';
         p.flx               = p.ddFLX + p.printTag + '_Print.ai';
-        p.flk               = p.ddFLK + p.printTag + '_Print.ai';
+        p.flo               = p.ddFLO + p.printTag + '_Print.ai';
         p.dtg               = p.ddDTG + p.printTag + '_Print.tif';
         p.stk               = p.ddDTG + p.printTag + '_Print.ai';
 

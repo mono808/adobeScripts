@@ -183,7 +183,7 @@
                     }
                 break;
 
-                case 'FLK' :
+                case 'FLO' :
                 case 'FLX' : return ['Folie XY'];
                 break;
 
