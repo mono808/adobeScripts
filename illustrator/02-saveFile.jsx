@@ -26,8 +26,15 @@ function main (report)
 
     sep.delete_layer('HilfsLayer');
     
-    var saveFile = pm.file(job.nfo.tech.toLowerCase(), job.nfo);
-    f_all.saveFile (saveFile, save_ops.ai_sep(), false);
+    // save print file
+    var printFile = pm.file(job.nfo.tech.toLowerCase(), job.nfo);
+    f_all.saveFile (printFile, save_ops.ai_flx(), false);
+    
+    // save preview file
+    var previewFile = pm.file('previewAi', job.nfo);
+    f_all.saveFile (previewFile, save_ops.ai_flx(), false);
+
+    app.open(printFile)
 }
 
 main();
