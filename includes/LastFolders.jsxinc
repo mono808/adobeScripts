@@ -73,7 +73,7 @@
         check_for_inclusion : function (fd) {
             for (var i = 0; i < folders.length; i++) {
                 var storedFolder = folders[i];
-                if(encodeURI(fd.fullName) == encodeURI(storedFolder.fullName)) {
+                if(encodeURI(fd.displayName) == encodeURI(storedFolder.displayName)) {
                     return i;
                 }
             }
@@ -225,8 +225,11 @@
                     upBtn.preferredSize.width = 40;
                     upBtn.onClick = up_helper(i, fd.parent);
 
-                    var btn = fdGrp['btn'] = fdGrp.add("button", undefined,fd.displayName);
-                    btn.preferredSize.width = 250;
+                    var btn = fdGrp['btn'] = fdGrp.add("button {justify:'left'}");
+                    // var btn = fdGrp['btn'] = fdGrp.add("button", undefined,fd.displayName);
+                    btn.preferredSize.width = 400;
+                    btn.text = fd.displayName;
+                    btn.justify ='left';
                     btn.onClick = select_helper (i);
                     
                     var dnBtn = fdGrp['dnBtn'] = fdGrp.add("button", undefined,'<<');
