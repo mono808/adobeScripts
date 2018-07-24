@@ -53,8 +53,14 @@ BaseAI.prototype.fit_artboard_to_art = function (artlayer_name)
     
     var selection = [];
 
+    var pI;
     var i = artLayer.pageItems.length-1;
     do {
+        pI = artLayer.pageItems[i];
+        if(pI.hidden || pI.locked) {
+            continue;        
+        }
+        
         selection.push(artLayer.pageItems[i]);
     } while (i--);
 
@@ -250,7 +256,7 @@ SepAI.prototype.sort_by_spotColor = function (pIs)
         }
 
         var fC = pI.fillColor;
-        var mySpot;
+        var mySpot = null;
         
         switch (fC.constructor.name) {
             case 'SpotColor' : mySpot = fC.spot;
@@ -258,6 +264,11 @@ SepAI.prototype.sort_by_spotColor = function (pIs)
 
             case 'GradientColor' : mySpot = fC.gradient.gradientStops[0].color.spot;
             break;
+        }
+    
+        if(mySpot == null) {
+            i--;
+            continue;
         }
 
         for (var j = 0; j < this.spots.length; j++) {
