@@ -532,15 +532,74 @@ MonoMockup.prototype.create_ui = function (rowObjs, job)
     myDialog.destroy();
 };
 
+MonoMockup.prototype.show_hinweisDialog = function () {
+    //<fragment>
+	var myDialog = app.dialogs.add({name:"Hinweis erstellen", canCancel:true});
+	with(myDialog){
+		//Add a dialog column.
+		with(dialogColumns.add()){
+			//Create a border panel.
+			with(borderPanels.add()){
+				with(dialogColumns.add()){
+					//The following line shows how to set a property as you create an object.
+					staticTexts.add({staticLabel:"Hinweis:"});
+				}
+				with(dialogColumns.add()){
+					//The following line shows how to set multiple properties as you create an object.
+					var myTextEditField = textEditboxes.add({editContents:"Das ist ein Hinweis!", minWidth:180});
+				}
+			}
+
+			//Create another border panel.
+			with(borderPanels.add()){
+				staticTexts.add({staticLabel:"Typ:"});
+				var myRadioButtonGroup = radiobuttonGroups.add();
+				with(myRadioButtonGroup){
+					var myLeftRadioButton = radiobuttonControls.add({staticLabel:"Interner Hinweis", checkedState:true});
+					var myCenterRadioButton = radiobuttonControls.add({staticLabel:"Kunden Hinweis"});
+				}
+			}
+		}
+	}
+	//Display the dialog box.
+	if(myDialog.show() == true){
+		var myString, mytarget;
+		//If the user didn’t click the Cancel button,
+		//then get the values back from the dialog box.	
+		//Get the example text from the text edit field.
+		myString = myTextEditField.editContents
+
+		//Get the paragraph alignment setting from the radiobutton group.
+		if(myRadioButtonGroup.selectedButton == 0){
+			myTarget = 'Intern';
+		}
+		else {
+			myTarget = 'Infos';
+		}
+
+        myDialog.destroy();
+        return {
+            hinweis: myString,
+            layername : myTarget
+        }
+	} else{
+		myDialog.destroy()
+        return null;
+	}
+};
+
 MonoMockup.prototype.add_hinweis = function () 
 {
     var myPage = app.activeWindow.activePage;
     var doc = myPage.parent.parent;
-    var internLayer = doc.layers.item('Intern');
+    
+    var dialogResult = this.show_hinweisDialog();
+    
+    if(!dialogResult) return;
 
-    var hwStr = Window.prompt('Hinweis eingeben');
-
-    doc.activeLayer = internLayer;
+    var lastLayer = doc.activeLayer;
+    var myLayer = doc.layers.item(dialogResult.layername);
+    doc.activeLayer = myLayer;
 
     try{
         var tFBounds = doc.masterSpreads.item('A-FixedStuff').pageItems.item('hinweisFrame').geometricBounds;
@@ -555,15 +614,18 @@ MonoMockup.prototype.add_hinweis = function ()
       var oStyle = doc.objectStyles.item(0);
     }
 
-    try {
+    /*try {
         myTF = myPage.textFrames.item('hinweisFrame');
         var check = myTF.name;
     } catch (e) {
-        var myTF = myPage.textFrames.add({geometricBounds:tFBounds, itemLayer:internLayer, name: 'hinweisFrame'});
+        var myTF = myPage.textFrames.add({geometricBounds:tFBounds, itemLayer:myLayer, name: 'hinweisFrame'});
         myTF.appliedObjectStyle = oStyle;
-    }
+    } */
+    
+    var myTF = myPage.textFrames.add({geometricBounds:tFBounds, itemLayer:myLayer, name: 'hinweisFrame'});
+    myTF.appliedObjectStyle = oStyle;    
 
-    myTF.contents = hwStr;
+    myTF.contents = dialogResult.hinweis;
 
     try {
       var pStyle = doc.paragraphStyles.item('hinweisTextStyle');
@@ -573,6 +635,8 @@ MonoMockup.prototype.add_hinweis = function ()
     }
 
     myTF.paragraphs.item(0).applyParagraphStyle(pStyle);
+
+    doc.activeLayer = lastLayer;
     return myTF;
 };
 
