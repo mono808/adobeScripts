@@ -21,7 +21,12 @@ function main () {
     var mockup = new MonoMockup(app.activeDocument);
     
     var texTool = new TexAdder();
-    texTool.add_tex(app.activeDocument);
+    if (app.selection.length > 0) {
+        texTool.set_tex(app.selection);
+    } else {
+        texTool.add_tex(app.activeDocument);
+    }
+    
    
     //mockup.save();
 };

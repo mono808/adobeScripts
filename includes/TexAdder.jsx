@@ -19,6 +19,17 @@
             var images = this.place_files_on_page(selectedTex);
             this.choose_graphicLayers(images);            
         },
+
+        set_tex: function (selection) {
+            var images = [];
+            for (var i=0, len=selection.length; i < len ; i++) {
+              var pI = selection[i];
+              if(pI.constructor.name == 'Rectangle' && pI.graphics.length > 0) {
+                  images.push(pI.graphics[0]);
+              }
+            };
+            this.choose_graphicLayers(images);
+        },
     
         get_tex_folder : function () {
             var texFolders = texRoot.getFiles (function (a) {return a instanceof Folder});
