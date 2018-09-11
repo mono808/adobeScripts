@@ -1,12 +1,24 @@
 ﻿#targetengine session
 #target indesign
 
-function toggle_standListener () 
+function show_dialog(){
+
+	var myDialog = app.dialogs.add({name:"Stand kompensieren?"});
+
+	var myResult = myDialog.show();   
+	myDialog.destroy();
+    
+    return myResult;
+}
+
+function toggle_standListener (compensate) 
 {   
     
     #include 'MonoGraphic.jsx'
     #include 'MonoTable.jsx'
     
+    var compensate = false;
+
     var update_stand = function (myEvent) 
     {
         if(app.selection.length < 1) return;
@@ -21,7 +33,7 @@ function toggle_standListener ()
                 if(sel[i] instanceof Rectangle && sel[i].itemLayer == printsLayer) {
                     var monoGraphic = new MonoGraphic(sel[i].allGraphics[0]);
                     var monoTable = new MonoTable(myPage);
-                    monoTable.update_stand(monoGraphic);
+                    monoTable.update_stand(monoGraphic,compensate);
                 }
             }
         }
@@ -50,13 +62,14 @@ function toggle_standListener ()
         standListener.remove();
         Window.alert('Stand-Automatic AUS');
     } else {
+        compensate = show_dialog();
         doc.addEventListener("afterSelectionAttributeChanged", update_stand);
-        Window.alert('Stand-Automatic AN');
+        compensate ? Window.alert('Stand-Automatic KOMPENSIERT') : Window.alert('Stand-Automatic 1:1')
     }
 };
 
 if(app.documents.length > 0 && app.activeDocument) {
-    toggle_standListener();
+    toggle_standListener(compensate);
 }
 
     

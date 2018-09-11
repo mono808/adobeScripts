@@ -129,7 +129,7 @@
             }
         },
 
-        get_stand : function () {
+        get_stand : function (compensate) {
             
             var adjust_for_shirts = function (virtDist) {                
                 // 1,1 (bei Shirts Faktor für die Krümmung der Brust 
@@ -161,7 +161,7 @@
             var graphicY = ref.geometricBounds[2] < y ? ref.geometricBounds[2] : ref.geometricBounds[0];
 
             var virtualStand = graphicY - y;
-            if(virtualStand > 0 && docScale == 6.5) {
+            if(virtualStand > 0 && docScale == 6.5 && compensate) {
                 return adjust_for_shirts(virtualStand);
             } else {
                 return virtualStand;
