@@ -132,7 +132,7 @@ function main() {
     var jobFolder = new JobFolder(job.nfo.folder);
 
     var iASwitch = new InteractSwitch();
-    iASwitch.set('none');
+    iASwitch.set('all');
 
     var myDocs = jobFolder.get_mockups();
     var filmhuelle = jobFolder.get_filmhuelle();
@@ -163,24 +163,31 @@ function main() {
 
             for (var k = 0; k < monoGraphics.length; k++) {
                 var mG = monoGraphics[k];
-                var match = mG.check_size();
-                if(!match.size || !match.placement) {   
-                    errors.push({mG:mG, match: match});
+                var result = mG.check_size();
+                if((result.sizedif > 1) || (result.posdif > 1)) {   
+                    errors.push({mG:mG, result: result});
                 }
             }
         }
     }
 
-    if(errors.length > 0) {
-
-        var alertStr = 'Ansicht weicht von Filmdaten ab oder diese konnten nicht geprüft werden:\r\r';
+    if(errors.length > 0) {      
+        var alertStr = '';        
         
         for (var i=0, len=errors.length; i < len ; i++) {
           var e = errors[i];
-          alertStr += 'Motiv '
+          alertStr += 'Motiv ';
           alertStr += e.mG.get_printId();
-          if(!e.match.size) alertStr += ': Größe abweichend'
-          if(!e.match.placement) alertStr += ': Platzierung abweichend'
+          alertStr += ':\r';
+          if(e.result.sizedif == null) {
+            alertStr = 'Größe / Platzierung konnte nicht geprüft werden\r\r';
+            continue;
+          }
+
+          if(result.sizedif > 1) 
+            alertStr += 'Größe abweichend um: ' + e.result.sizedif.toFixed(1) + ' mm\r';
+          if(result.posdif > 1)
+            alertStr += 'Platzierung abweichend um: ' + e.result.posdif.toFixed(1) + ' mm\r';
           alertStr += '\r';
         };
         
