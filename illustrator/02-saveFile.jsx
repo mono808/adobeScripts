@@ -28,7 +28,21 @@ function main (report)
     
     // save print file
     var printFile = pm.file(job.nfo.tech.toLowerCase(), job.nfo);
-    f_all.saveFile (printFile, save_ops.ai_flx(), false);
+    var saveOpts;
+    switch (job.nfo.tech.toLowerCase()) {
+        case 'flx' : saveOpts = save_ops.ai_flx();
+        break;
+        case 'flk' : saveOpts = save_ops.ai_flx();
+        break;
+        case 'dtax' : saveOpts = save_ops.ai_dta();
+        break;
+        case 'dtak' : saveOpts = save_ops.ai_dta();
+        break;
+        case 'stk' : saveOpts = save_ops.ai_flx();
+        break;   
+    }
+
+    f_all.saveFile (printFile, saveOpts, false);
     
     // save preview file
     var previewFile = pm.file('previewAi', job.nfo);
