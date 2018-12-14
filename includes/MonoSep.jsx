@@ -14,7 +14,7 @@
     
 };
 
-MonoSep.prototype.resize = function (newWidth, newHeight) {
+MonoSep.prototype.resize = function (newWidth, newHeight, rotationAngle) {
     var oldWidth = this.get_width();
     var oldHeight = this.get_height();
 
@@ -22,6 +22,7 @@ MonoSep.prototype.resize = function (newWidth, newHeight) {
     var heightRatio = newHeight / oldHeight;
 
     this.rect.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [widthRatio, heightRatio]);
+    this.graphic.rotationAngle = rotationAngle;
     this.graphic.fit(FitOptions.PROPORTIONALLY);
 };
 

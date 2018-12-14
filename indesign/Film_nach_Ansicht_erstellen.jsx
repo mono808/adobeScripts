@@ -29,7 +29,7 @@ function main () {
 
         var monoFilm = new MonoFilm();
         monoFilm.create_template();
-        monoFilm.place_sep(monoGraphic.get_file('print'), monoGraphic.get_width(), monoGraphic.get_height(), monoGraphic.get_displacement());
+        monoFilm.place_sep(monoGraphic.get_file('print'), monoGraphic.get_width(), monoGraphic.get_height(), monoGraphic.get_displacement(), monoGraphic.get_rotationAngle());
         monoFilm.get_sep_type();
         monoFilm.add_centermarks();
         monoFilm.add_spotInfo2();

@@ -211,14 +211,14 @@ MonoFilm.prototype.create_guide_rectangles = function (guideRec)
     return rec;
 };
 
-MonoFilm.prototype.place_sep = function (graphicFile, width, height, displacement) 
+MonoFilm.prototype.place_sep = function (graphicFile, width, height, displacement, rotationAngle) 
 {
     this.layers.sep = this.check_create_layer('motivEbene','sep');
     this.filmDoc.activeLayer = this.layers.sep;
 
     this.sep = new MonoSep(this.filmPage.place(graphicFile)[0]);
-
-    if(width && height) this.sep.resize(width, height);
+    
+    if(width && height) this.sep.resize(width, height, rotationAngle);
 
     if (displacement) {
         // position sep according to displacment
@@ -312,7 +312,17 @@ MonoFilm.prototype.create_text_frame = function (layer,frameName)
     tF.contents = '';
     return tF;
 };
-
+MonoFilm.prototype.get_kuerzel = function () 
+{
+    var username = $.getenv('USERNAME');
+    
+    if(username.indexOf('.') > 0) {
+        // if username contains . make kuerzel from username jan.untiedt -> JU
+        return (username.split('.')[0][0] + username.split('.')[1][0]).toUpperCase();        
+    } else {
+        return username;
+    }
+}
 
 MonoFilm.prototype.add_jobInfo = function (job)
 {
@@ -334,8 +344,10 @@ MonoFilm.prototype.add_jobInfo = function (job)
     } else {
         jobString += this.sep.name.substring(0, this.sep.name.lastIndexOf('.'));
     }
-        
-    jobString += ' | ' + this.sep.get_width() + 'x' + this.sep.get_height() + 'mm | ' + $.getenv('USERNAME');
+
+    var d = new Date();
+    var datestring = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);        
+    jobString += ' | ' + this.sep.get_width() + 'x' + this.sep.get_height() + 'mm | ' + datestring + ' ' + this.get_kuerzel();
 
     infoTF.contents += jobString;
     
