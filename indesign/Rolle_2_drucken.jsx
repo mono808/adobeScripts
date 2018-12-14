@@ -34,11 +34,18 @@ function main() {
         for (i = 0, maxI = pdfs.length; i < maxI; i+=1) 
         {
             pdf = pdfs[i];
-            pdfName = rE.jobNrShort.exec(pdf)[0];
-            shorty = rE.jobNrVeryShort.exec(pdfName)[0];
-            tempRegEx = new RegExp(String(shorty));
+            var filename = pdf.split('\\').pop();
+            var jobNrResults = rE.jobNrShort.exec(filename);
+            if(jobNrResults && jobNrResults.length > 0) {
+                pdfName = jobNrResults[0];
+                pdfName = rE.jobNrVeryShort.exec(pdfName)[0];
+            } else { 
+                pdfName = filename.substring(0, filename.lastIndexOf ('.'));
+            }           
+            
+            tempRegEx = new RegExp(String(pdfName));
             if(!tempRegEx.test(namesArray)) {
-                namesArray.push(shorty);
+                namesArray.push(pdfName);
             };
         }
         return namesArray;
