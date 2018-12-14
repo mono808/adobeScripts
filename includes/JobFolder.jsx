@@ -39,15 +39,10 @@
 	var is_print = function (a) {
         var fileName = a.displayName;
 		if(!is_file(a)) return false;
-		if(fileName.match(/.?(\.(ai|psd|tif|eps))$/ig)) {
+		if(fileName.match(/.?(\.(ai|psd|tif|eps|pdf))$/ig)) {
 			return true;
 		}
 		return false;
-		// if(fileName.match(/.?(\.(indd|pdf|idlk|db))/ig)) {
-        //     return false;
-        // } else {
-        //     return true;
-        // }
 	};
 
     var is_printFolder = function (a) {
