@@ -28,40 +28,44 @@
     },
 
     sepPS : function () {
-            var ops = new DCS2_SaveOptions();
-            with(ops){
-                dCS = DCSType.NOCOMPOSITE;
-                embedColorProfile = false;
-                encoding = SaveEncoding.ASCII;
-                halftoneScreen = false;
-                interpolation = false;
-                multiFileDCS = false;
-                preview = Preview.EIGHTBITTIFF;
-                spotColors = true;
-                transferFunction = false;
-                vectorData = false;
-            }
-            return ops;
+        var ops = new DCS2_SaveOptions();
+        with(ops){
+            dCS = DCSType.NOCOMPOSITE;
+            embedColorProfile = false;
+            encoding = SaveEncoding.ASCII;
+            halftoneScreen = false;
+            interpolation = false;
+            multiFileDCS = false;
+            preview = Preview.EIGHTBITTIFF;
+            spotColors = true;
+            transferFunction = false;
+            vectorData = false;
+        }
+        return ops;
     },
             
     dtgPS : function () {
-            var options = new TiffSaveOptions();
-            options.alphaChannels = false;
-            options.embedColorProfile = true;
-            options.imageCompression = TIFFEncoding.TIFFLZW;
-            options.layers = false;
-            options.spotColors = true;
-            options.transparency = true;
-            return options;
+        var options = new TiffSaveOptions();
+        with(options){
+            alphaChannels = false;
+            embedColorProfile = true;
+            imageCompression = TIFFEncoding.TIFFLZW;
+            layers = false;
+            spotColors = true;
+            transparency = true;
+        }            
+        return options;
     },
 
     // Illustrator
 
     ai_sep : function () {
         var options = new IllustratorSaveOptions();
-        options.compatibility = Compatibility.ILLUSTRATOR16;
-        options.embedICCProfile = true;
-        options.pdfCompatible = true;
+        with(options) {
+            compatibility = Compatibility.ILLUSTRATOR16;
+            embedICCProfile = true;
+            pdfCompatible = true;
+        }            
         return options;
     },
 
@@ -111,9 +115,9 @@
     ai_dta : function () {
         var options = new PDFSaveOptions();
         options.compressArt = false;
-        options.pDFPreset = 'DTA2';
+        options.pDFPreset = 'DTA2.2';
         options.colorProfileID = ColorProfile.INCLUDEALLPROFILE;
-        options.compatibility = PDFCompatibility.ACROBAT4;
+        options.compatibility = PDFCompatibility.ACROBAT5;
         options.greyscaleCompression = CompressionQuality.ZIP8BIT;
         options.colorCompression = CompressionQuality.ZIP8BIT;
         options.monochromeCompression = MonochromeCompression.MONOZIP;
