@@ -312,11 +312,22 @@ SepAI.prototype.delete_underbase2 = function ()
 
 SepAI.prototype.get_sep_coordinates = function ()
 {
-    var doc = this.doc,
-        abRect = doc.artboards[0].artboardRect,
-        xRef = doc.pageItems.getByName('xLine').position[0],
-        yRef = doc.pageItems.getByName('yLine').position[1],
-        dist = {};
+    var doc = this.doc;
+    var abRect = doc.artboards[0].artboardRect;
+    
+    try {
+        var xRef = doc.pageItems.getByName('xLine').position[0];
+    } catch(e) {
+        var xRef = abRect[0]+(abRect[2]-abRect[0])/2;
+    }
+    try {
+        var yRef = doc.pageItems.getByName('yLine').position[1];
+    } catch(e) {
+        var yRef = 300;
+    }
+    
+
+    var dist = {};
 
     dist.x = UnitValue((abRect[0] - xRef), 'pt');
     dist.y = UnitValue((yRef - abRect[1]), 'pt');
