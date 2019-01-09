@@ -24,6 +24,8 @@ function main () {
     mockup.init();
     mockup.import_pages();
 
+    mockup.save();
+
     mockup.show_shop_logo(job.nfo.shop);
     mockup.fill_job_infos(job.nfo);
 
@@ -35,7 +37,7 @@ function main () {
 
     mockup.add_preview_page();
     
-    mockup.save();
+    //mockup.save();
 };
 
 main();
