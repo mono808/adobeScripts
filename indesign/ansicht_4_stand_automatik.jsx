@@ -69,7 +69,7 @@ function toggle_standListener (compensate)
 };
 
 if(app.documents.length > 0 && app.activeDocument) {
-    toggle_standListener(compensate);
+    toggle_standListener();
 }
 
     
