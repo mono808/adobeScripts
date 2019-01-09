@@ -53,6 +53,10 @@ function rastern() {
     // remove Alphachannels and return color of Shirt-Channel    
     //var teeColor = remove_alpha_channels(interDoc);
     
+    if(interDoc.bitsPerChannel != BitsPerChannelType.EIGHT) {
+        interDoc.bitsPerChannel = BitsPerChannelType.EIGHT;
+    }
+
     // remove component channels not needed for halftoning
     remove_component_channels(interDoc);
                  
@@ -120,9 +124,11 @@ function rastern() {
     interDoc.close(SaveOptions.DONOTSAVECHANGES);
 
     //readd the Shirt-AlphaChannel if there was an Shirt-Channel in the original file
+    /*
     if(teeColor) {
         add_tee_channel(destDoc, teeColor);
     }
+    */
 
     activate_all_channels();
 
