@@ -631,8 +631,17 @@ MonoMockup.prototype.add_hinweis = function ()
       var pStyle = doc.paragraphStyles.item('hinweisTextStyle');
       var check = pStyle.name;
     } catch(e){
-      var pStyle = doc.paragraphStyles.item(0)
+      var pStyle = doc.paragraphStyles.add();
+      with(pStyle){
+        appliedFont = "Myriad Pro";
+        fontStyle = "Regular";
+        pointSize = 16 * this.scale;
+        fillColor = "C=0 M=100 Y=0 K=0";
+      }
     }
+    
+    
+    pStyle.justification = Justification.CENTER_ALIGN;
 
     myTF.paragraphs.item(0).applyParagraphStyle(pStyle);
 
