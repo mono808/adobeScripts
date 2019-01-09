@@ -86,11 +86,11 @@
         SD   : 'Siebdruck',
         FLX  : 'Flexdruck',
         FLO  : 'Flockdruck',
-        SUB  : 'Sublimationsdruck',
-        DTAX : 'Digital-Flexdruck',
-        DTAK : 'Digital-Flockdruck',
-        DTG  : 'Digital-Direktdruck',
-        STK  : 'Bestickung'
+        SUB  : 'Sublimation',
+        DTAX : 'Digital-Flex',
+        DTAK : 'Digital-Flock',
+        DTG  : 'Digital-Direkt',
+        STK  : 'Einstickung'
     };
 
     this.screenCount = {

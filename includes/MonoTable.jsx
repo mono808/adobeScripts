@@ -82,11 +82,11 @@
         var totalWidth = myTable.parent.geometricBounds[3]-myTable.parent.geometricBounds[1];
         switch (docScale) {
             case 4.5 : // for bags
-                var columnWidths = [6, 12, 15, 10, 15, 15, 10, 22, 5];
+                var columnWidths = [8, 12, 15, 10, 15, 15, 10, 22, 5];
                 break;
 
             default :  //for shirts
-                var columnWidths = [6, 14, 15, 10, 15, 17, 10, 22, 5];
+                var columnWidths = [8, 14, 15, 10, 15, 17, 10, 22, 5];
         }
 
         var sum = sum_array(columnWidths);
@@ -364,7 +364,7 @@
             return rowContents;
         },
 
-        update_stand : function (monoGraphic) {
+        update_stand : function (monoGraphic, compensateStand) {
             if(!myTable) return null;
             if(!monoGraphic) return null;
 
@@ -378,7 +378,7 @@
             var rC = {
                 height : monoGraphic.get_height().toFixed(0),
                 width : monoGraphic.get_width().toFixed(0) + ' x ' + monoGraphic.get_height().toFixed(0),
-                stand : monoGraphic.get_stand(),
+                stand : monoGraphic.get_stand(compensateStand),
             };
             rC.stand = update_standString(rC, oldContents);
 
