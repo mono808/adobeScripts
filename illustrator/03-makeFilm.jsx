@@ -28,16 +28,23 @@ function main (report)
     
     if(sep.pathItems.length > 0) sep.rename_pantone_colors(sep.pathItems);
 
-    // save final separation for film output
-    var sepFile = pm.file('sepAi', job.nfo);
+    //     var previewFile = pm.file('previewAi');
+    // f_all.saveFile (previewFile, sep.saveOpts, false);
+
+    // delete fluff and save final separation for film output
+    app.doScript('Delete Fluff', 'Separation');
+
+    var sepFile = pm.file('sepAi', job.nfo);    
     f_all.saveFile (sepFile, sep.saveOpts, false);
     
     var sepPos = sep.get_sep_coordinates();
     f_all.send_sep_to_indesign(sepFile, sepPos);
 
     sep.get_totalArea();
+    //app.activeDocument.close();
     //var inkDialog = new AreaDialog(sep.spots, sep.totalArea).create_win().show();
 
+    //app.open(previewFile);
     //create a print preview for use in mockups (no spotcolors, no underbase)
     sep.delete_underbase2();
     sep.delete_layer('HilfsLayer');
