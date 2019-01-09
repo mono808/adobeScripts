@@ -37,18 +37,28 @@ function main () {
       clipComplexRegions: true
     });
 
-    with(app.pdfExportPreferences) {
-        acrobatCompatibility = AcrobatCompatibility.ACROBAT_4;
-        appliedFlattenerPreset = myFlattenerPreset;
+    var myExportPreset;
+    try{
+        myExportPreset = app.pdfExportPresets.itemByName('monosPDFExportPreset');
+        var check = myExportPreset.name;    
+    } catch (e) {
+        myExportPreset = app.pdfExportPresets.add();
+    }  
+
+    with(myExportPreset) {
+        name = 'monosPDFExportPreset'
+        acrobatCompatibility = AcrobatCompatibility.ACROBAT_7;
+        //appliedFlattenerPreset = myFlattenerPreset;
         cropImagesToFrames = true;
         exportGuidesAndGrids = false;
         exportLayers = false;
         exportNonprintingObjects = false;
         generateThumbnails = true;
         includeICCProfiles = true;
-        optimizePDF = true;
+        optimizePDF = false;
         pdfColorSpace = PDFColorSpace.RGB;
         viewPDF = true;
+        compressTextAndLineArt = true;  
 
         colorBitmapCompression = BitmapCompression.JPEG;
         colorBitmapQuality = CompressionQuality.HIGH;
@@ -65,14 +75,46 @@ function main () {
         monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
         monochromeBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
         monochromeBitmapSamplingDPI = resolution*2;
-        thresholdToCompressMonochrome = resolution*2;
-    }
+        thresholdToCompressMonochrome = resolution*2;    
+    };
 
 
+//~     with(app.pdfExportPreferences) {
+//~         acrobatCompatibility = AcrobatCompatibility.ACROBAT_4;
+//~         appliedFlattenerPreset = myFlattenerPreset;
+//~         cropImagesToFrames = true;
+//~         exportGuidesAndGrids = false;
+//~         exportLayers = false;
+//~         exportNonprintingObjects = false;
+//~         generateThumbnails = true;
+//~         includeICCProfiles = true;
+//~         optimizePDF = true;
+//~         pdfColorSpace = PDFColorSpace.RGB;
+//~         viewPDF = true;
+
+//~         colorBitmapCompression = BitmapCompression.JPEG;
+//~         colorBitmapQuality = CompressionQuality.HIGH;
+//~         colorBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+//~         colorBitmapSamplingDPI = resolution;
+//~         thresholdToCompressColor = resolution;
+
+//~         grayscaleBitmapCompression = BitmapCompression.JPEG;
+//~         grayscaleBitmapQuality = CompressionQuality.HIGH;
+//~         grayscaleBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+//~         grayscaleBitmapSamplingDPI = resolution;
+//~         thresholdToCompressGray = resolution;
+
+//~         monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
+//~         monochromeBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+//~         monochromeBitmapSamplingDPI = resolution*2;
+//~         thresholdToCompressMonochrome = resolution*2;
+//~     }
+
+    
     var layerToggle = f_id.layerToggle(['Intern', 'HL'])
     layerToggle.hide();
     
-    myDoc.exportFile(ExportFormat.pdfType, saveFile, false);
+    myDoc.exportFile(ExportFormat.pdfType, saveFile, false, myExportPreset);
 
     layerToggle.show();
 }

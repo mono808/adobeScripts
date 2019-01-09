@@ -104,8 +104,8 @@ dtgDocPS.make = function (saveFile) {
 
     //baseDoc.get_saveName = function (sourceFile, search, replace, extension)
     try {
-        var searchFor = ['Working', 'Print', 'Sep'];
-        var saveName = this.get_saveName(this.startDoc.fullName, searchFor, 'DTG', 'tif');
+        var searchFor = ['Working'];
+        var saveName = this.get_saveName(this.startDoc.fullName, searchFor, 'Print', 'tif');
     } catch (e) {
         alert(e);
     }

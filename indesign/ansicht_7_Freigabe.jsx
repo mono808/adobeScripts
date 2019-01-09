@@ -184,9 +184,9 @@ function main() {
             continue;
           }
 
-          if(result.sizedif > 1) 
+          if(e.result.sizedif > 1) 
             alertStr += 'Größe abweichend um: ' + e.result.sizedif.toFixed(1) + ' mm\r';
-          if(result.posdif > 1)
+          if(e.result.posdif > 1)
             alertStr += 'Platzierung abweichend um: ' + e.result.posdif.toFixed(1) + ' mm\r';
           alertStr += '\r';
         };
