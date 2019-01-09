@@ -18,7 +18,7 @@ function main () {
     var job = new Job(null,false);
     var pm = new Pathmaker();
     //var typeahead = new Typeahead();
-    var mockup = new MonoMockup(app.activeDocument);
+    //var mockup = new MonoMockup(app.activeDocument);
     
     var texTool = new TexAdder();
     if (app.selection.length > 0) {
