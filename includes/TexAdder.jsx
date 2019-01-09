@@ -175,7 +175,7 @@ function TexAdder (doc) {
             {
                 keyCount++;
                 if(keyCount < 4) return;
-                var temp = entry.text;
+                var temp = String(entry.text).toLowerCase();
                 var tempArray = [];
                 for (var i = 0; i < names.length; i++) {
                     if (names[i].toLowerCase().indexOf(temp) > -1) {
