@@ -95,6 +95,7 @@
         },
 
         get_active_layer : function (myImage) {
+            if(!myImage) return('no graphicLayers');
             var layers = myImage.graphicLayerOptions.graphicLayers;
             
             var i = layers.length-1;
