@@ -139,6 +139,7 @@ function SepAI (initDoc) {
     this.spots = [];
     this.pathItems = this.get_items_on_layer(this.doc.pathItems, 'Motiv');
     this.rasterItems = this.get_items_on_layer(this.doc.rasterItems, 'Motiv');
+    this.pageItems = this.get_items_on_layer(this.doc.pageItems, 'Motiv');
     this.ubRegEx = /^(UB|UL|Unterleger|Vordruck|UB-Grey)$/i;
     this.pantoneTxt = new File($.getenv('pcroot') + '/adobescripts/pantones.txt');
     this.spots = [];
@@ -156,7 +157,7 @@ SepAI.prototype.check = function (items)
         spotStrokes : [],
     };
 
-    if(this.pathItems.length < 1 && this.rasterItems.length < 1) return false;
+    if(this.pathItems.length < 1 && this.rasterItems.length < 1 && this.pageItems.length < 1) return false;
 
     if(this.pathItems.length > 0) {
         var i = this.pathItems.length-1;
