@@ -244,7 +244,7 @@
         win.textilPanel.beidseitig  = win.textilPanel.add("checkbox", [5, 100, 390, 125], 'Textil beidseitig bedrucken',{enabled:true});
         win.textilPanel.hinweis     = win.textilPanel.add("edittext", [5, 130, 390, 155], 'Hinweise', { enterKeySignalsOnChange : true });
 
-        win.quitBtn = win.add('button', [120,275,200,295], 'Fertig');
+        win.quitBtn = win.add('button', [120,275,200,295], 'OK');
 
         win.quitBtn.onClick = function() {
             rC.textilName = win.textilPanel.textil.text;
