@@ -81,7 +81,7 @@
 		},
 
 		get_mockups : function () {
-			return ansichtenFolder.getFiles('*Ansicht.indd');
+			return ansichtenFolder.getFiles('*Ansicht*.indd');
 		},
 
 		get_filmhuelle : function () {
