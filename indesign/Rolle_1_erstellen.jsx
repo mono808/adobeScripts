@@ -128,16 +128,26 @@ function main() {
 			hilfsLayer.name = 'hilfsLayer';
 
 			// erstelle haarlinie am rand der filmrolle
-			var mPage = myDoc.masterSpreads.item('A-Musterseite').pages.item(0),
-				myLine = mPage.graphicLines.add(hilfsLayer, LocationOptions.AT_BEGINNING);
 
-			with(myLine) {
-				paths.item(0).pathPoints.item(0).anchor = [myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[3],0],
-				paths.item(0).pathPoints.item(1).anchor = [myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[3], myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[2]];
-				strokeWeight = 2;
-				strokeColor = myDoc.swatches.item('Registration');
-				name = 'hairLine';
+			function make_haarlinie (p1,p2) {
+				var mPage = myDoc.masterSpreads.item('A-Musterseite').pages.item(0);
+				var myLine = mPage.graphicLines.add(hilfsLayer, LocationOptions.AT_BEGINNING);
+
+				with(myLine) {
+					paths.item(0).pathPoints.item(0).anchor = p1;
+					paths.item(0).pathPoints.item(1).anchor = p2;
+					strokeWeight = 2;
+					strokeColor = myDoc.swatches.item('Registration');
+				}
 			}
+
+			var r1 = [myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[3],0];
+			var r2 = [myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[3], myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[2]];
+			var l1 = [myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[1],0];
+			var l2 = [myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[0], myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[2]];
+			
+			make_haarlinie(r1,r2);
+			make_haarlinie(l1,l2);
 
 			hilfsLayer.locked = true;
 			myDoc.activeLayer = motivEbene;
@@ -147,7 +157,7 @@ function main() {
 	}
 
 	var docSize = {
-		w : 422,
+		w : 426,
 		h : 1024
 	}
 
