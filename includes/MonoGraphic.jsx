@@ -31,8 +31,10 @@
     var doc = myGraphic.parentPage.parent.parent;
     var docScale =doc.documentPreferences.pageWidth/ 297;
     var page = ref.parentPage;
-    var fileName = myGraphic.properties.itemLink.name;
-    var filePath = myGraphic.properties.itemLink.filePath;
+    if(myGraphic.properties.itemLink) {
+        var fileName = myGraphic.properties.itemLink.name;
+        var filePath = myGraphic.properties.itemLink.filePath;
+    }
     var myFile = File(filePath);
     var myFolder = myFile.parent;
     var jobFolder;
@@ -221,8 +223,8 @@
                             var sepPos = monoFilm.get_sepPos();
                             var sepWidth = monoFilm.get_sepWidth();
                             monoFilm.filmDoc.close(SaveOptions.no);
-                            result.sizedif = Math.abs(placedWidth - sepWidth);
-                            result.posdif = Math.abs(placedX - sepPos.deltaX);
+                            result.sizedif = placedWidth - sepWidth;
+                            result.posdif = placedX - sepPos.deltaX;
                         }
                     break;
                 }

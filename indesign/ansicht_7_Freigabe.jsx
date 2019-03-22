@@ -16,7 +16,7 @@ function select_docs (arrayOfFiles) {
         checkBoxes.push(checkPnl.add ("checkbox", undefined, "\u00A0"+arrayOfFiles[i].displayName));
     }
     
-    var print = btnGrp.add ("button", undefined, "Print");
+    var print = btnGrp.add ("button", undefined, "Ok");
     print.onClick = function () {
         for (var i = 0; i < checkBoxes.length; i++){
             if(checkBoxes[i].value) {
@@ -45,7 +45,7 @@ function print_docs (myFiles)
     for(var i = 0; i < myFiles.length; i++ ) {
         var myFile = myFiles[i];
         var doc = app.open(myFile,true);
-        if(myFile.displayName.match(/Ansicht\.indd/i)) {            
+        if(myFile.displayName.match(/Ansicht.*\.indd/i)) {
             doc.print(false, muPPreset);
             doc.close(SaveOptions.ASK);
         } else {
@@ -147,7 +147,7 @@ function main() {
     // loop through all files
     for (var i = 0; i < filesToPrint.length; i++) {
         var myFile = filesToPrint[i];
-        if(myFile.displayName.match(/Ansicht\.indd/i)) {
+        if(myFile.displayName.match(/Ansicht.*\.indd/i)) {
             var monoMockup = new MonoMockup(app.open(myFile,true));
             var layerToggle = f_id.layerToggle(['Intern']);
             layerToggle.show();
@@ -164,7 +164,7 @@ function main() {
             for (var k = 0; k < monoGraphics.length; k++) {
                 var mG = monoGraphics[k];
                 var result = mG.check_size();
-                if((result.sizedif > 1) || (result.posdif > 1)) {   
+                if((Math.abs(result.sizedif) > 1) || (Math.abs(result.posdif) > 1)) {   
                     errors.push({mG:mG, result: result});
                 }
             }
@@ -184,9 +184,9 @@ function main() {
             continue;
           }
 
-          if(e.result.sizedif > 1) 
+          if(Math.abs(e.result.sizedif) > 1) 
             alertStr += 'Größe abweichend um: ' + e.result.sizedif.toFixed(1) + ' mm\r';
-          if(e.result.posdif > 1)
+          if(Math.abs(e.result.posdif) > 1)
             alertStr += 'Platzierung abweichend um: ' + e.result.posdif.toFixed(1) + ' mm\r';
           alertStr += '\r';
         };
