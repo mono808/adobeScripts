@@ -1,11 +1,12 @@
 ﻿function PasserFab (filmType, xCenter, sep)
 {
     this.settings = {
-        stroke1 : 0.3,
+        stroke1 : 0.25,
         stroke2 : 0.6,
-        circle : 4,
+        circle : 4.5,
         dia1 : 10,
         dia2 : 10,
+        dia3 : 16.5,
         distance : 2.5,
     };
     this.pictoScale = 0.75;
@@ -47,12 +48,14 @@ PasserFab.prototype.create_centerMark = function (xy, name)
         regC = this.regColor;
       
     // create Kreuz
-    var gLH,gVH;
+
+    var circle =    this.page.ovals.add(this.regLayer, undefined, undefined,        {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y-pS.circle/2, x-pS.circle/2, y+pS.circle/2, x+pS.circle/2]});
+    var gLH =       this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y, x-pS.dia2/2, y, x+pS.dia2/2] });
+    var gLV =       this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y-pS.circle/2, x, y+pS.circle/2, x] });
+    var gLHhair =   this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke1, fillColor:noC, strokeColor:regC, geometricBounds: [y, x-pS.dia3/2, y, x+pS.dia3/2] });
+    var gLVhair =   this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke1, fillColor:noC, strokeColor:regC, geometricBounds: [y-pS.circle, x, y+pS.circle, x] });
     
-    gLH = this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y, x-pS.dia2/2, y, x+pS.dia2/2] });    
-    gLV = this.page.graphicLines.add(this.regLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y-pS.dia2/3, x, y+pS.dia2/3, x] });
-    
-    pGroup.push(gLH,gLV);
+    pGroup.push(circle,gLH,gLHhair,gLV,gLVhair);
     centerMark = this.page.groups.add(pGroup);
     centerMark.name = name;
    
