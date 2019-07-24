@@ -62,7 +62,8 @@ function toggle_standListener (compensate)
         standListener.remove();
         Window.alert('Stand-Automatic AUS');
     } else {
-        compensate = show_dialog();
+        //compensate = show_dialog();
+        compensate = false;
         doc.addEventListener("afterSelectionAttributeChanged", update_stand);
         compensate ? Window.alert('Stand-Automatic KOMPENSIERT') : Window.alert('Stand-Automatic 1:1')
     }
