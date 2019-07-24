@@ -279,7 +279,7 @@ function fill_table_with_printNfo (monoPrints, myTable, monoNamer)
         var monoFilm = new MonoFilm(monoPrints[i].film);
         var use_longNames = true;
         var spotNames = monoFilm.get_spotNames(use_longNames);
-        monoFilm.close(SaveOptions.NO);
+        monoFilm.close(SaveOptions.YES);
         
         var posCell = posRow.cells.item(i);
         posCell.contents = monoNamer.name('printId', monoPrints[i].id);

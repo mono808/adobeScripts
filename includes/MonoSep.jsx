@@ -43,7 +43,7 @@ MonoSep.prototype.get_spots = function () {
         spotNames.push(spots[i].name);
     }
     
-    tempFilm.filmDoc.close(SaveOptions.NO);
+    tempFilm.filmDoc.close(SaveOptions.ASK);
     this.spots = spotNames;
     return this.spots;
 };

@@ -391,7 +391,7 @@ MonoMockup.prototype.place_prints_on_page = function (monoPrints)
         if(mP.film) {
             var monoFilm = new MonoFilm(mP.film);
             var sepPos = monoFilm.get_sepPos();
-            monoFilm.filmDoc.close(SaveOptions.no);
+            monoFilm.filmDoc.close(SaveOptions.ASK);
         }
 
         var side = mN.name_side(mP.id);
@@ -485,7 +485,7 @@ MonoMockup.prototype.get_all_monoGraphics = function ()
     for (var i = 0; i < this.doc.allGraphics.length; i++) {
         var graphic = this.doc.allGraphics[i];
         if(graphic.parent.itemLayer != printsLayer) continue;
-        if(graphic.parentPage.appliedMaster == previewMaster) continue;
+        if(!graphic.parentPage || graphic.parentPage.appliedMaster == previewMaster) continue;
         monoGraphics.push(new MonoGraphic(graphic));
     }
     return monoGraphics;
@@ -601,11 +601,11 @@ MonoMockup.prototype.add_hinweis = function ()
     var myLayer = doc.layers.item(dialogResult.layername);
     doc.activeLayer = myLayer;
 
-    try{
+/*     try{
         var tFBounds = doc.masterSpreads.item('A-FixedStuff').pageItems.item('hinweisFrame').geometricBounds;
     } catch(e) {
         var tFBounds = [400,400,1000,1000];
-    }
+    } */
 
     try {
       var oStyle = doc.objectStyles.item('hinweisFrameStyle');
@@ -613,17 +613,14 @@ MonoMockup.prototype.add_hinweis = function ()
     } catch(e){
       var oStyle = doc.objectStyles.item(0);
     }
-
-    /*try {
-        myTF = myPage.textFrames.item('hinweisFrame');
-        var check = myTF.name;
-    } catch (e) {
-        var myTF = myPage.textFrames.add({geometricBounds:tFBounds, itemLayer:myLayer, name: 'hinweisFrame'});
-        myTF.appliedObjectStyle = oStyle;
-    } */
     
-    var myTF = myPage.textFrames.add({geometricBounds:tFBounds, itemLayer:myLayer, name: 'hinweisFrame'});
-    myTF.appliedObjectStyle = oStyle;    
+    var tFBounds = [800,32.5,1000,600];
+    var myTF = myPage.textFrames.add({
+            geometricBounds: tFBounds,
+            itemLayer: myLayer,
+            name: 'hinweisFrame',
+            appliedObjectStyle: oStyle
+        });
 
     myTF.contents = dialogResult.hinweis;
 
@@ -632,16 +629,14 @@ MonoMockup.prototype.add_hinweis = function ()
       var check = pStyle.name;
     } catch(e){
       var pStyle = doc.paragraphStyles.add();
-      with(pStyle){
+    }
+    with(pStyle){
         appliedFont = "Myriad Pro";
         fontStyle = "Regular";
-        pointSize = 16 * this.scale;
+        pointSize = 15 * this.scale;
         fillColor = "C=0 M=100 Y=0 K=0";
-      }
+        justification = Justification.LEFT_ALIGN;
     }
-    
-    
-    pStyle.justification = Justification.CENTER_ALIGN;
 
     myTF.paragraphs.item(0).applyParagraphStyle(pStyle);
 
