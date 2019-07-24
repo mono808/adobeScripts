@@ -47,7 +47,7 @@
     /* Public API
     ----------------------------------------------------*/
     return {
-        get_displacement : function () {
+        get_placement : function () {
             
             var xFront, xBack, x;
 
@@ -60,9 +60,19 @@
                 x = xBack;
             }
             var geoBounds = ref.geometricBounds;
-            var displacement = geoBounds[1] > x ? geoBounds[1] - x : geoBounds[1] - x;
+            var refWidth = geoBounds[3]-geoBounds[1];
+            var refCenter = geoBounds[1] + refWidth/2;
+            
+            var deltaX = geoBounds[1] - x;
+            var deltaCenter = refCenter - x;
+            var percentage = -deltaX / refWidth * 100;
 
-            return displacement;
+            return {
+                deltaX : deltaX,
+                deltaCenter : deltaCenter,
+                percentage : percentage,
+                width : refWidth
+            };
         },
 
         get_textil : function () {
@@ -184,7 +194,7 @@
                     if(monoPrint.film) {
                         var monoFilm = new MonoFilm(monoPrint.film);
                         var spotNames = monoFilm.get_spotNames(longNames);
-                        monoFilm.filmDoc.close(SaveOptions.no);
+                        monoFilm.filmDoc.close(SaveOptions.ASK);
                         return spotNames;
                     }
                 break;
@@ -207,24 +217,24 @@
         },
 
         check_size : function () {
-            var placedWidth = this.get_width();
-            var placedX = this.get_displacement();
-            var result = {
-                sizedif : null,
-                posdif : null
-            };
+            var previewPlacement = this.get_placement();
+            var result = {};
+
             if(!jobFolder) jobFolder = check_folder(myFolder);
             if(!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
+            
             if(monoPrint.tech) {
                 switch(monoPrint.tech.toUpperCase()) {
                     case 'SD' :               
                         if(monoPrint.film) {
                             var monoFilm = new MonoFilm(monoPrint.film);
-                            var sepPos = monoFilm.get_sepPos();
-                            var sepWidth = monoFilm.get_sepWidth();
-                            monoFilm.filmDoc.close(SaveOptions.no);
-                            result.sizedif = placedWidth - sepWidth;
-                            result.posdif = placedX - sepPos.deltaX;
+                            var sepPlacement = monoFilm.get_sepPos();
+                            monoFilm.filmDoc.close(SaveOptions.ASK);
+                            result.sizeDif = previewPlacement.width - sepPlacement.width;
+                            result.posDif = previewPlacement.deltaX - sepPlacement.deltaX;
+                            result.placedDif = previewPlacement.percentage - sepPlacement.percentage;
+                            result.previewPlacement = previewPlacement;
+                            result.sepPlacement = sepPlacement;
                         }
                     break;
                 }

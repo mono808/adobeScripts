@@ -164,7 +164,7 @@ function main() {
             for (var k = 0; k < monoGraphics.length; k++) {
                 var mG = monoGraphics[k];
                 var result = mG.check_size();
-                if((Math.abs(result.sizedif) > 1) || (Math.abs(result.posdif) > 1)) {   
+                if((Math.abs(result.sizeDif) > 2) || (Math.abs(result.posDif) > 1.5) || Math.abs(result.placedDif) > 1) {
                     errors.push({mG:mG, result: result});
                 }
             }
@@ -173,27 +173,38 @@ function main() {
 
     if(errors.length > 0) {      
         var alertStr = '';        
-        
-        for (var i=0, len=errors.length; i < len ; i++) {
-          var e = errors[i];
-          alertStr += 'Motiv ';
-          alertStr += e.mG.get_printId();
-          alertStr += ':\r';
-          if(e.result.sizedif == null) {
-            alertStr = 'Größe / Platzierung konnte nicht geprüft werden\r\r';
-            continue;
-          }
 
-          if(Math.abs(e.result.sizedif) > 1) 
-            alertStr += 'Größe abweichend um: ' + e.result.sizedif.toFixed(1) + ' mm\r';
-          if(Math.abs(e.result.posdif) > 1)
-            alertStr += 'Platzierung abweichend um: ' + e.result.posdif.toFixed(1) + ' mm\r';
-          alertStr += '\r';
-        };
-        
+        for (var i=0, len=errors.length; i < len ; i++) {
+            var e = errors[i];
+            alertStr += 'Motiv ';
+            alertStr += e.mG.get_printId();
+            alertStr += ':\r';
+            if(e.result.sizeDif == null) {
+                alertStr = 'Größe / Platzierung konnte nicht geprüft werden\r\r';
+                continue;
+            }
+
+            if(Math.abs(e.result.sizeDif) > 2) {
+                alertStr += 'Größe abweichend um: ' + e.result.sizeDif.toFixed(1) + ' mm\r\r';
+            }
+/* 
+            if(Math.abs(e.result.posDif) > 1) {
+                 alertStr += 'Platzierung abweichend um: ' + e.result.posDif.toFixed(1) + ' mm\r\r';
+            }
+*/
+            if(Math.abs(e.result.placedDif) > 1) {
+                alertStr += 'Zentrierung abweichend!\r\r';
+                alertStr += e.result.previewPlacement.percentage.toFixed(1);
+                alertStr += '% in Ansicht\r';
+                alertStr += e.result.sepPlacement.percentage.toFixed(1);
+                alertStr += '% auf Film \r\r';
+            }
+        }
+
         alertStr += '\rAbweichung ignorieren und weitermachen?';
-        
-        if(!Window.confirm(alertStr)) return null;
+
+    if(!Window.confirm(alertStr)) {
+        return null;}
     }
 
     // objs containing the strings extracted from the mockup to copy to wawi    

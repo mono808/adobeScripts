@@ -776,16 +776,24 @@ MonoFilm.prototype.get_sepPos = function ()
     vPrefs.verticalMeasurementUnits = MeasurementUnits.MILLIMETERS;
     
     var sepBounds = this.sep.rect.geometricBounds;
-
+    var sepWidth = sepBounds[3]-sepBounds[1];
+    var sepCenter = sepBounds[1] + sepWidth/2;
+    var deltaCenter = sepCenter - this.vLine.location;    
     var deltaX = sepBounds[1] - this.vLine.location;
     var deltaY = sepBounds[0] - this.hLine.location;
+    var percentage = -deltaX / sepWidth * 100;
 
     vPrefs.horizontalMeasurementUnits = oldXUnits;
     vPrefs.verticalMeasurementUnits = oldYUnits;
 
     return {
+        'deltaCenter' : deltaCenter,
         'deltaX' : deltaX,
-        'deltaY' : deltaY
+        'deltaY' : deltaY,
+        'x' : sepBounds[1],
+        'y' : sepBounds[0],
+        'percentage' : percentage,
+        'width' : sepWidth
     };
 };
 
@@ -820,4 +828,58 @@ MonoFilm.prototype.close = function (saveOpts)
     } else {       
         this.filmDoc.close();
     }
+};
+
+MonoFilm.prototype.create_graphicLine = function (page, layer, p1, p2, strokeColor, strokeWeight) {
+    var lineOpts = {
+        strokeWeight:strokeWeight.value,
+        fillColor:this.colors.none,
+        strokeColor:this.colors.reg
+    }
+    var myLine = page.graphicLines.add(layer, LocationOptions.AT_BEGINNING, undefined, lineOpts);
+    with(myLine) {
+        paths.item(0).pathPoints.item(0).anchor = p1;
+        paths.item(0).pathPoints.item(1).anchor = p2;
+    }
+}
+
+
+
+MonoFilm.prototype.add_hairLines = function () {
+    var width = this.filmPage.bounds[3] -this.filmPage.bounds[1];
+    var height = this.filmPage.bounds[2] - this.filmPage.bounds[0];
+    var printSize = 425;
+    var bounds = this.filmPage.bounds;
+    var yCenter = bounds[0] + (bounds[2] - bounds[0])/2;
+    var xCenter = bounds[1] + (bounds[3] - bounds[1])/2;
+    
+    if (height < 423 && height > width) 
+    {
+        t1x = bounds[1];
+        t1y = bounds[0] - 0.5 * (printSize-height);
+        t2x = bounds[3];
+        t2y = t1y;
+        this.create_graphicLine(this.filmPage, this.layers.reg, [t1x,t1y], [t2x,t2y], this.colors.reg, new UnitValue(1,'pt'));
+
+        b1x = bounds[1];
+        b1y = bounds[2] + 0.5 * (printSize-height);
+        b2x = bounds[3];
+        b2y = b1y;
+        this.create_graphicLine(this.filmPage, this.layers.reg, [b1x,b1y], [b2x,b2y], this.colors.reg, new UnitValue(1,'pt'));
+    }
+    else if (width > height) 
+    {
+        l1x = bounds[1] - 0.5 * (printSize-width);
+        l1y = bounds[0];
+        l2x = l1x;
+        l2y = bounds[2];
+        this.create_graphicLine(this.filmPage, this.layers.reg, [l1x,l1y], [l2x,l2y], this.colors.reg, new UnitValue(1,'pt'));
+
+        r1x = bounds[3] + 0.5 * (printSize-width);
+        r1y = bounds[0];
+        r2x = r1x;
+        r2y = bounds[2];
+        this.create_graphicLine(this.filmPage, this.layers.reg, [r1x,r1y], [r2x,r2y], this.colors.reg, new UnitValue(1,'pt'));
+    } 
+
 };
