@@ -1,12 +1,22 @@
-﻿function LastFolders () {
+﻿function get_primary_screen () {
+    var screens = $.screens;    
+    for (var i=0, len=screens.length; i < len ; i++) {
+        if(screens[i].primary === true) {
+        return screens[i]
+        }
+    }
+}
+
+function LastFolders () {
     var folders = [];
     var txt = new File('~/lastFolders.txt');
     var csroot = $.getenv("csroot");
     var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
-    var maxFolder = 40;
+    var screen = get_primary_screen();
+    var maxFolder = (screen.bottom - screen.top)/38
     
     return {
-        
+
         add : function (ref) {
             // get the folder from these possible inputs (file|document|folder)
             var fd = this.get_folder_from_ref(ref);
@@ -176,11 +186,12 @@
                 }
             }
 
-            var win = new Window("dialog", "Extracted Infos",undefined);  // bounds = [left, top, right, bottom]
+            var win = new Window("dialog", "Extracted Infos",undefined, {resizeable:true});  // bounds = [left, top, right, bottom]
             this.windowRef = win;
 
-                var fdPnl = win[fdPnl] = win.add("panel", undefined);
                 var manualGrp = win[manualGrp] = win.add("group", undefined);
+                var fdPnl = win[fdPnl] = win.add("panel", undefined);
+                
                 fdPnl.alignChildren = 'left';
                 var grps = fdPnl.grps = [];
 
@@ -212,7 +223,7 @@
                 	}
                 }
 
-                for (var i = 0; i < fds.length; i++) {
+                for (var i = 0; i < maxFolder; i++) {
                     var fdGrp = grps[i] = fdPnl.add('group');
                     var fd = fds[i];
                    
