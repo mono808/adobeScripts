@@ -18,6 +18,9 @@ function main (report)
     
     if(!sep.check()) return;
     
+    var workingFile = pm.file('workingAi', job.nfo);
+    f_all.saveFile (workingFile, sep.saveOpts, false);
+    
     //sort pathItems by spotcolor, putting them into indivdual "spot arrays"
     sep.sort_by_spotColor(sep.pathItems);
 
@@ -27,9 +30,6 @@ function main (report)
     sep.delete_layer('BG');
     
     if(sep.pathItems.length > 0) sep.rename_pantone_colors(sep.pathItems);
-
-    //     var previewFile = pm.file('previewAi');
-    // f_all.saveFile (previewFile, sep.saveOpts, false);
 
     // delete fluff and save final separation for film output
     app.doScript('Delete Fluff', 'Separation');
