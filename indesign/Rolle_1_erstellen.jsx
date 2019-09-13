@@ -146,8 +146,8 @@ function main() {
 			var l1 = [myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[1],0];
 			var l2 = [myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[0], myDoc.masterSpreads.item('A-Musterseite').pages.item(0).bounds[2]];
 			
-			make_haarlinie(r1,r2);
-			make_haarlinie(l1,l2);
+			// make_haarlinie(r1,r2);
+			// make_haarlinie(l1,l2);
 
 			hilfsLayer.locked = true;
 			myDoc.activeLayer = motivEbene;
