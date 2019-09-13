@@ -6,7 +6,7 @@ var remove_component_channels = function ()
         i,
         chan;
 
-    if (doc.DocumentMode = DocumentMode.CMYK || doc.DocumentMode = DocumentMode.RGB || doc.DocumentMode = DocumentMode.GRAYSCALE) {
+    if (doc.DocumentMode == DocumentMode.CMYK || doc.DocumentMode == DocumentMode.RGB || doc.DocumentMode == DocumentMode.GRAYSCALE) {
         doc.activeChannels = doc.componentChannels;
         for (i = doc.componentChannels.length-1; i >= 0; i-=1) {
             chan = doc.channels[i];
@@ -133,7 +133,7 @@ function rastern() {
     activate_all_channels();
 
     var saveFile = get_save_file(srcDoc, settings);
-    destDoc.saveAs(saveFile);
+    if(saveFile) destDoc.saveAs(saveFile);
 
     app.displayDialogs = diagMode;
     app.preferences.rulerUnits = originalRulerUnits;
@@ -185,18 +185,24 @@ function rastern() {
 
     function get_save_file(srcDoc, settings) { 
 
-        var srcName = srcDoc.name,
-            srcPath = srcDoc.fullName.parent,
-            saveName = srcName,
-            saveFile;
 
-        if (saveName.indexOf('.') < 0) {saveName = saveName.substring(0, saveName.lastIndexOf('.'));}        
-        saveName += "-RS";
-        saveName += settings.lpi;
-        saveName += ".psd";
-    
-        saveFile = new File(srcPath + '/' + saveName);
-        return saveFile;
+        if(srcDoc && srcDoc.fullName && srcDoc.fullName.parent) {
+            var srcName = srcDoc.name;
+            var srcPath = srcDoc.fullName.parent;
+            var saveName = srcName;
+            var saveFile;
+
+            if (saveName.indexOf('.') < 0) {saveName = saveName.substring(0, saveName.lastIndexOf('.'));}        
+            saveName += "-RS";
+            saveName += settings.lpi;
+            saveName += ".psd";
+        
+            saveFile = new File(srcPath + '/' + saveName);
+            return saveFile;
+        } else {
+            return null;
+        }
+
     }
 
     function convert_bitmap_to_multichannel (doc) {
@@ -280,10 +286,10 @@ function rastern() {
         win.setPnl.lpi.set = win.setPnl.lpi.add('dropdownlist', [135,5,210,25], 55);
 
         win.setPnl.wnkl.txt = win.setPnl.wnkl.add('statictext',[5,5,160,25], 'Rasterwinkel:');
-        win.setPnl.wnkl.set = win.setPnl.wnkl.add('edittext', [165,5,210,25], 165);
+        win.setPnl.wnkl.set = win.setPnl.wnkl.add('edittext', [165,5,210,25], 162);
 
         win.setPnl.wnklK.txt = win.setPnl.wnklK.add('statictext',[5,5,160,25], 'Rasterwinkel sisBlack:');
-        win.setPnl.wnklK.set = win.setPnl.wnklK.add('edittext', [165,5,210,25], 15);
+        win.setPnl.wnklK.set = win.setPnl.wnklK.add('edittext', [165,5,210,25], 12);
 
         win.setPnl.res.txt = win.setPnl.res.add('statictext',[5,5,130,25], 'Auflösung:');
         win.setPnl.res.set = win.setPnl.res.add('dropdownlist', [135,5,210,25], 900);

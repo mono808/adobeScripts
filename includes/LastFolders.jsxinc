@@ -13,7 +13,7 @@ function LastFolders () {
     var csroot = $.getenv("csroot");
     var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
     var screen = get_primary_screen();
-    var maxFolder = (screen.bottom - screen.top)/38
+    var maxFolder = (screen.bottom - screen.top)/38;
     
     return {
 
@@ -223,7 +223,8 @@ function LastFolders () {
                 	}
                 }
 
-                for (var i = 0; i < maxFolder; i++) {
+                var maxLength = fds.length < maxFolder ? fds.length : maxFolder;
+                for (var i = 0; i < maxLength; i++) {
                     var fdGrp = grps[i] = fdPnl.add('group');
                     var fd = fds[i];
                    

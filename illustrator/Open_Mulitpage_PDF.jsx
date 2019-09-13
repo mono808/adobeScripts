@@ -149,7 +149,6 @@ $.hiresTimer; // start timer
 					}
 				else
 					{
-// TODO			// x = 8498 seems to be the canvas max X position, check and make another row if a page gets to here
 						if ((abRect[2]+spacing+pdfw)>=8494) // if rightmost artboard position surpases the canvas size,
 							{
 								var ableft = firstabRect[0]; // position next artboard below the first one

@@ -79,6 +79,8 @@ function main () {
         thresholdToCompressMonochrome = resolution*2;    
     };
     
+    // TODO: toggle for exporting neutral proofs (no shop & job info)
+
     var layerToggle = f_id.layerToggle(['Intern', 'HL'])
     layerToggle.hide();
     

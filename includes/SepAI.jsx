@@ -464,6 +464,7 @@ SepAI.prototype.rename_pantone_colors = function ()
     }
 
     var nrOnlyRE = /^\d{3,4}\s(C|U)$/i;
+    // FIXME: if user enters '', no nonbreaking space character is needed
 
     for (var i = 0, maxI = panSpots.length; i < maxI; i+=1) {
         var panSpot = panSpots[i];
