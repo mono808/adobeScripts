@@ -6,7 +6,7 @@ var remove_component_channels = function ()
         i,
         chan;
 
-    if (doc.DocumentMode == DocumentMode.CMYK || doc.DocumentMode == DocumentMode.RGB || doc.DocumentMode == DocumentMode.GRAYSCALE) {
+    if (doc.mode == DocumentMode.CMYK || doc.mode == DocumentMode.RGB || doc.mode == DocumentMode.GRAYSCALE) {
         doc.activeChannels = doc.componentChannels;
         for (i = doc.componentChannels.length-1; i >= 0; i-=1) {
             chan = doc.channels[i];
@@ -47,27 +47,27 @@ function rastern() {
     app.preferences.rulerUnits = Units.CM;
 
     var srcDoc = app.activeDocument;    
-    var interDoc = srcDoc.duplicate();
-    interDoc.name = 'InterDoc';
+    var tempDoc = srcDoc.duplicate('tempDoc');
+    //tempDoc.name = 'tempDoc';
     
     // remove Alphachannels and return color of Shirt-Channel    
-    //var teeColor = remove_alpha_channels(interDoc);
+    //var teeColor = remove_alpha_channels(tempDoc);
     
-    if(interDoc.bitsPerChannel != BitsPerChannelType.EIGHT) {
-        interDoc.bitsPerChannel = BitsPerChannelType.EIGHT;
+    if(tempDoc.bitsPerChannel != BitsPerChannelType.EIGHT) {
+        tempDoc.bitsPerChannel = BitsPerChannelType.EIGHT;
     }
 
     // remove component channels not needed for halftoning
-    remove_component_channels(interDoc);
+    remove_component_channels(tempDoc);
                  
     // activate first channel only
-    var destDoc = interDoc.duplicate();
-    destDoc.name = 'DestDoc';
-    destDoc.channels[0].visible = true;
-    destDoc.activeChannels = [activeDocument.channels[0]];
+    var targetDoc = tempDoc.duplicate('targetDoc');
+    //targetDoc.name = 'targetDoc';
+    targetDoc.channels[0].visible = true;
+    targetDoc.activeChannels = [activeDocument.channels[0]];
         
     // store channel parameters for recreating the settings on haltoned channel after bitmapping
-    var chan = destDoc.channels[0];
+    var chan = targetDoc.channels[0];
     var c = {
         kind : chan.kind,
         name : chan.name,
@@ -76,28 +76,28 @@ function rastern() {
     };
                    
     //bitmap the activeChannel with user defined settings
-    convert_to_bitmap(destDoc, settings);
+    convert_to_bitmap(targetDoc, settings);
 
     //convert file back to multichannel, so other (halftoned)spot channels can be added
-    convert_bitmap_to_multichannel(destDoc);
+    convert_bitmap_to_multichannel(targetDoc);
 
     //reset the spotchannel properties to the previously backed up settings
-    //destDoc.channels[0].kind = c.kind;
-    destDoc.channels[0].name = c.name;
-    destDoc.channels[0].color = c.color;
-    destDoc.channels[0].opacity = c.opacity;
+    //targetDoc.channels[0].kind = c.kind;
+    targetDoc.channels[0].name = c.name;
+    targetDoc.channels[0].color = c.color;
+    targetDoc.channels[0].opacity = c.opacity;
 
-    //save history state, to reset the interDoc after bitmapping a singel channel (which removes the others)
-    app.activeDocument = interDoc;
-    var myHistoryState = interDoc.activeHistoryState;
+    //save history state, to reset the tempDoc after bitmapping a singel channel (which removes the others)
+    app.activeDocument = tempDoc;
+    var myHistoryState = tempDoc.activeHistoryState;
 
-    //halftone the remaining channels in interDoc
-    //and copy them one by one to destDoc
+    //halftone the remaining channels in tempDoc
+    //and copy them one by one to targetDoc
     var i,maxI;
-    for (i = 1, maxI = interDoc.channels.length; i < maxI; i += 1) {
-        chan = interDoc.channels[i];
+    for (i = 1, maxI = tempDoc.channels.length; i < maxI; i += 1) {
+        chan = tempDoc.channels[i];
         chan.visible = true;
-        interDoc.activeChannels = [chan];
+        tempDoc.activeChannels = [chan];
         
         c.name = chan.name;
         c.kind = chan.kind;
@@ -105,35 +105,35 @@ function rastern() {
         c.opacity = chan.opacity;
 
         //convert selected channel to Bitmap, all other channels are deleted
-        convert_to_bitmap(interDoc, settings);
-        convert_bitmap_to_multichannel(interDoc);
-        interDoc.channels[0].duplicate(destDoc);
+        convert_to_bitmap(tempDoc, settings);
+        convert_bitmap_to_multichannel(tempDoc);
+        tempDoc.channels[0].duplicate(targetDoc);
         
-        app.activeDocument = destDoc;
-        chan = destDoc.channels[destDoc.channels.length-1];
+        app.activeDocument = targetDoc;
+        chan = targetDoc.channels[targetDoc.channels.length-1];
         //chan.kind = c.kind;
         chan.name = c.name;
         chan.color = c.color;
         chan.opacity = c.opacity;
         
         // revert back to history state with all channels intact, and repeat steps with next channel
-        app.activeDocument = interDoc;
-        interDoc.activeHistoryState = myHistoryState;
+        app.activeDocument = tempDoc;
+        tempDoc.activeHistoryState = myHistoryState;
     }
 
-    interDoc.close(SaveOptions.DONOTSAVECHANGES);
+    tempDoc.close(SaveOptions.DONOTSAVECHANGES);
 
     //readd the Shirt-AlphaChannel if there was an Shirt-Channel in the original file
     /*
     if(teeColor) {
-        add_tee_channel(destDoc, teeColor);
+        add_tee_channel(targetDoc, teeColor);
     }
     */
 
     activate_all_channels();
 
     var saveFile = get_save_file(srcDoc, settings);
-    if(saveFile) destDoc.saveAs(saveFile);
+    if(saveFile) targetDoc.saveAs(saveFile);
 
     app.displayDialogs = diagMode;
     app.preferences.rulerUnits = originalRulerUnits;
