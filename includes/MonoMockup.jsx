@@ -1,21 +1,29 @@
 ﻿function MonoMockup (initDoc) 
 {
     var csroot = Folder($.getenv("csroot"));
-    this.templates = {
-        bags : {            
+    this.templates = [
+        {
+            type: 'bags',
             file: File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/taschen/Ansicht_Taschen_Master.indd'),
             scale : 4.5
         },
-        shirts : {
+        {
+            type: 'shirts',            
             file : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master.indd'),
             scale : 6.5
+        },
+        {
+            type: 'accessoires',
+            file : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/taschen/Ansicht_Accessoires_Master.indd'),
+            scale : 3
         }
-    };
+    ];
     this.doc;
     this.type;
     this.scale;
     this.masterPages = {};
     this.layers = {};
+    this.template;
 
     if(initDoc && initDoc.constructor.name == 'Document') this.init(initDoc);
 };
@@ -26,8 +34,8 @@ MonoMockup.prototype.texTool = new TexAdder();
 MonoMockup.prototype.import_pages = function () 
 {
 
-    var templateFile = this.get_scale() > 5 ? this.templates.shirts.file : this.templates.bags.file;        
-    this.templateDoc = app.open(templateFile, false);
+    //var templateFile = this.get_scale() > 5 ? this.templates.shirts.file : this.templates.bags.file;        
+    this.templateDoc = app.open(this.template.file, false);
     
     this.label_pages(this.templateDoc);
     
@@ -43,10 +51,12 @@ MonoMockup.prototype.import_pages = function ()
 
 MonoMockup.prototype.create_mockupDoc = function () 
 {
-    var templateFiles = this.typeahead.show_dialog([this.templates.bags.file, this.templates.shirts.file], 'displayName');   
     
-    this.templateDoc = templateFiles[0] ? app.open(templateFiles[0]) : null;
-    if(!this.templateDoc)return;
+    var retArray = this.typeahead.show_dialog(this.templates, 'type');
+    this.template = retArray[0] ? retArray[0] : null;
+    
+    if(!this.template) return;
+    this.templateDoc = app.open(this.template.file);
 
     //create doc preset based on the chosen template document
     var newDocPreset = this.createDocPresetFromMaster();
