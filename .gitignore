@@ -1,3 +1,4 @@
 *.swp
 /pantones.txt
 samplescripts/**
+launch.json

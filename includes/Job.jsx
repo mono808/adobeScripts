@@ -31,7 +31,9 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich)
     if(!ref) {
         ref = this.get_ref();
     }
-      
+
+    if(ref == null) return ref;
+    
     //extract additional nfos from filename and folderstructure
     var tempNfo = null;
 

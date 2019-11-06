@@ -1,0 +1,10 @@
+// TODO: script for adding job infos textframe to any ps ai or indd file
+// TODO: indd script for replacing multilayer shirt graphics with flattened ones + embed
+// TODO: batch file for exporting / importing Adobe CS Settings & Presets
+// TODO: AI script to open saveDialog in folder of placed graphic
+
+// TODO: powershell script abzug senden, 2 Ordner verwenden (Ausgang, Warte auf Freigabe)
+
+
+
+CS colorsetting C:\Users\karen.wittrin\AppData\Roaming\Adobe\Color\Settings

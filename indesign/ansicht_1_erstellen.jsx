@@ -16,6 +16,7 @@ function main () {
     #include 'TexAdder.jsx'
     
     var job = new Job(null,false);
+    if(!job.nfo) return;
     var pm = new Pathmaker(job.nfo);
     //var typeahead = new Typeahead();
     var mockup = new MonoMockup();
