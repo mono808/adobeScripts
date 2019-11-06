@@ -170,7 +170,7 @@ function TexAdder (doc) {
             var w = new Window ('dialog {text: "Quick select", alignChildren: "fill"}');
             var entry = w.add ('edittext {active: true}');
             var dummy = w.add ('panel {alignChildren: "fill"}');
-            var list = dummy.add ('listbox', [0,0,250,250], names, {multiselect: true});
+            var list = dummy.add ('listbox', [0,0,250,500], names, {multiselect: true});
             entry.onChanging = function ()
             {
                 keyCount++;
