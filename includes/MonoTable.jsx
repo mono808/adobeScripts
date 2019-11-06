@@ -15,21 +15,35 @@
         var deltaW = myColumn.width - newWidth;
         myColumn.width = newWidth;
 
-        var getIndex = function (myColumn) {
-            for (var i = 0, maxI = myColumn.parent.columns.length; i < maxI; i+=1) {
-                if(myTable.columns.item(i) === myColumn) {
-                    return i
-                };
-            };
-        };
+//~         var getIndex = function (myColumn) {
+//~             for (var i = 0, maxI = myColumn.parent.columns.length; i < maxI; i+=1) {
+//~                 if(myTable.columns.item(i) === myColumn) {
+//~                     return i
+//~                 };
+//~             };
+//~         };
 
-        var index = getIndex(myColumn);
+//~         var index = getIndex(myColumn);
 
-        for (var i = index+1, maxI = myTable.columns.length; i < maxI ; i+=1) {
+
+        for (var i = myColumn.index+1, maxI = myTable.columns.length; i < maxI ; i+=1) {
             var otherColumn = myTable.columns.item(i);
-            otherColumn.width += deltaW/(myTable.columns.length - 1 - index);
+            otherColumn.width += deltaW/(myTable.columns.length - 1 - myColumn.index);
         };
     };
+
+    var get_chars = function (myTable) {
+        var columnChars = [];
+        var contentString = myTable.contents.join('');
+        for(var i = 0, maxI = myTable.columns.length; i < maxI ;i++) {
+            var columnContentString = myTable.columns.item(i).contents.join('');
+            columnChars[i] = columnContentString.length;
+        }
+        return {
+            totalChars : contentString.length,
+            columnChars : columnChars
+        }
+    }
 
     var get_table = function (myPage) {
         try {
@@ -403,6 +417,16 @@
                 newContents.stand = update_standString(newContents, oldContents);
                 write_nfo_to_row(myRow, newContents);
             }
+        },
+
+        update_columnWidths : function () {
+            if(!myTable) return null;
+            var chars = get_chars(myTable);
+            var totalWidth = myTable.parent.geometricBounds[3]-myTable.parent.geometricBounds[1];
+            for (var i=0, len=chars.columnChars.length; i < len ; i++) {
+              var newWidth = chars.columnChars[i] / chars.totalChars * totalWidth;
+              resize_column(myTable.columns[i], newWidth);
+            };
         }
-	}
+ 	}
 }
