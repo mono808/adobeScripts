@@ -2,18 +2,20 @@
 {
     this.hidden = hidden || false;
     this.filmWidth = 420;
-    this.filmHeight = 550;
-    this.guideRecs = [
-        {w:this.filmWidth,h:this.filmHeight,name:'max',align:'top'},
-        {w:300,h:420,name:'a3',align:'top'},
-        {w:120,h:300,name:'ar',align:'top'},
-    ];
+    this.filmHeight = 750;
     this.backgroundColor = {
         space:ColorSpace.RGB,
         model:ColorModel.PROCESS,
         colorValue:[214,255,207],
         name:'bgColor'
     };
+    this.guideRecs = [
+        //{w:this.filmWidth,h:this.filmHeight,name:'bg',align:'bg', fillColor:'bgColor'},
+        {w:420,h:550,name:'max',align:'top', fillColor:'bgColor'},
+        {w:300,h:420,name:'a3',align:'top'},
+        {w:120,h:300,name:'ar',align:'top'},
+    ];
+
     this.colors = {};
     this.layers = {};
     this.sep = {};
@@ -132,7 +134,7 @@ MonoFilm.prototype.create_template = function ()
     var hLine = {
         name: 'hLine',
         orientation: HorizontalOrVertical.horizontal,
-        location: 0,
+        location: 100,
         fitToPage:false
     };
 
@@ -193,6 +195,12 @@ MonoFilm.prototype.create_guide_rectangles = function (guideRec)
     var myBounds = [];
     switch (guideRec.align) {
         case 'top' :
+            myBounds[0] = 100;
+            myBounds[1] = pC.x - guideRec.w/2;
+            myBounds[2] = 100+guideRec.h;
+            myBounds[3] = pC.x+guideRec.w/2;
+        break;
+        case 'bg' : 
             myBounds[0] = pageGB[0];
             myBounds[1] = pC.x - guideRec.w/2;
             myBounds[2] = pageGB[0]+guideRec.h;
@@ -206,8 +214,7 @@ MonoFilm.prototype.create_guide_rectangles = function (guideRec)
         break;          
     }
     var rec = this.filmPage.rectangles.add({itemLayer:this.layers.guides,name:guideRec.name, geometricBounds:myBounds, locked:true});
-    if(guideRec.name === 'max') {rec.fillColor = this.colors.bg;}
-    else {rec.fillColor = this.colors.none;}  
+    rec.fillColor = guideRec.fillColor ? this.filmDoc.colors.itemByName(guideRec.fillColor) : this.filmDoc.swatches.itemByName('None');
     return rec;
 };
 
@@ -303,10 +310,10 @@ MonoFilm.prototype.create_text_frame = function (layer,frameName)
     textBounds[3] = this.filmDoc.documentPreferences.pageWidth/2 + tfWidth/2;
 
     var tF = this.filmPage.textFrames.add( { geometricBounds : textBounds, contents : ' ', itemLayer : layer} );
-    with(tF.textFramePreferences) {
+    /*with(tF.textFramePreferences) {
         autoSizingType = AutoSizingTypeEnum.OFF;
         useNoLineBreaksForAutoSizing = false;
-    }
+    }*/
 
     tF.name = frameName;
     tF.contents = '';
@@ -359,7 +366,7 @@ MonoFilm.prototype.add_jobInfo = function (job)
 MonoFilm.prototype.add_spotInfo_numbered = function ()
 {
     this.layers.colors = this.check_create_layer('farbenEbene','colors');
-    this.filmDoc.activeLayer = this.layers.colors;    
+    this.filmDoc.activeLayer = this.layers.colors;
 
     var doc = this.filmDoc;
     var colorTF = this.create_text_frame(this.layers.colors, 'colorTextFrame');
