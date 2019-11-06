@@ -29,8 +29,11 @@ function main () {
         monoTable.add_row(monoGraphics[i]);
     }
 
+    //monoTable.update_columnWidths();
+
     //indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/ansicht_4_stand_automatik.jsx'));
     //monoTable.update_stand(monoGraphics[0]);
     //monoTable.update_row(monoGraphics[1], false);
 }
+
 main();

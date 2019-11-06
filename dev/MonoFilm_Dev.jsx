@@ -17,35 +17,34 @@ function main () {
     #include 'Typeahead.jsx'
     #include 'TexAdder.jsx'
 
-
+/* 
     for (var i = 0; i < app.documents.length; i++) {
         app.documents[i].close(SaveOptions.NO);
     }
-
-    var graphicFile = new File('/c/capri-stuff/Kundendaten/B2B/Criminals/0546A17-014_Mausi-Shirts/Druckdaten-SD/Front_220x245_SD_Print.ai');
+ */
+    //var graphicFile = new File('/c/capri-stuff/Kundendaten/B2B/Criminals/0546A17-014_Mausi-Shirts/Druckdaten-SD/Front_220x245_SD_Print.ai');
     
-    var monoFilm = new MonoFilm();
+    var monoFilm = new MonoFilm(app.activeDocument);
+    //var job = new Job(null, false);
+    //var pm = new Pathmaker(job.nfo);
 
-    monoFilm.create_template (false);
+    //monoFilm.create_template (false);
 
-    monoFilm.place_sep (graphicFile);
+    //monoFilm.place_sep (graphicFile);
 
-    var job = new Job(null, false);
-    var pm = new Pathmaker(job.nfo);
+    //monoFilm.add_centermarks ();
 
-    monoFilm.add_centermarks ();
-
-    monoFilm.add_jobInfo (job);
+    //monoFilm.add_jobInfo (job);
 
     //monoFilm.add_spotInfo_numbered ();
 
-    monoFilm.add_spotInfo2 ();
+    //monoFilm.add_spotInfo2 ();
     
-    monoFilm.position_textFrames();
+    //monoFilm.position_textFrames();
 
-    monoFilm.save (job, true, false);
+    //monoFilm.save (job, true, false);
 
-    monoFilm.print ();
+    //monoFilm.print ();
 
     var spotNames = monoFilm.get_spotNames ();
 
@@ -53,22 +52,9 @@ function main () {
 
     var sepPos = monoFilm.get_sepPos ();
     var sepWidth = monoFilm.get_sepWidth ();
-    monoFilm.close ();
-
-    var myFile = monoFilm.filmFile;
-
-    //monoFilm.reset ();
-
-    var monoFilm = {};
-    monoFilm = new MonoFilm(myFile);
     
-    spotNames = monoFilm.get_spotNames ();
+    monoFilm.add_hairLines();
 
-    spots = monoFilm.get_all_spotColors ();
-
-    sepPos = monoFilm.get_sepPos ();
-    sepWidth = monoFilm.get_sepWidth ();
-    monoFilm.close ();
 
 }
 main();

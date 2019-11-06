@@ -22,5 +22,7 @@ function main () {
     var monoFilm = new MonoFilm(app.activeDocument);
     monoFilm.print(job, true, false);
 
+    app.activeDocument.save();
+
 }
 main();

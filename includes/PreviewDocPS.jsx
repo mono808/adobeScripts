@@ -88,9 +88,11 @@ previewDocPS.create_merged_doc = function () {
 
     var teeChan = this.find_tee_channel();
     /*convert tee chan to alpha, so its not misinterpreted as regular spotchannel*/
+    /*
     if(teeChan && teeChan.kind == ChannelType.SPOTCOLOR) {
         teeChan.kind = ChannelType.SELECTEDAREA;
     }
+    */
 
     var spotChans = this.get_spot_channels();
 

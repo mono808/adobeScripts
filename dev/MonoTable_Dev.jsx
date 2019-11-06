@@ -2,7 +2,7 @@
 function main () {
 
      
-    #include 'augment_objects.jsx'
+    #include augment_objects.jsx;
     #include 'reflector.jsxinc'
     #include 'Job.jsx'
     #include 'JobFolder.jsx'
@@ -25,6 +25,7 @@ function main () {
     var monoGraphics = monoMockup.get_monoGraphics(myPage, monoMockup.layers.prints);
     
 	var monoTable = new MonoTable(myPage);
+    monoTable.update_columnWidths();
 	//monoTable.create_table(myPage, true);
    
 //~     for(var i = 0; i < monoGraphics.length; i++) {
