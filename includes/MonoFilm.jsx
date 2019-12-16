@@ -77,9 +77,9 @@ MonoFilm.prototype.init = function (initDoc) {
     // set layers
     this.layers.guides = this.check_create_layer('hilfsLayer', 'guides');
     this.layers.sep    = this.check_create_layer('motivEbene', 'sep');
-    this.layers.job    = this.check_create_layer('infoEbene', 'job');
-    this.layers.colors = this.check_create_layer('farbenEbene', 'colors');
-    this.layers.reg    = this.check_create_layer('passerEbene', 'reg');
+    this.layers.info    = this.check_create_layer('infoEbene', 'job');
+    //this.layers.info = this.check_create_layer('farbenEbene', 'colors');
+    //this.layers.info    = this.check_create_layer('passerEbene', 'reg');
     
     initDoc.activeLayer = this.layers.sep;
 
@@ -154,6 +154,7 @@ MonoFilm.prototype.create_template = function ()
     return newDoc;
 };
 
+// accepts multiple strings of layersnames, checks if any of the layers exists and and renames it to first string / creates a layer with name of the first string
 MonoFilm.prototype.check_create_layer = function (/* ... */)
 {
     if(arguments && arguments.length > 0) {
@@ -334,10 +335,10 @@ MonoFilm.prototype.get_kuerzel = function ()
 MonoFilm.prototype.add_jobInfo = function (job)
 {
 
-    this.layers.job = this.check_create_layer('infoEbene','job');
-    this.filmDoc.activeLayer = this.layers.job;
+    this.layers.info = this.check_create_layer('infoEbene','job');
+    this.filmDoc.activeLayer = this.layers.info;
 
-    var infoTF = this.create_text_frame(this.layers.job, 'infoTextFrame');
+    var infoTF = this.create_text_frame(this.layers.info, 'infoTextFrame');
     var infoText = infoTF.texts[0];
     var mN = new MonoNamer();
        
@@ -365,11 +366,11 @@ MonoFilm.prototype.add_jobInfo = function (job)
 
 MonoFilm.prototype.add_spotInfo_numbered = function ()
 {
-    this.layers.colors = this.check_create_layer('farbenEbene','colors');
-    this.filmDoc.activeLayer = this.layers.colors;
+    this.layers.info = this.check_create_layer('infoEbene','job');
+    this.filmDoc.activeLayer = this.layers.info;
 
     var doc = this.filmDoc;
-    var colorTF = this.create_text_frame(this.layers.colors, 'colorTextFrame');
+    var colorTF = this.create_text_frame(this.layers.info, 'colorTextFrame');
     var colorText = colorTF.texts.item(0);
     
     colorText.contents = '';
@@ -407,11 +408,11 @@ MonoFilm.prototype.add_spotInfo_numbered = function ()
 MonoFilm.prototype.add_spotInfo2 = function ()
 {
     
-    this.layers.colors = this.check_create_layer('farbenEbene', 'colors');
-    this.filmDoc.activeLayer = this.layers.colors;
+    this.layers.info = this.check_create_layer('infoEbene', 'job');
+    this.filmDoc.activeLayer = this.layers.info;
 
     var doc = this.filmDoc;
-    var colorTF = this.create_text_frame(this.layers.colors, 'colorTextFrame');
+    var colorTF = this.create_text_frame(this.layers.info, 'colorTextFrame');
     var colorText = colorTF.texts.item(0);
     
     colorTF.contents = '< ';
@@ -508,8 +509,8 @@ MonoFilm.prototype.get_sep_type = function ()
 
 MonoFilm.prototype.get_picto_type = function () 
 {
-    for (var i = 0; i < this.layers.reg.pageItems.length; i++) {
-        var pI = this.layers.reg.allPageItems[i];
+    for (var i = 0; i < this.layers.info.pageItems.length; i++) {
+        var pI = this.layers.info.allPageItems[i];
         switch(pI.name) {
             case 'pictoShirt' : return 'Shirts';
             break;
@@ -602,6 +603,8 @@ MonoFilm.prototype.get_spotNames = function (longNames)
 
     return names;
 };
+
+MonoFilm.prototype
 
 MonoFilm.prototype.position_textFrames = function () 
 {
@@ -704,9 +707,9 @@ MonoFilm.prototype.resize_page = function ()
 
 MonoFilm.prototype.reset = function () 
 {
-    this.layers.reg.pageItems.everyItem().remove();
-    this.layers.colors.pageItems.everyItem().remove();
-    this.layers.job.pageItems.everyItem().remove();
+    this.layers.info.pageItems.everyItem().remove();
+    this.layers.info.pageItems.everyItem().remove();
+    this.layers.info.pageItems.everyItem().remove();
 };
 
 MonoFilm.prototype.save = function (job, showDialog, close) 

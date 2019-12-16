@@ -19,11 +19,11 @@
     this.regMarkCoordinates = this.get_regMarkCoordinates(this.sep);
     this.regColor = this.doc.colors.item('Registration'),
     this.noColor = this.doc.swatches.item('None'),
-    this.regLayer = this.doc.layers.item("passerEbene");    
+    this.regLayer = this.doc.layers.item("infoEbene");    
     
     try{this.regLayer.name}
     catch (myError){
-        this.regLayer = this.doc.layers.add({name:"passerEbene"});
+        this.regLayer = this.doc.layers.add({name:"infoEbene"});
     }
 };
 
