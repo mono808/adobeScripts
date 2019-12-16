@@ -206,7 +206,7 @@ Job.prototype.get_nfo_from_filename = function (target)
         match = fileName.match(rE.printTag2)
         if (match) {
             nfo.printId     = match[1];
-            nfo.tech        = match[2];
+            nfo.tech        = match[3];
         }
 
         match = fileName.match(rE.doc)
