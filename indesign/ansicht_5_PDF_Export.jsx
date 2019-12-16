@@ -83,10 +83,22 @@ function main () {
 
     var layerToggle = f_id.layerToggle(['Intern', 'HL'])
     layerToggle.hide();
-    
-    myDoc.exportFile(ExportFormat.pdfType, saveFile, false, myExportPreset);
 
-    layerToggle.show();
+    // when exporting fails, ask user for a new filename
+    try {
+        myDoc.exportFile(ExportFormat.pdfType, saveFile, false, myExportPreset);
+        layerToggle.show();
+    } catch(e) {
+        alert(e+'\n\nBitte neuen Dateinamen wählen')
+        var newSaveFile = saveFile.saveDlg();
+        if(newSaveFile && newSaveFile.exist()) {
+            myDoc.exportFile(ExportFormat.pdfType, saveFile, false, myExportPreset);
+            layerToggle.show();
+        } else {
+            alert('Save file canceled')
+            layerToggle.show();
+        }
+    }
 }
 
 function check() {
