@@ -644,9 +644,9 @@ MonoFilm.prototype.select_all_printable_pageItems = function ()
     var doc = this.filmDoc,
         selection = [];
 
-    var i, 
-        maxI = doc.allPageItems.length,
-        pI;
+    var i; 
+    var maxI = doc.allPageItems.length;
+    var pI;
     for (i = 0; i < maxI; i+=1) {
         pI = doc.allPageItems[i];
         
@@ -663,22 +663,22 @@ MonoFilm.prototype.select_all_printable_pageItems = function ()
 MonoFilm.prototype.get_bounds_of_selection = function (mySelection) 
 {
 
-    var selBounds = mySelection[0].geometricBounds,
+    var selBounds = mySelection[0].visibleBounds,
         j;
 
     maxI = mySelection.length;
 
     for (i = 0; i < maxI; i+=1) {
         pI = mySelection[i];
-        for (j = 0; j < pI.geometricBounds.length; j+=1) {
+        for (j = 0; j < pI.visibleBounds.length; j+=1) {
             
             if ( j === 0 || j === 1 ) {
-                if (pI.geometricBounds[j] < selBounds[j]) {
-                    selBounds[j] = pI.geometricBounds[j]
+                if (pI.visibleBounds[j] < selBounds[j]) {
+                    selBounds[j] = pI.visibleBounds[j]
                 };
             } else if ( j === 2 || j === 3) {
-                if (pI.geometricBounds[j] > selBounds[j]) {
-                    selBounds[j] = pI.geometricBounds[j];
+                if (pI.visibleBounds[j] > selBounds[j]) {
+                    selBounds[j] = pI.visibleBounds[j];
                 };
             };
         };
