@@ -858,38 +858,40 @@ MonoFilm.prototype.create_graphicLine = function (page, layer, p1, p2, strokeCol
 MonoFilm.prototype.add_hairLines = function () {
     var width = this.filmPage.bounds[3] -this.filmPage.bounds[1];
     var height = this.filmPage.bounds[2] - this.filmPage.bounds[0];
-    var printSize = 425;
+    var printSize = 424;
+    var strokeWidth = new UnitValue(2,'pt');
     var bounds = this.filmPage.bounds;
     var yCenter = bounds[0] + (bounds[2] - bounds[0])/2;
     var xCenter = bounds[1] + (bounds[3] - bounds[1])/2;
+    var l1x1,l1y1,l1x2,l1y2,l2x1,l2y1, l2x2,l2y2;
     
-    if (height < 423 && height > width) 
-    {
-        t1x = bounds[1];
-        t1y = bounds[0] - 0.5 * (printSize-height);
-        t2x = bounds[3];
-        t2y = t1y;
-        this.create_graphicLine(this.filmPage, this.layers.reg, [t1x,t1y], [t2x,t2y], this.colors.reg, new UnitValue(1,'pt'));
+    if (height < 420 && height > width) {
+    // create lines horizontally above and below sep
+        l1x1 = bounds[1];
+        l1y1 = bounds[0] - 0.5 * (printSize-height);
+        l1x2 = bounds[3];
+        l1y2 = l1y;
 
-        b1x = bounds[1];
-        b1y = bounds[2] + 0.5 * (printSize-height);
-        b2x = bounds[3];
-        b2y = b1y;
-        this.create_graphicLine(this.filmPage, this.layers.reg, [b1x,b1y], [b2x,b2y], this.colors.reg, new UnitValue(1,'pt'));
+        l2x1 = bounds[1];
+        l2y1 = bounds[2] + 0.5 * (printSize-height);
+        l2x2 = bounds[3];
+        l2y2 = l2y1;
+    }   //else if (width > height)
+    else { 
+    // create lines vertically to the left and right of sep
+        l1x1 = bounds[1] - 0.5 * (printSize-width);
+        l1y1 = bounds[0];
+        l1x2 = l1x1;
+        l1y2 = bounds[2];
+
+        l2x1 = bounds[3] + 0.5 * (printSize-width);
+        l2y1 = bounds[0];
+        l2x2 = l2x1;
+        l2y2 = bounds[2];
     }
-    else if (width > height) 
-    {
-        l1x = bounds[1] - 0.5 * (printSize-width);
-        l1y = bounds[0];
-        l2x = l1x;
-        l2y = bounds[2];
-        this.create_graphicLine(this.filmPage, this.layers.reg, [l1x,l1y], [l2x,l2y], this.colors.reg, new UnitValue(1,'pt'));
+    
+    this.create_graphicLine(this.filmPage, this.layers.info, [l1x1,l1y1], [l1x2,l1y2], this.colors.reg, strokeWidth);
+    this.create_graphicLine(this.filmPage, this.layers.info, [l2x1,l2y1], [l2x2,l2y2], this.colors.reg, strokeWidth);
 
-        r1x = bounds[3] + 0.5 * (printSize-width);
-        r1y = bounds[0];
-        r2x = r1x;
-        r2y = bounds[2];
-        this.create_graphicLine(this.filmPage, this.layers.reg, [r1x,r1y], [r2x,r2y], this.colors.reg, new UnitValue(1,'pt'));
-    } 
 
 };
