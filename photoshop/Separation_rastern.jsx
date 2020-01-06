@@ -1,5 +1,8 @@
 ﻿#target photoshop
 
+#include 'augment_objects.jsx'
+#include 'BaseDocPS.jsx'
+
 var remove_component_channels = function () 
 {
     var doc = activeDocument,
@@ -186,7 +189,7 @@ function rastern() {
     function get_save_file(srcDoc, settings) { 
 
 
-        if(srcDoc && srcDoc.fullName && srcDoc.fullName.parent) {
+        if(srcDoc.saved && srcDoc.fullName && srcDoc.fullName.parent) {
             var srcName = srcDoc.name;
             var srcPath = srcDoc.fullName.parent;
             var saveName = srcName;
@@ -344,6 +347,28 @@ function rastern() {
     }    
 }
 
-if(app.documents.length > 0) {
+function check () {
+
+    var baseDoc = Object.create(baseDocPS);
+    baseDoc.doc = app.activeDocument;
+    var pantoneChannels = baseDoc.check_for_pantone();
+    if( pantoneChannels.length > 0) {
+        var alertStr = '';
+        alertStr += 'Dokument enthält Pantone-Farben in folgenden Kanälen:\n\n';
+        alertStr += pantoneChannels.join('\n');
+        alertStr += '\n\nBitte erst in RGB Farben wandeln!';
+        alert(alertStr);
+        return false;
+    }
+
+    if(baseDoc.get_spot_channels().length < 1) {
+        alert('Document contains no SpotColor Channels, script cancelled');
+        return false;
+    }
+
+    return true;
+}
+
+if(app.activeDocument && check(app.activeDocument)) {
     rastern();
 }
