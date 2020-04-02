@@ -90,28 +90,31 @@ dtgDocPS.make = function (saveFile) {
     var originalRulerUnits = app.preferences.rulerUnits;
     app.preferences.rulerUnits = Units.MM;
 
-    try{
-        var check = this.startDoc.fullName;
-    } catch (e) {
-        var saveFolder = new Folder($.getenv("csroot")+"\\kundendaten").selectDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');
-        var saveFile = new File(saveFolder + '/' + this.startDoc.name);
-        this.startDoc.saveAs(saveFile);
-    }
 
-    var saveFolder = new Folder(this.startDoc.fullName.parent.parent + '/Druckdaten-DTG');
+    try{
+        var check = dtgObj.startDoc.fullName;
+        var saveFolder = new Folder(this.startDoc.fullName.parent.parent + '/Druckdaten-DTG');
+        try {
+            var searchFor = ['Working'];
+            var saveName = this.get_saveName(this.startDoc.fullName, searchFor, 'Print', 'tif');
+        } catch (e) {
+            alert(e);
+        }
+        var saveFile = new File(saveFolder + '/' + saveName);        
+        
+    } catch (e) {
+        var lastFolders = new LastFolders();
+        lastFolders.import_txt();
+        var saveFolder = lastFolders.show_dialog();
+        var saveFile = new File(saveFolder + '/Druckdaten-DTG/' + dtgObj.startDoc.name).saveDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');
+        //saveFile = saveFile.saveDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');        
+    }
 
     this.doc = this.startDoc.duplicate() || app.activeDocument.duplicate();
 
     //baseDoc.get_saveName = function (sourceFile, search, replace, extension)
-    try {
-        var searchFor = ['Working'];
-        var saveName = this.get_saveName(this.startDoc.fullName, searchFor, 'Print', 'tif');
-    } catch (e) {
-        alert(e);
-    }
-    var saveFile = new File(saveFolder + '/' + saveName);
-
     //baseDoc.save_doc = function (dest, saveOps, close, showDialog)
+
     this.save_doc(saveFile, this.tiffOptions, false, true);
 
     app.preferences.rulerUnits = originalRulerUnits;
