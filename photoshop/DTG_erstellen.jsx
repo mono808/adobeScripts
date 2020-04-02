@@ -5,6 +5,7 @@ function main () {
     #include 'DTGDocPS.jsx'
     #include 'Job.jsx'
     #include 'JobFolder.jsx'
+    #include 'LastFolders.jsx'
     #include 'Pathmaker.jsx'
     #include 'MonoNamer.jsx'
     #include 'InteractSwitch.jsx'
@@ -18,6 +19,7 @@ function main () {
 
     var dtgObj = Object.create(dtgDocPS);
     dtgObj.startDoc = app.activeDocument;
+   
     if(dtgObj.check()) {
         dtgObj.make();
     }
