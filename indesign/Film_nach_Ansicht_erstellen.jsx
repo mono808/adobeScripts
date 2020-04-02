@@ -32,6 +32,7 @@ function main () {
         monoFilm.place_sep(monoGraphic.get_file('print'), monoGraphic.get_width(), monoGraphic.get_height(), monoGraphic.get_placement().deltaX, monoGraphic.get_rotationAngle());
         monoFilm.get_sep_type();
         monoFilm.add_centermarks();
+        monoFilm.add_pictogram();
         monoFilm.add_spotInfo_numbered();
         monoFilm.add_jobInfo(job);
         monoFilm.position_textFrames();

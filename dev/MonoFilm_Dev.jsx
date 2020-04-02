@@ -25,22 +25,24 @@ function main () {
     //var graphicFile = new File('/c/capri-stuff/Kundendaten/B2B/Criminals/0546A17-014_Mausi-Shirts/Druckdaten-SD/Front_220x245_SD_Print.ai');
     
     var monoFilm = new MonoFilm(app.activeDocument);
-    //var job = new Job(null, false);
+    var job = new Job(null, false);
     //var pm = new Pathmaker(job.nfo);
 
     //monoFilm.create_template (false);
 
     //monoFilm.place_sep (graphicFile);
 
-    //monoFilm.add_centermarks ();
+    monoFilm.add_centermarks ();
+    
+    monoFilm.add_pictogram();
 
-    //monoFilm.add_jobInfo (job);
+    monoFilm.add_jobInfo (job);
 
-    //monoFilm.add_spotInfo_numbered ();
+    monoFilm.add_spotInfo_numbered ();
 
     //monoFilm.add_spotInfo2 ();
     
-    //monoFilm.position_textFrames();
+    monoFilm.position_textFrames();
 
     //monoFilm.save (job, true, false);
 

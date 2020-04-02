@@ -25,6 +25,8 @@ function main () {
     monoFilm.reset ();
     
     monoFilm.add_centermarks ();
+    
+    monoFilm.add_pictogram();    
 
     monoFilm.add_jobInfo (job);
 

@@ -7,9 +7,8 @@
         dia1 : 10,
         dia2 : 10,
         dia3 : 16.5,
-        distance : 2.5,
+        distance : 8,
     };
-    this.pictoScale = 0.75;
 
     this.doc = app.activeDocument;
     this.page = app.activeWindow.activePage;
@@ -30,12 +29,6 @@
 PasserFab.prototype.create_centerMark = function (xy, name)
 {
     var pS = this.settings;
-
-    /*pobj = {
-        center : true,
-        picto : null
-        xy : coords[pos],
-    }*/
 
     var oldActiveLayer = this.doc.activeLayer;
     this.doc.activeLayer = this.regLayer;
@@ -103,62 +96,6 @@ PasserFab.prototype.create_regMark = function (xy)
     return regMark;
 };
 
-PasserFab.prototype.create_pictoBags = function (centerMark) 
-{
-    var pictogram = this.page.rectangles.add(this.regLayer, undefined, undefined, {geometricBounds:[2,1,10,9]});
-    var henkel = this.page.rectangles.add(this.regLayer, undefined, undefined, {geometricBounds:[0,3,2,7]});
-
-    pictogram.makeCompoundPath(henkel);
-    with(pictogram){
-        name = 'pictoBags';
-        fillColor = this.noColor;
-        strokeColor = this.regColor;
-        strokeWeight = 0.5;
-    }
-    var scale = this.pictoScale;
-    pictogram.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [scale, scale]);
-    pictogram.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]]);
-
-    return pictogram;
-};
-
-PasserFab.prototype.create_pictoShirt = function (centerMark)
-{
-    var torso = this.page.rectangles.add(this.regLayer, undefined, undefined, {geometricBounds:[3,2,10,8]});
-    var arms = this.page.rectangles.add(this.regLayer, undefined, undefined, {geometricBounds:[0,0,4,10]});
-    var neck = this.page.ovals.add(this.regLayer, undefined, undefined, {geometricBounds:[-2,3,2,7]});
-    
-    var pictogram = arms.addPath(torso);
-    neck.subtractPath(pictogram);
-    with(pictogram){
-        name = 'pictoShirt';
-        fillColor = this.noColor;
-        strokeColor = this.regColor;
-        strokeWeight = 0.5;
-    }
-    var scale = this.pictoScale;
-    pictogram.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [scale, scale]);
-    pictogram.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]]);        
-    return pictogram;
-};
-
-PasserFab.prototype.create_pictoNull = function (centerMark)
-{
-    var tfBounds = [0,0,6,6];
-          
-    var myTF = this.page.textFrames.add(this.regLayer, {geometricBounds:tfBounds, fillColor: this.noColor});
-    myTF.contents = '!?';
-    myTF.name = 'pictoNull';
-
-    var myText = myTF.paragraphs[0];
-    myText.pointSize = this.pictoScale*30;
-    myText.fillColor = this.regColor;
-    myText.strokeColor = this.noColor;
-                    
-    myTF.move([centerMark.geometricBounds[3]+1,centerMark.geometricBounds[0]]);
-    return myTF;
-};
-
 PasserFab.prototype.get_regMarkCoordinates = function ()
 {
     var sepHeight = this.sep.get_height(),
@@ -207,18 +144,6 @@ PasserFab.prototype.add_centerMarks = function ()
 
     var topMark = this.create_centerMark(cTop,'topMark');
     var bottomMark = this.create_centerMark(cBottom, 'bottomMark');
-
-    switch(this.filmType) {
-        case 'Shirts' :
-            this.create_pictoShirt(topMark);
-            break;
-        case 'Bags' : 
-            this.create_pictoBags(bottomMark);
-            break;
-        case 'Null' : 
-            this.create_pictoNull(topMark);             
-            break;
-    }
 };
 
 PasserFab.prototype.add_regMarks = function (positions)

@@ -32,7 +32,9 @@ function main () {
 
     try{myDoc.layers.item('motivEbene').visible = false;} catch(e){}
 
-    monoFilm.add_centermarks ();
+    monoFilm.add_centermarks();
+
+    monoFilm.add_pictogram();
 
     monoFilm.add_jobInfo (job);
 

@@ -16,6 +16,7 @@
         {w:120,h:300,name:'ar',align:'top'},
     ];
 
+    this.pictoScale = 0.75;
     this.colors = {};
     this.layers = {};
     this.sep = {};
@@ -154,7 +155,7 @@ MonoFilm.prototype.create_template = function ()
     return newDoc;
 };
 
-// accepts multiple strings of layersnames, checks if any of the layers exists and and renames it to first string / creates a layer with name of the first string
+// accepts multiple strings of layernames, checks if any of the layers exists and and renames it to first string / creates a layer with name of the first string
 MonoFilm.prototype.check_create_layer = function (/* ... */)
 {
     if(arguments && arguments.length > 0) {
@@ -230,12 +231,11 @@ MonoFilm.prototype.place_sep = function (graphicFile, width, height, displacemen
 
     if (displacement) {
         // position sep according to displacment
-        var
-        xRef = this.vLine.location,
-        sepCoor = {};
+        var xRef = this.vLine.location;
+        var sepCoor = {};
 
         sepCoor.x = xRef + displacement;
-        sepCoor.y = 100;
+        sepCoor.y = 200;
         this.sep.rect.move( [sepCoor.x, sepCoor.y] );
         //$.writeln('Sep placed according to PlacementInfos');
 
@@ -263,26 +263,11 @@ MonoFilm.prototype.get_sep = function ()
     }    
 };
 
-MonoFilm.prototype.add_centermarks = function () 
-{    
-    if(!this.type) this.get_sep_type();
-    
-    var passerFab = new PasserFab(this.type, this.vLine.location, this.sep);
-    passerFab.add_centerMarks();   
-
-};
-
 MonoFilm.prototype.add_regmarks = function () 
 {    
-    if(!this.type) this.get_sep_type();
-    
-    if(this.type == 'Bags') {
-        var regMarks = [0,2,4,6];
-    } else {
-        var regMarks = [0,2,4,6];
-    }
-
-    var passerFab = new PasserFab(this.type, this.vLine.location, this.sep);
+    var type = this.get_sep_type();   
+    var regMarks = type === 'Bags' ? [0,2,4,6] : [0,2,4,6];
+    var passerFab = new PasserFab(type, this.vLine.location, this.sep);
         
     if(regMarks && regMarks.length > 0 && this.get_all_spotColors().length > 1) {
         passerFab.add_regMarks(regMarks);
@@ -292,8 +277,8 @@ MonoFilm.prototype.add_regmarks = function ()
 MonoFilm.prototype.create_regmark = function () 
 {    
     var regMarks = [3];
-
-    var passerFab = new PasserFab(this.type, this.vLine.location, this.sep);
+    var type = this.get_sep_type();
+    var passerFab = new PasserFab(type, this.vLine.location, this.sep);
         
     passerFab.add_regMarks(regMarks);
 
@@ -311,10 +296,6 @@ MonoFilm.prototype.create_text_frame = function (layer,frameName)
     textBounds[3] = this.filmDoc.documentPreferences.pageWidth/2 + tfWidth/2;
 
     var tF = this.filmPage.textFrames.add( { geometricBounds : textBounds, contents : ' ', itemLayer : layer} );
-    /*with(tF.textFramePreferences) {
-        autoSizingType = AutoSizingTypeEnum.OFF;
-        useNoLineBreaksForAutoSizing = false;
-    }*/
 
     tF.name = frameName;
     tF.contents = '';
@@ -332,36 +313,53 @@ MonoFilm.prototype.get_kuerzel = function ()
     }
 }
 
-MonoFilm.prototype.add_jobInfo = function (job)
+MonoFilm.prototype.create_pictogram = function (type)
 {
+    var pictogram;
+    switch(type) {
+        case 'Bags' :
+            pictogram = this.filmPage.rectangles.add(this.layers.info, undefined, undefined, {geometricBounds:[2,1,10,9]});
+            var henkel = this.filmPage.rectangles.add(this.layers.info, undefined, undefined, {geometricBounds:[0,3,2,7]});
 
-    this.layers.info = this.check_create_layer('infoEbene','job');
-    this.filmDoc.activeLayer = this.layers.info;
+            pictogram.makeCompoundPath(henkel);
+            with(pictogram){
+                fillColor = this.colors.none;
+                strokeColor = this.colors.reg;
+                strokeWeight = 0.5;
+            }
+            pictogram.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [this.pictoScale, this.pictoScale]);
+        break;
 
-    var infoTF = this.create_text_frame(this.layers.info, 'infoTextFrame');
-    var infoText = infoTF.texts[0];
-    var mN = new MonoNamer();
-       
-    infoText.fillColor = this.colors.reg;
-    infoText.hyphenation = false;
-      
-    var jobString = '';
-    if(job.nfo.client && job.nfo.jobNr && job.nfo.jobName && job.nfo.printId) {
-        var printId = mN.name('printId', job.nfo.printId);
-        jobString += job.nfo.client + ' | ' + job.nfo.jobNr + '_' + job.nfo.jobName + '\n' + printId;
-    } else {
-        jobString += this.sep.name.substring(0, this.sep.name.lastIndexOf('.'));
+        case 'Shirts' :
+            var torso = this.filmPage.rectangles.add(this.layers.info, undefined, undefined, {geometricBounds:[3,2,10,8]});
+            var arms = this.filmPage.rectangles.add(this.layers.info, undefined, undefined, {geometricBounds:[0,0,4,10]});
+            var neck = this.filmPage.ovals.add(this.layers.info, undefined, undefined, {geometricBounds:[-2,3,2,7]});
+            
+            pictogram = arms.addPath(torso);
+            neck.subtractPath(pictogram);
+            with(pictogram){
+                fillColor = this.colors.none;
+                strokeColor = this.colors.reg;
+                strokeWeight = 0.5;
+            }
+            pictogram.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [this.pictoScale, this.pictoScale]);
+        break;
+
+        default :
+            var tfBounds = [0,0,6,6];
+            pictogram = this.filmPage.textFrames.add(this.layers.info, {geometricBounds:tfBounds, fillColor: this.colors.none});
+            pictogram.contents = '!?';
+
+            var myText = pictogram.paragraphs[0];
+            myText.pointSize = this.pictoScale*30;
+            myText.fillColor = this.colors.reg;
+            myText.strokeColor = this.colors.none;
+        break;
     }
-
-    var d = new Date();
-    var datestring = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);        
-    jobString += ' | ' + this.sep.get_width() + 'x' + this.sep.get_height() + 'mm | ' + datestring + ' ' + this.get_kuerzel();
-
-    infoTF.contents += jobString;
     
-    this.fit_frame_to_text(infoTF);
-    this.jobFrame = infoTF;
-    return infoTF;
+    pictogram.name = 'pictogram';
+    this.pictogram = pictogram;
+    return pictogram;
 };
 
 MonoFilm.prototype.add_spotInfo_numbered = function ()
@@ -503,7 +501,7 @@ MonoFilm.prototype.get_sep_type = function ()
             type = 'Shirts';
         }
     }
-    this.type = type ? type : this.choose_type();
+    //this.type = type ? type : this.choose_type();
     return type;
 };
 
@@ -604,41 +602,6 @@ MonoFilm.prototype.get_spotNames = function (longNames)
     return names;
 };
 
-MonoFilm.prototype
-
-MonoFilm.prototype.position_textFrames = function () 
-{
-    function move_item1_below_item2 (item1, item2, distance) 
-    {
-        var x = item2.geometricBounds[1];
-        var y = item2.geometricBounds[2] + distance;
-        item1.move([x,y]);
-    }
-
-    function move_item1_above_item2 (item1, item2, distance)
-    {
-        var item1Height = item1.geometricBounds[2] - item1.geometricBounds[0];
-        var x = item2.geometricBounds[1];
-        var y = item2.geometricBounds[0] - item1Height - distance;
-        item1.move([x,y]);
-    }
-
-    function move_item1_next_to_item2 (item1, item2, distance)
-    {
-        var x = item2.geometricBounds[3] + distance;
-        var y = item2.geometricBounds[0];
-        item1.move([x,y]);
-    }
-
-    var topMark = this.filmPage.pageItems.itemByName('topMark');
-    var bottomMark = this.filmPage.pageItems.itemByName('bottomMark');
-
-    var placeInfoNextTo = this.type == 'Bags' ? bottomMark : topMark;
-
-    move_item1_next_to_item2(this.jobFrame, placeInfoNextTo, 10);
-    move_item1_below_item2(this.spotsFrame, this.jobFrame, 0.5);
-};
-
 MonoFilm.prototype.select_all_printable_pageItems = function () 
 {
     var doc = this.filmDoc,
@@ -687,57 +650,11 @@ MonoFilm.prototype.get_bounds_of_selection = function (mySelection)
     return selBounds;
 };
 
-MonoFilm.prototype.resize_page = function () 
-{
-    var sel = this.select_all_printable_pageItems();
-    var bounds = this.get_bounds_of_selection(sel);
-
-    var rec = this.filmPage.rectangles.add({ geometricBounds: [bounds[0], bounds[1], bounds[2], bounds[3]] });
-
-    var topLeft = rec.resolve(AnchorPoint.TOP_LEFT_ANCHOR,CoordinateSpaces.SPREAD_COORDINATES)[0];
-    var bottomRight = rec.resolve(AnchorPoint.BOTTOM_RIGHT_ANCHOR,CoordinateSpaces.SPREAD_COORDINATES)[0];
-    var corners = [topLeft, bottomRight];
-
-    rec.remove();
-    
-    this.filmPage.reframe(CoordinateSpaces.SPREAD_COORDINATES, corners);
-
-    app.layoutWindows[0].zoom(ZoomOptions.FIT_PAGE);
-};
-
 MonoFilm.prototype.reset = function () 
 {
     this.layers.info.pageItems.everyItem().remove();
     this.layers.info.pageItems.everyItem().remove();
     this.layers.info.pageItems.everyItem().remove();
-};
-
-MonoFilm.prototype.save = function (job, showDialog, close) 
-{
-    var wxhRE = /\d{2,3}x\d{2,3}_/i;
-    var saveFolder = this.sep.folder;
-    var saveName = this.sep.name.substring(0, this.sep.name.lastIndexOf('.'));
-
-    //saveName = saveName.replace(/_(sep|print|druck)/i, '').replace(wxhRE, '');
-    saveName = saveName.replace(/_(sep|print|druck)/i, '')
-    saveName += '_Film.indd';
-
-    if(job && job.nfo.jobNr && job.nfo.jobName) {
-        var jobTag = job.nfo.jobNr + '_' + job.nfo.jobName + '_';
-        saveName = jobTag + saveName;
-    }
-
-    var saveFile = new File(saveFolder.fullName + '/' + saveName);
-
-    if(showDialog)
-        saveFile = saveFile.saveDlg('Please check Filename');
-
-    if(saveFile)
-        this.filmDoc.save(saveFile);
-        this.filmFile = this.filmDoc.fullName;
-    
-    if(close)
-        saveDoc.close();
 };
 
 MonoFilm.prototype.print_to_postscript = function (myDoc, targetFile, printPreset) 
@@ -754,24 +671,6 @@ MonoFilm.prototype.print_to_postscript = function (myDoc, targetFile, printPrese
     }
 
     return doc.print(false, undefined);
-};
-
-MonoFilm.prototype.print = function ()
-{
-    if(!this.filmDoc.saved) {
-        alert('Film wurde noch nicht gespeichert, bitte erst abspeichern');
-        return;
-    }
-    var saveName = this.filmDoc.name.substring(0, this.filmDoc.name.lastIndexOf('.'));
-    var saveFolder = this.filmDoc.fullName.parent;
-     
-    var pdfName = saveName + '.pdf';
-    var pdfFile = new File(pm.path('filmOut') + pdfName);
-    
-    var psName = saveName + '.ps';
-    var psFile = new File(pm.path('filmIn') + psName);
-
-    this.print_to_postscript (this.filmDoc, psFile, 'monoFilms');
 };
 
 MonoFilm.prototype.get_sepPos = function ()
@@ -840,7 +739,8 @@ MonoFilm.prototype.close = function (saveOpts)
     }
 };
 
-MonoFilm.prototype.create_graphicLine = function (page, layer, p1, p2, strokeColor, strokeWeight) {
+MonoFilm.prototype.create_graphicLine = function (page, layer, p1, p2, strokeColor, strokeWeight)
+{
     var lineOpts = {
         strokeWeight:strokeWeight.value,
         fillColor:this.colors.none,
@@ -851,7 +751,7 @@ MonoFilm.prototype.create_graphicLine = function (page, layer, p1, p2, strokeCol
         paths.item(0).pathPoints.item(0).anchor = p1;
         paths.item(0).pathPoints.item(1).anchor = p2;
     }
-}
+};
 
 
 
@@ -893,5 +793,239 @@ MonoFilm.prototype.add_hairLines = function () {
     this.create_graphicLine(this.filmPage, this.layers.info, [l1x1,l1y1], [l1x2,l1y2], this.colors.reg, strokeWidth);
     this.create_graphicLine(this.filmPage, this.layers.info, [l2x1,l2y1], [l2x2,l2y2], this.colors.reg, strokeWidth);
 
+
+};
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//
+//    TEMPORARY INTERFACE
+//
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+MonoFilm.prototype.add_centermarks = function () 
+{       
+    var type = this.get_sep_type();
+   
+    var passerFab = new PasserFab(type, this.vLine.location, this.sep);
+    passerFab.add_centerMarks();   
+};
+
+MonoFilm.prototype.add_pictogram = function () {
+    var type = this.get_sep_type();
+    var pictogram = this.create_pictogram(type);
+}
+
+MonoFilm.prototype.add_jobInfo = function (job)
+{
+
+    this.layers.info = this.check_create_layer('infoEbene','job');
+    this.filmDoc.activeLayer = this.layers.info;
+
+    var infoTF = this.create_text_frame(this.layers.info, 'infoTextFrame');
+    var infoText = infoTF.texts[0];
+    var mN = new MonoNamer();
+       
+    infoText.fillColor = this.colors.reg;
+    infoText.hyphenation = false;
+      
+    var jobString = '';
+    if(job.nfo.client && job.nfo.jobNr && job.nfo.jobName && job.nfo.printId) {
+        var printId = mN.name('printId', job.nfo.printId);
+        jobString += job.nfo.client + ' | ' + job.nfo.jobNr + '_' + job.nfo.jobName + '\n' + printId;
+    } else {
+        jobString += this.sep.name.substring(0, this.sep.name.lastIndexOf('.'));
+    }
+
+    var d = new Date();
+    var datestring = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);        
+    jobString += ' | ' + this.sep.get_width() + 'x' + this.sep.get_height() + 'mm | ' + datestring + ' ' + this.get_kuerzel();
+
+    infoTF.contents += jobString;
+    
+    this.fit_frame_to_text(infoTF);
+    this.jobFrame = infoTF;
+    return infoTF;
+};
+
+MonoFilm.prototype.add_spotInfo_numbered = function ()
+{
+    this.layers.info = this.check_create_layer('infoEbene','job');
+    this.filmDoc.activeLayer = this.layers.info;
+
+    var doc = this.filmDoc;
+    var colorTF = this.create_text_frame(this.layers.info, 'colorTextFrame');
+    var colorText = colorTF.texts.item(0);
+    
+    colorText.contents = '';
+    colorText.hyphenation = false;
+    colorText.allowArbitraryHyphenation;
+  
+    var spots = this.get_all_spotColors();
+    var mN = new MonoNamer();
+    var charIndex = 0;           
+
+    for (var i = 0; i < spots.length; i += 1)  {
+        
+        var spot = spots[i];
+        var spotString = '#';
+        spotString += i+1;
+        spotString += '/';
+        spotString += spots.length;
+        spotString += '\xa0';
+        spotString += mN.name('color', (spot.name));
+        spotString = spotString.replace(/\s/g, '\xa0');
+        
+        colorTF.contents += spotString;
+        colorTF.contents += ' ';
+
+        var spotChars = colorText.characters.itemByRange(charIndex, charIndex + spotString.length-1);
+        spotChars.fillColor = spot;
+        charIndex += spotString.length + 1;
+    }
+
+    this.fit_frame_to_text(colorTF);
+    this.spotsFrame = colorTF;
+    return colorTF;
+};
+
+MonoFilm.prototype.print = function ()
+{
+    if(!this.filmDoc.saved) {
+        alert('Film wurde noch nicht gespeichert, bitte erst abspeichern');
+        return;
+    }
+    var saveName = this.filmDoc.name.substring(0, this.filmDoc.name.lastIndexOf('.'));
+    var saveFolder = this.filmDoc.fullName.parent;
+     
+    var pdfName = saveName + '.pdf';
+    var pdfFile = new File(pm.path('filmOut') + pdfName);
+    
+    var psName = saveName + '.ps';
+    var psFile = new File(pm.path('filmIn') + psName);
+
+    this.print_to_postscript (this.filmDoc, psFile, 'monoFilms');
+};
+
+MonoFilm.prototype.save = function (job, showDialog, close) 
+{
+    var wxhRE = /\d{2,3}x\d{2,3}_/i;
+    var saveFolder = this.sep.folder;
+    var saveName = this.sep.name.substring(0, this.sep.name.lastIndexOf('.'));
+
+    //saveName = saveName.replace(/_(sep|print|druck)/i, '').replace(wxhRE, '');
+    saveName = saveName.replace(/_(sep|print|druck)/i, '')
+    saveName += '_Film.indd';
+
+    if(job && job.nfo.jobNr && job.nfo.jobName) {
+        var jobTag = job.nfo.jobNr + '_' + job.nfo.jobName + '_';
+        saveName = jobTag + saveName;
+    }
+
+    var saveFile = new File(saveFolder.fullName + '/' + saveName);
+
+    if(showDialog)
+        saveFile = saveFile.saveDlg('Please check Filename');
+
+    if(saveFile)
+        this.filmDoc.save(saveFile);
+        this.filmFile = this.filmDoc.fullName;
+    
+    if(close)
+        saveDoc.close();
+};
+
+MonoFilm.prototype.resize_page = function () 
+{
+    var sel = this.select_all_printable_pageItems();
+    var bounds = this.get_bounds_of_selection(sel);
+
+    var rec = this.filmPage.rectangles.add({ geometricBounds: [bounds[0], bounds[1], bounds[2], bounds[3]] });
+
+    var topLeft = rec.resolve(AnchorPoint.TOP_LEFT_ANCHOR,CoordinateSpaces.SPREAD_COORDINATES)[0];
+    var bottomRight = rec.resolve(AnchorPoint.BOTTOM_RIGHT_ANCHOR,CoordinateSpaces.SPREAD_COORDINATES)[0];
+    var corners = [topLeft, bottomRight];
+
+    rec.remove();
+    
+    this.filmPage.reframe(CoordinateSpaces.SPREAD_COORDINATES, corners);
+
+    app.layoutWindows[0].zoom(ZoomOptions.FIT_PAGE);
+};
+
+MonoFilm.prototype.position_textFrames = function (type)
+{
+    function move_item1_below_item2 (item1, item2, distance) 
+    {
+        var x = item2.geometricBounds[1];
+        var y = item2.geometricBounds[2] + distance;
+        item1.move([x,y]);
+    }
+
+    function move_item1_above_item2 (item1, item2, distance)
+    {
+        var item1Height = item1.geometricBounds[2] - item1.geometricBounds[0];
+        var x = item2.geometricBounds[1];
+        var y = item2.geometricBounds[0] - item1Height - distance;
+        item1.move([x,y]);
+    }
+
+    function move_item1_next_to_item2 (item1, item2, distance)
+    {
+        var x = item2.geometricBounds[3] + distance;
+        var y = item2.geometricBounds[0];
+        item1.move([x,y]);
+    }
+
+    function align_item1_vertically_to_item2 (item1, item2) 
+    {
+        item1Height = item1.geometricBounds[2] - item1.geometricBounds[0];
+        item2Height = item2.geometricBounds[2] - item2.geometricBounds[0];
+        
+        var x = item1.geometricBounds[1];
+        var y = item2.geometricBounds[0] + item2Height/2 - item1Height/2;
+        
+        item1.move([x,y]);
+    }
+
+    function align_item1_horizontally_to_item2 (item1, item2)
+    {
+        item1Width = item1.geometricBounds[3] - item1.geometricBounds[1];
+        item2Width = item2.geometricBounds[3] - item2.geometricBounds[1];
+        
+        var x = item2.geometricBounds[1] - item1Width/2 + item2Width/2;
+        var y = item1.geometricBounds[0];
+        
+        item1.move([x,y]);
+    }
+
+    var topMark = this.filmPage.pageItems.itemByName('topMark');
+    var bottomMark = this.filmPage.pageItems.itemByName('bottomMark');
+
+    var placeInfoNextTo = this.type == 'Bags' ? bottomMark : topMark;
+
+    move_item1_next_to_item2(this.jobFrame, this.pictogram, 0.5);
+    move_item1_below_item2(this.spotsFrame, this.jobFrame, 0.5);
+
+    var groupItems = [];
+    if(this.jobFrame) groupItems.push(this.jobFrame);
+    if(this.spotsFrame) groupItems.push(this.spotsFrame);
+    if(this.pictogram) groupItems.push(this.pictogram);
+
+    var group = this.filmPage.groups.add(groupItems);
+
+    if(type === 'Bags') {
+        move_item1_below_item2(group, bottomMark, 1);
+    } else {
+        move_item1_above_item2(group, topMark, 1);
+    }
+
+    align_item1_horizontally_to_item2(group, topMark);
+
+    group.ungroup();
 
 };

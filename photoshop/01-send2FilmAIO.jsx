@@ -51,6 +51,8 @@ function main() {
     app.preferences.rulerUnits = originalRulerUnits;
 }
 
+
+
 function check () {
 
     if(!app.activeDocument) return false;
