@@ -91,8 +91,8 @@ function main () {
     } catch(e) {
         alert(e+'\n\nBitte neuen Dateinamen wählen')
         var newSaveFile = saveFile.saveDlg();
-        if(newSaveFile && newSaveFile.exists) {
-            myDoc.exportFile(ExportFormat.pdfType, saveFile, false, myExportPreset);
+        if(newSaveFile) {
+            myDoc.exportFile(ExportFormat.pdfType, newSaveFile, false, myExportPreset);
             layerToggle.show();
         } else {
             alert('Save file canceled')
