@@ -26,7 +26,7 @@
         x2 = (gB1[3] < gB2[3]);
         return (y1 && x1 && y2 && x2);
     };
-    var reJobNr = /\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i;
+    var reJobNr = /\d{1,5}(wme|wm|ang|cs|cn|a)\d\d-0\d\d/i;
     var ref = myGraphic;
     var doc = myGraphic.parentPage.parent.parent;
     var docScale =doc.documentPreferences.pageWidth/ 297;
