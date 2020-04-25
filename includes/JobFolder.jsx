@@ -1,4 +1,6 @@
-﻿function JobFolder (folder) {
+﻿// testing git stuff
+
+function JobFolder (folder) {
     var jobRE = /\d{1,5}(wme|ang|cs|a)\d\d-0\d\d/i;
 	var get_jobFolder = function (fld) {
 	    if(fld.displayName.match(jobRE)) {
