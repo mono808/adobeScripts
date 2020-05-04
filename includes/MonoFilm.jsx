@@ -1006,8 +1006,6 @@ MonoFilm.prototype.position_textFrames = function (type)
     var topMark = this.filmPage.pageItems.itemByName('topMark');
     var bottomMark = this.filmPage.pageItems.itemByName('bottomMark');
 
-    var placeInfoNextTo = this.type == 'Bags' ? bottomMark : topMark;
-
     move_item1_next_to_item2(this.jobFrame, this.pictogram, 0.5);
     move_item1_below_item2(this.spotsFrame, this.jobFrame, 0.5);
 
@@ -1018,7 +1016,7 @@ MonoFilm.prototype.position_textFrames = function (type)
 
     var group = this.filmPage.groups.add(groupItems);
 
-    if(type === 'Bags') {
+    if(this.get_sep_type() === 'Bags') {
         move_item1_below_item2(group, bottomMark, 1);
     } else {
         move_item1_above_item2(group, topMark, 1);
