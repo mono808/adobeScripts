@@ -2,6 +2,7 @@
 
 function select_docs (arrayOfFiles) {
     var selectedFiles = [];
+    var action;
     var checkBoxes = [];
     var w = new Window ("dialog");
     w.alignChildren = "fill";
@@ -16,15 +17,28 @@ function select_docs (arrayOfFiles) {
         checkBoxes.push(checkPnl.add ("checkbox", undefined, "\u00A0"+arrayOfFiles[i].displayName));
     }
     
-    var print = btnGrp.add ("button", undefined, "Ok");
+    var print = btnGrp.add ("button", undefined, "Print");
     print.onClick = function () {
         for (var i = 0; i < checkBoxes.length; i++){
             if(checkBoxes[i].value) {
                 selectedFiles.push(arrayOfFiles[i]);
             }
         }
+        action = 'print';
         w.close();
     }
+
+    var check = btnGrp.add ("button", undefined, "Check");
+    check.onClick = function () {
+        for (var i = 0; i < checkBoxes.length; i++){
+            if(checkBoxes[i].value) {
+                selectedFiles.push(arrayOfFiles[i]);
+            }
+        }
+        action = 'check';
+        w.close();
+    }    
+    
 
     var cancel = btnGrp.add("button", undefined, "Cancel");
     cancel.onClick = function () {
@@ -33,8 +47,11 @@ function select_docs (arrayOfFiles) {
     }
     
     w.show ();
-
-    return selectedFiles;
+    var result = {
+        action : action,
+        files : selectedFiles
+    }
+    return result;
 }
 
 function print_docs (myFiles)
@@ -138,7 +155,8 @@ function main() {
     var filmhuelle = jobFolder.get_filmhuelle();
     if(filmhuelle && filmhuelle.length > 0) myDocs.push(filmhuelle[0]);
 
-    var filesToPrint = select_docs(myDocs);
+    var result = select_docs(myDocs);
+    var filesToPrint = result.files;
     if(filesToPrint.length < 1) return;
 
     var errors = [];
@@ -208,7 +226,9 @@ function main() {
     }
 
     // objs containing the strings extracted from the mockup to copy to wawi    
-    print_docs(filesToPrint);
+    if(result.action === 'print') {
+        print_docs(filesToPrint);
+    }
 
     iASwitch.set('all');
     show_wawi_string_dialog(rowContents, job);
