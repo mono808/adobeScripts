@@ -1,4 +1,4 @@
-﻿#target photoshop-60.064
+﻿//#target photoshop-60.064
 
 function main() {
 
