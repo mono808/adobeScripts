@@ -1,8 +1,11 @@
 ﻿#target indesign
 
 function select_docs (arrayOfFiles) {
-    var selectedFiles = [];
-    var action;
+    var result = {
+        action : undefined,
+        files : []
+    }
+
     var checkBoxes = [];
     var w = new Window ("dialog");
     w.alignChildren = "fill";
@@ -21,10 +24,10 @@ function select_docs (arrayOfFiles) {
     print.onClick = function () {
         for (var i = 0; i < checkBoxes.length; i++){
             if(checkBoxes[i].value) {
-                selectedFiles.push(arrayOfFiles[i]);
+                result.files.push(arrayOfFiles[i]);
             }
         }
-        action = 'print';
+        result.action = 'print';
         w.close();
     }
 
@@ -32,10 +35,10 @@ function select_docs (arrayOfFiles) {
     check.onClick = function () {
         for (var i = 0; i < checkBoxes.length; i++){
             if(checkBoxes[i].value) {
-                selectedFiles.push(arrayOfFiles[i]);
+                result.files.push(arrayOfFiles[i]);
             }
         }
-        action = 'check';
+        result.action = 'check';
         w.close();
     }    
     
@@ -47,10 +50,7 @@ function select_docs (arrayOfFiles) {
     }
     
     w.show ();
-    var result = {
-        action : action,
-        files : selectedFiles
-    }
+
     return result;
 }
 
@@ -156,15 +156,14 @@ function main() {
     if(filmhuelle && filmhuelle.length > 0) myDocs.push(filmhuelle[0]);
 
     var result = select_docs(myDocs);
-    var filesToPrint = result.files;
-    if(filesToPrint.length < 1) return;
+    if(result.files.length < 1) return;
 
     var errors = [];
     var rowContents = [];
     
     // loop through all files
-    for (var i = 0; i < filesToPrint.length; i++) {
-        var myFile = filesToPrint[i];
+    for (var i = 0; i < result.files.length; i++) {
+        var myFile = result.files[i];
         if(myFile.displayName.match(/Ansicht.*\.indd/i)) {
             var monoMockup = new MonoMockup(app.open(myFile,true));
             var layerToggle = f_id.layerToggle(['Intern']);
@@ -181,9 +180,9 @@ function main() {
 
             for (var k = 0; k < monoGraphics.length; k++) {
                 var mG = monoGraphics[k];
-                var result = mG.check_size();
-                if((Math.abs(result.sizeDif) > 2) || (Math.abs(result.posDif) > 1.5) || Math.abs(result.placedDif) > 1) {
-                    errors.push({mG:mG, result: result});
+                var checkResult = mG.check_size();
+                if((Math.abs(checkResult.sizeDif) > 2) || (Math.abs(checkResult.posDif) > 1.5) || Math.abs(checkResult.placedDif) > 1) {
+                    errors.push({mG:mG, result: checkResult});
                 }
             }
         }
@@ -227,7 +226,7 @@ function main() {
 
     // objs containing the strings extracted from the mockup to copy to wawi    
     if(result.action === 'print') {
-        print_docs(filesToPrint);
+        print_docs(result.files);
     }
 
     iASwitch.set('all');
