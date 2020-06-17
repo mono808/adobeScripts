@@ -38,8 +38,10 @@ function TexAdder (doc) {
             */
             var allTexs = this.get_tex_files(texRoot);
             var selectedTex = this.show_type_ahead(allTexs, 'displayName');
-            var images = this.place_files_on_page(selectedTex);
-            this.choose_graphicLayers(images);            
+            if(selectedTex) {
+                var images = this.place_files_on_page(selectedTex);
+                this.choose_graphicLayers(images);            
+            }
         },
 
         set_tex: function (selection) {
@@ -124,16 +126,18 @@ function TexAdder (doc) {
 
                 var selectedLayerNames = this.show_type_ahead(layerNames);
                 
-                for(var k = 0, maxK = gLO.graphicLayers.length; k < maxK; k += 1) {
-                    var gLO = rect.graphics.item(0).graphicLayerOptions;
-                    var gL = gLO.graphicLayers.item(k);
-                                       
-                    if(!gL.isValid) continue;
-                    if(this.get_member(selectedLayerNames, gL.name)) {
-                        gL.currentVisibility = true;
-                    } else {
-                        if(!gL.name.match(fixedLayers))
-                            gL.currentVisibility = false;
+                if(selectedLayerNames) {
+                    for(var k = 0, maxK = gLO.graphicLayers.length; k < maxK; k += 1) {
+                        var gLO = rect.graphics.item(0).graphicLayerOptions;
+                        var gL = gLO.graphicLayers.item(k);
+                                           
+                        if(!gL.isValid) continue;
+                        if(this.get_member(selectedLayerNames, gL.name)) {
+                            gL.currentVisibility = true;
+                        } else {
+                            if(!gL.name.match(fixedLayers))
+                                gL.currentVisibility = false;
+                        }
                     }
                 }
             }
