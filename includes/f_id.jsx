@@ -427,5 +427,58 @@
                 }
             }
         }
+    },
+
+    setPageItemsVisibility : function (pINames, visible) {
+        var setVisibility = function (pageItems, visible) {
+            var pI;
+            for (var j=0, len=pageItems.count(); j < len ; j++) {
+                try{
+                    pI = pageItems.item(pINames[j]);
+                    pI.visible = visible;
+                } catch(e) {
+                    continue;
+                }
+            }
+        };
+
+        var doc = app.activeDocument;
+        for (var i=0, len=doc.pages.count(); i < len ; i++) {
+            setVisibility(doc.pages[i].pageItems, visible);
+        };
+
+        for (var i=0, len=doc.masterSpreads.count(); i < len ; i++) {
+            setVisibility(doc.masterSpreads[i].pageItems, visible);
+        };
+    },
+
+    // sets pageItems to the desired visibility. Reset functions restores visiblity to its prior state
+    smartPageItemsVisibilityToggle : function () {
+        var processedPageItems = [];
+
+        return {
+            set : function (pINames, visible) {
+                var doc = app.activeDocument;
+                var pIs = doc.allPageItems;
+                var pI;
+                for (var i=0, lenI=pIs.length; i < lenI ; i++) {
+                    for (var j=0, lenJ=pINames.length; j < lenJ ; j++) {
+                        pI = pIs[i];
+                        if(pINames[j] === pIs[i].name) {
+                            processedPageItems.push({
+                                pI : pI,
+                                oldVisibilty : pI.visible
+                            })
+                            pI.visible = visible;
+                        }
+                    }
+                }
+            },
+            reset : function () {
+                for (var i=0, len=processedPageItems.length; i < len ; i++) {
+                  processedPageItems[i].pI.visible = processedPageItems[i].oldVisibilty;
+                };
+            }
+        }
     }
 }
