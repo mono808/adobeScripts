@@ -87,7 +87,7 @@ function generate_wawi_strings (rowContent)
     texString += ' - Druckposition: ';
     texString += rowContent.printId;  // Druckposi
 
-    wawiString  = 'Produktionsdetails --> ';
+    wawiString  = 'Produktionsdetails: ';
     wawiString += rowContent.tech == 'Siebdruck' ? 'Druckfarben (~ Pantone C): ' : 'Druckfarben: ';
     wawiString += rowContent.colors;
     wawiString += ' - Druckbreite: ca. ';
@@ -100,7 +100,7 @@ function generate_wawi_strings (rowContent)
     return rowStrings;
 }
 
-function show_wawi_string_dialog (rowContents, job) 
+function show_wawi_string_dialog (rowContents, job, copyToClipboard) 
 {
     var result = null;
     var dialogTitle;
@@ -108,18 +108,28 @@ function show_wawi_string_dialog (rowContents, job)
     dialogTitle += job ? job.nfo.jobNr + ' - ' + job.nfo.client : 'irgendeinem bekloppten Auftrag';
 
     var win = new Window ('dialog', dialogTitle);
-    win.alignChildren = 'fill';
+    win.alignChildren = 'right';
         var aPnl;
         for(var i = 0; i < rowContents.length; i++) {
             var rowContent = rowContents[i];
             var rowStrings = generate_wawi_strings(rowContent);
             aPnl = win.add('panel', undefined, '');
-            aPnl.alignChildren = 'fill';
+            aPnl.alignment = 'fill';
+            aPnl.alignChildren = 'left';
             aPnl.add('statictext', undefined, rowStrings.textil);
-            aPnl.add('edittext', undefined, rowStrings.wawi);
+            aPnl.wawiGroup = aPnl.add('group', undefined, '');
+            aPnl.wawiGroup.alignChildren = 'fill';
+            aPnl.wawiGroup.wawiText = aPnl.wawiGroup.add('edittext', undefined, rowStrings.wawi);
+            aPnl.wawiGroup.wawiText.preferredSize = [500, 25];
+            aPnl.wawiGroup.copyButton = aPnl.wawiGroup.add('button', undefined, 'copy to clipboard');
+            aPnl.wawiGroup.copyButton.onClick = function () {
+                    copyToClipboard.copy(this.parent.wawiText.text);
+                }
         }
     
-    win.add('button', undefined, 'Cancel');
+        win.add('button', undefined, 'Ok');
+
+
 
     win.show();
 }
@@ -129,6 +139,7 @@ function main() {
      
     #include 'augment_objects.jsx'
     #include 'Job.jsx'
+    #include 'f_all.jsx'
     #include 'f_id.jsx'
     #include 'JobFolder.jsx'
     #include 'Pathmaker.jsx'
@@ -230,7 +241,7 @@ function main() {
     }
 
     iASwitch.set('all');
-    show_wawi_string_dialog(rowContents, job);
+    show_wawi_string_dialog(rowContents, job, f_all.copyToClipboard);
 }
 
 main();
