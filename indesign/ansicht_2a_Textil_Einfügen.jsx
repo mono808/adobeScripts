@@ -1,17 +1,17 @@
 ﻿function add_textiles () {
 
-    var find_files = function  (dir) {
-        return find_files_sub (dir, []);
+    var find_files = function  (dir, filter) {
+        return find_files_sub (dir, [], filter);
     }
 
-    var find_files_sub = function  (dir, array) {
+    var find_files_sub = function  (dir, array, filter) {
         var f = Folder (dir).getFiles ("*.*");
         for (var i = 0; i < f.length; i++)
             {
             if (f[i] instanceof Folder)
-                find_files_sub (f[i], array);
+                find_files_sub (f[i], array, filter);
             else
-                if (f[i] instanceof File)
+                if (f[i] instanceof File && f[i].displayName.search(filter) == -1)
                     array.push (f[i]);
             }
         return array;
@@ -23,10 +23,10 @@
         return selectedFolders;
     };
 
-    var get_tex_files = function (dir) {
-        var texFiles = find_files (dir);
+    var get_tex_files = function (dir, filter) {
+        var texFiles = find_files (dir, filter);
         return texFiles;
-    };        
+    };
 
     var create_names_array = function (array, propertyToList) {            
         var names = [];
@@ -44,10 +44,6 @@
             }
         }
         return null;
-    };
-
-    var place_files = function (myFiles) {
-
     };
 
     var show_type_ahead = function (array, propertyToList, multiselect) {
@@ -120,8 +116,14 @@
     var texFolders = [];
     var finalSelection = [];
     var sel = app.selection;
-    var allTexs = get_tex_files(texRoot);
+    var ignoreThoseFiles = /\.bridge/i;
+    var allTexs = get_tex_files(texRoot, ignoreThoseFiles);
+    allTexs.sort(function(a,b) {
+        return a.displayName.toLowerCase() > b.displayName.toLowerCase();
+    })
 
+
+    // if something is selected,  place image into selected rectangles
     if(sel.length > 0) {
         for (var i=0, len=sel.length; i < len ; i++) {
             var selItem = sel[i]
@@ -140,6 +142,7 @@
                 }
             }
         }
+    // if nothing is selected, just place selected images onto the page
     } else {
         var selectedTex = show_type_ahead(allTexs, 'displayName', true);
         if(selectedTex) {
