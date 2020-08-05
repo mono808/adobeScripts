@@ -22,11 +22,9 @@ function sendScriptToPhotoshop (PSfunction, scriptArgs) {
     bt.onResult = function(resObj)
     {
         // The result of executing the code is the last line of the script that was executed in the target (Photoshop)
-        $.writeln('BridgeTalk result:');
-        $.writeln(resObj.body);
+        $.writeln('BridgeTalk result:' + resObj.body);
         retval = eval(resObj.body);
-        $.writeln("result evaled to:");
-        $.writeln(retval);
+
     }
 
     // Send the message, wait max 30 sec for response
@@ -74,6 +72,10 @@ function changeImage(image, aFile) {
     rec.place(aFile);
     //rec.fit(FitOptions.CONTENT_TO_FRAME);
     rec.allGraphics[0].itemLink.unlink();
+}
+
+function ai_run (myArgs) {
+
 }
 
 function ps_run (myArgs) {
@@ -148,15 +150,10 @@ function indd_run () {
                 btArgs.destPath = encodeURI(destPath);
                 btArgs.visibleOjectLayers = visibleOjectLayers;
 
-                var jpgFilePath = sendScriptToPhotoshop(ps_run, btArgs);
-                if(jpgFilePath) {
-                    var jpgFile = new File(decodeURI(jpgFilePath));
-                }
-                
-                if(jpgFile.exists) {
-                changeImage(graphic, jpgFile);
-                jpgFile.remove();
-                }
+               var jpgPath = sendScriptToPhotoshop(ps_run, btArgs);
+               var jpgFile = new File(decodeURI(jpgPath));
+               changeImage(graphic, jpgFile);
+               jpgFile.remove();
             }
         }
     }
@@ -166,12 +163,14 @@ $.writeln('script started');
 if(BridgeTalk.appName == 'indesign') {
     $.writeln('running in indesign');
     indd_run();
-}
 
 // just for testing the photoshop script without sending it through bridgeTalk
-if(BridgeTalk.appName == 'photoshop') {
+} else if (BridgeTalk.appName == 'photoshop') {
     $.writeln('running in photoshop');
     var args = eval({sourcePath:"%5C%5Ccs-server16.dc-krueger.local%5CCapriShare%5CProduktion%5CDruckvorstufe%5Ctextilien%5Csweats%5CStanley%20Cultivator.psd", destPath:"%5C%5Ccs-server16.dc-krueger.local%5CCapriShare%5CProduktion%5CDruckvorstufe%5Ctextilien%5Csweats%5CStanley%20Cultivator_-_French_Navy_Front.jpg", visibleOjectLayers:["French_Navy_Front"]});
     // var args = eval({sourcePath:"%5C%5Ccs-server16%5Ccaprishare%5CProduktion%5CDruckvorstufe%5Ctextilien%5C!Dummies%5CT-Shirt%20M%C3%A4nner-Test.psd", destPath:"%5C%5Ccs-server16%5Ccaprishare%5CProduktion%5CDruckvorstufe%5Ctextilien%5C!Dummies%5CT-Shirt%20M%C3%A4nner-Test_-_ForestGreen_-_Shirt.jpg", visibleOjectLayers:["ForestGreen", "Shirt"]});
     ps_run(args);
+} else if (BridgeTalk.appName == 'illustrator') {
+    $.writeln('running script in illustrator');
+
 }
