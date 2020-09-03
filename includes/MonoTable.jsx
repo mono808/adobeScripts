@@ -146,8 +146,11 @@
     var update_standString = function (rC, oldRC) {
         //var stand = (rC.stand + rC.height)<0 ? Math.abs(rC.height+rC.stand) : rC.stand;
         var stand = rC.stand;
-        var roundedCM = roundHalf(stand*0.1);
+        var roundedValue = roundHalf(stand*0.1);
+        var roundedString = Math.abs(roundedValue) + ' cm';
+        
         var match = oldRC.stand.match(/(ca\.)\s(\d{1,2}\.?,?5?)\s?(.+)/i);
+        var retval;
 
         if(match) {
             if(stand < 0) {
@@ -155,14 +158,20 @@
             } else {
                 var tail = match[3].replace('über', 'unter');
             }
-            var updatedString = ''
-            updatedString += match[1] + ' ';
-            updatedString += Math.abs(roundedCM) + ' ';
-            updatedString += tail;
-            return updatedString;
+            retval = ''
+            retval += match[1] + ' ';
+            retval += Math.abs(roundedValue) + ' ';
+            retval += tail;
+            
         } else {
-            return oldRC.stand.replace(/\d{1,2}\.?,?5?/, stand);
+            if(oldRC.stand.match(/\d{1,2}\.?,?5?/)) {
+                retval = oldRC.stand.replace(/\d{1,2}\.?,?5?/, roundedValue);
+            } else {
+                retval = oldRC.stand + ' ' + roundedString;
+            }
         }
+        
+        return retval;
     };
 
     var add_id_column = function () {
