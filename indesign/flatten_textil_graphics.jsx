@@ -140,7 +140,7 @@ function indd_run () {
                 var destExtension = '.jpg';
                 for (var i=0, len=visibleOjectLayers.length; i < len ; i++) {
                 filename += '_-_';
-                filename += visibleOjectLayers[i];
+                filename += (encodeURI(visibleOjectLayers[i]));
                 };
 
                 var destPath = filename + destExtension;
@@ -150,10 +150,14 @@ function indd_run () {
                 btArgs.destPath = encodeURI(destPath);
                 btArgs.visibleOjectLayers = visibleOjectLayers;
 
-               var jpgPath = sendScriptToPhotoshop(ps_run, btArgs);
-               var jpgFile = new File(decodeURI(jpgPath));
-               changeImage(graphic, jpgFile);
-               jpgFile.remove();
+
+                var jpgFile = new File(decodeURI(destPath));
+                
+                graphic.exportFile(ExportFormat.JPG, jpgFile, false);
+                // var jpgPath = sendScriptToPhotoshop(ps_run, btArgs);
+
+                changeImage(graphic, jpgFile);
+                jpgFile.remove();
             }
         }
     }
