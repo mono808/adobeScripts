@@ -48,8 +48,6 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich)
                 ref = saveFile;
             }
             
-                  
-        
         case 'File' :
             //this.nfo.file = ref;
             tempNfo = this.get_nfo_from_filename(ref);
@@ -101,13 +99,19 @@ Job.prototype.get_ref = function ()
         }
     }
 
+    // if no reference is found, try the lastFolders
+    if(!ref) {
+        ref = this.lastFolders.show_dialog();
+    }
+
+    // try the old saveDialog if still no ref path
+    if(!ref) {
+        ref = File.saveDialog();
+    }
+
     if(ref) {
         this.lastFolders.add(ref);
         return ref;
-    } else {
-        // if no reference is found, try the lastFolders
-        // return this.jobSafe.get_set();
-        return this.lastFolders.show_dialog();
     }
 };
 
@@ -217,17 +221,6 @@ Job.prototype.get_nfo_from_filename = function (target)
         }
         
         return nfo;
-};
-
-Job.prototype.get_jobBaseFolder = function (fld) 
-{
-    if(fld.displayName.match(this.regExJobNr)) {
-        return fld;
-    } else if (fld.parent) {
-        return this.get_jobBaseFolder(fld.parent);
-    } else {
-        return null;
-    }
 };
 
 Job.prototype.get_nfo_from_filepath = function (fldr) 
@@ -386,6 +379,17 @@ Job.prototype.get_nfo_from_user = function ()
     win.show();
     //$.writeln(result.toSource());
     return result
+};
+
+Job.prototype.get_jobBaseFolder = function (fld) 
+{
+    if(fld.displayName.match(this.regExJobNr)) {
+        return fld;
+    } else if (fld.parent) {
+        return this.get_jobBaseFolder(fld.parent);
+    } else {
+        return null;
+    }
 };
 
 Job.prototype.get_jobNames = function (jobfolder) 
