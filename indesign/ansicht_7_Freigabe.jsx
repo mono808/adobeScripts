@@ -1,6 +1,4 @@
-﻿#target indesign
-
-function select_docs (arrayOfFiles) {
+﻿function select_docs (arrayOfFiles) {
     var result = {
         action : undefined,
         files : []
@@ -156,6 +154,7 @@ function main() {
     #include 'save_Options.jsx'
 
     var job = new Job(null,false);
+    if(!job.nfo.folder) return;
     var pm = new Pathmaker(job.nfo);
     var jobFolder = new JobFolder(job.nfo.folder);
 
