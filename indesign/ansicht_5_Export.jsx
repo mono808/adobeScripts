@@ -122,8 +122,8 @@
         var win = new Window("dialog", "Neutral Ansicht erstellen?",undefined);
         this.windowRef = win;
         win.presetGroup = win.add("group",undefined,'presetGroup');
-        win.presetGroup.pdfButton = win.presetGroup.add("button",undefined,"pdf");
-        win.presetGroup.jpgButton = win.presetGroup.add("button", undefined, "jpg");
+        win.presetGroup.pdfButton = win.presetGroup.add("button",[15,15,105,100],"pdf");
+        win.presetGroup.jpgButton = win.presetGroup.add("button",[120, 15, 210, 100], "jpg");
         win.styleGroup = win.add("group", undefined, "styleGroup");
         win.styleGroup.normalBtn = win.styleGroup.add("button", [15,15,105,185], "Normal");
         win.styleGroup.neutralBtn = win.styleGroup.add("button", [120, 15, 210, 185], "NEUTRAL");
