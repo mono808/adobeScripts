@@ -27,11 +27,11 @@ function main() {
     var iaSwitch = new InteractSwitch();
     iaSwitch.set('none');
 
-    var saveFile = pm.file('sepPs');
-
     var sepObj = Object.create(sepDocPS)
     sepObj.startDoc = app.activeDocument;
-    sepObj.make(saveFile);
+    var sepFormat = sepObj.get_sep_fileformat_dialog();
+    var saveFile = pm.file(sepFormat.fileName, job.nfo);
+    sepObj.make(saveFile, sepFormat.isSpot);
 
     sepObj.pos = sepObj.get_guide_location();
     sepObj.place_on_film(saveFile, sepObj.pos);

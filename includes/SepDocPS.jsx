@@ -146,6 +146,15 @@ sepDocPS.save_dcs2 = function (saveFile) {
     executeAction( idsave, desc2, DialogModes.NO );
 };
 
+sepDocPS.save_psd = function (saveFile) {
+    var saveOptions = new PhotoshopSaveOptions ();
+    saveOptions.alphaChannels = true;
+    saveOptions.spotColors = true;
+    saveOptions.layers = true;
+    saveOptions.embedColorProfile = true;
+    app.activeDocument.saveAs(saveFile, saveOptions);
+}
+
 sepDocPS.get_histogram_reports = function () {
 
     var oldUnits = app.preferences.rulerUnits;
@@ -313,7 +322,52 @@ sepDocPS.get_raster_settings = function () {
     return result;
 };
 
-sepDocPS.make = function (saveFile) {
+sepDocPS.get_sep_fileformat_dialog = function () {
+    var returnValue = {
+        isSpot : null
+    };
+
+    var screen = $.screens[0];
+    var width = screen.right-screen.left;
+    centerWidth = screen.left + width/2;
+    var height = screen.bottom-screen.top;
+    centerHeight = screen.top + height/2;
+
+    var dialogWidth = 225;
+    var dialogHeight = 200;
+    var dLeft = centerWidth-dialogWidth/2;
+    var dRight = centerWidth+dialogWidth/2;
+    var dTop = centerHeight-dialogHeight/2;
+    var dBottom = centerHeight+dialogHeight/2;
+
+    //var win = new Window("dialog", "Vollton oder Raster",[dLeft,dTop,dRight,dBottom]);
+    var win = new Window("dialog", "Neutral Ansicht erstellen?",undefined);
+    this.windowRef = win;
+    win.presetGroup = win.add("group",undefined,'presetGroup');
+    win.presetGroup.spotButton = win.presetGroup.add("button",[15,15,105,100],"PSD");
+    win.presetGroup.htButton = win.presetGroup.add("button",[120, 15, 210, 100], "EPS");
+
+    // Register event listeners that define the button behavior
+    win.presetGroup.spotButton.onClick = function () {
+        returnValue.isSpot = true;
+        returnValue.fileName = 'sepPsPSD';
+        win.close();
+    }
+
+    win.presetGroup.htButton.onClick = function () {
+        returnValue.isSpot = false;
+        returnValue.fileName = 'sepPsEPS';
+        win.close();
+    }
+
+    // Display the window
+    win.show();
+        
+    return returnValue;
+}
+
+
+sepDocPS.make = function (saveFile, isSpot) {
 
     this.doc = this.startDoc.duplicate();
     
@@ -322,13 +376,21 @@ sepDocPS.make = function (saveFile) {
 
     var iaSwitch = new InteractSwitch();
     iaSwitch.set('none');
+    
+    if(isSpot) {
+        if (this.doc.componentChannels.length < 1) {
+            this.add_RGB_channels();
+        }
+    } else {
+        if (this.doc.componentChannels.length > 0) {
+            this.remove_component_channels();
+        }
+    }
 
-    if (this.doc.componentChannels.length > 0) {
-        this.remove_component_channels();
-        this.remove_alpha_channels(true);
-    	var teeChan = this.find_tee_channel();
-		if(teeChan) teeChan.remove();
-    };
+    this.remove_alpha_channels(true);
+
+    var teeChan = this.find_tee_channel();
+    if(teeChan) teeChan.remove();
 
 	/*spotchannels named like cmyk channels cause problems*/
     this.rename_cmyk();
@@ -341,7 +403,7 @@ sepDocPS.make = function (saveFile) {
 
     for (var i = this.doc.channels.length-1; i >= 0; i--) {
         var chan = this.doc.channels[i];
-    	if(activeChannels.includes(chan.name)) {
+    	if(activeChannels.includes(chan.name) || chan.kind === ChannelType.COMPONENT) {
             chan.visible = true;
         } else {
             chan.remove();
@@ -360,8 +422,13 @@ sepDocPS.make = function (saveFile) {
 //~         saveFile = saveFile.saveDlg();
 //~     }
 
-    if(saveFile) this.save_dcs2(saveFile);
-
+    if(saveFile) {
+        if(isSpot) {
+            this.save_psd(saveFile);
+        } else {
+            this.save_dcs2(saveFile);
+        }
+    }
     iaSwitch.reset();
     return this.doc;
 };

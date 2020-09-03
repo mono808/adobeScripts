@@ -99,6 +99,8 @@
         p.sepAi             = p.ddSD  + p.printTag + '_Print.ai';
         p.sepDCS2           = p.ddSD  + p.printTag + '_Print.eps';
         p.sepPs             = p.ddSD  + p.printTag + '_Print.eps';
+        p.sepPsEPS          = p.ddSD  + p.printTag + '_Print.eps';
+        p.sepPsPSD          = p.ddSD  + p.printTag + '_Print.psd';
         p.sd                = p.ddSD  + p.printTag + '_Print.ai';
         p.dta               = p.ddDTA + p.printTag + '_Print.pdf';
         p.dtax              = p.ddDTA + p.printTag + '_Print.pdf';
