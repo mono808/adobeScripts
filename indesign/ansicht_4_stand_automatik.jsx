@@ -30,7 +30,9 @@ function toggle_standListener (compensate)
         
         if(myTable && myTable.name) {
             for (var i = 0; i < sel.length; i++) {
-                if(sel[i] instanceof Rectangle && sel[i].itemLayer == printsLayer) {
+                if((sel[i] instanceof Rectangle || sel[i] instanceof Polygon)
+                    && sel[i].itemLayer == printsLayer) 
+                {
                     var monoGraphic = new MonoGraphic(sel[i].allGraphics[0]);
                     var monoTable = new MonoTable(myPage);
                     monoTable.update_stand(monoGraphic,compensate);
