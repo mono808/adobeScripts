@@ -23,6 +23,7 @@ function TexAdder (doc) {
     var doc;
     //var fixedLayers = /(Shirt|Front|Back|Naht|Tasche|Beutel)$/i;
     var fixedLayers = /(Shirt|Naht|Tasche|Beutel|Hintergrund)$/i;
+    var fixedLayerNames = ["Shirt","Naht","Tasche","Beutel","Hintergrund"];
         
     return {
         add_tex : function (targetDoc) {
@@ -100,43 +101,63 @@ function TexAdder (doc) {
             return images;
         },
 
+        get_graphicLayerNames : function (graphicLayers) {
+            // get ref to the parent object, otherwise the script will fuckup ...
+
+            var graphicLayerNames = [];
+
+            if (graphicLayers.length < 2) return graphicLayerNames;
+
+
+            for (var j = 0; j < graphicLayers.length; j++) {
+                if(!graphicLayers.item(j).name.match(fixedLayers)) { 
+                    graphicLayerNames.push(graphicLayers.item(j).name);
+                }
+            }
+            return graphicLayerNames;
+        },
+
         choose_graphicLayers : function (myImages)
         {            
             for (var i = 0; i < myImages.length; i++) {
                 var myImage = myImages[i];
-                
-                // filter out graphic files unsuitable for activating graphic layers
                 if (myImage.imageTypeName != "Photoshop" && myImage.imageTypeName != "Adobe PDF") continue;
 
-                // get ref to the parent object, otherwise the script will fuckup ...
                 var rect = myImage.parent;
                 var gLO = rect.graphics.item(0).graphicLayerOptions;
-
-                if (gLO.graphicLayers < 2) continue;
-
-                var layerNames = [];
-                for (var j = 0; j < gLO.graphicLayers.length; j++) {
-                        
-                    if(!gLO.graphicLayers.item(j).name.match(fixedLayers)) { 
-                        layerNames.push(gLO.graphicLayers.item(j).name);
-                    }
-                    //layerNames.push(gLO.graphicLayers.item(j).name);
-                    //$.writeln('j-gL ' + j + ': '  + gLO.graphicLayers.item(j).name + ' myImage ID: ' + myImage.id);
-                }
-
-                var selectedLayerNames = this.show_type_ahead(layerNames);
                 
-                if(selectedLayerNames) {
-                    for(var k = 0, maxK = gLO.graphicLayers.length; k < maxK; k += 1) {
-                        var gLO = rect.graphics.item(0).graphicLayerOptions;
-                        var gL = gLO.graphicLayers.item(k);
-                                           
-                        if(!gL.isValid) continue;
-                        if(this.get_member(selectedLayerNames, gL.name)) {
-                            gL.currentVisibility = true;
-                        } else {
-                            if(!gL.name.match(fixedLayers))
+                var graphicLayerNames = this.get_graphicLayerNames(gLO.graphicLayers);
+                
+                var selectedLayerNames = this.show_type_ahead(graphicLayerNames);
+
+                var visibleLayerNames = selectedLayerNames ? selectedLayerNames.concat(fixedLayerNames) : fixedLayerNames;
+
+                if(visibleLayerNames) {
+                    var gLO = rect.graphics.item(0).graphicLayerOptions;
+                    var gL;
+                    
+                    deactivate_block: 
+                    for (var k=0, lenK = gLO.graphicLayers.length; k < lenK ; k++) {
+                        gL = gLO.graphicLayers[k];
+                        if(gL.isValid) {
+                            if(gL.currentVisibility) {
                                 gL.currentVisibility = false;
+                                gLO = rect.graphics.item(0).graphicLayerOptions;
+                            }
+                        }
+                    }
+                    
+                    activate_block: 
+                    for (var k=0, lenK = gLO.graphicLayers.length; k < lenK ; k++) {
+                        gL = gLO.graphicLayers[k];
+                        if(gL.isValid) {
+                            for (var i=0, lenI=visibleLayerNames.length; i < lenI ; i++) {
+                                if(visibleLayerNames[i] === gL.name) {
+                                    gL.currentVisibility = true;
+                                    gLO = rect.graphics.item(0).graphicLayerOptions;
+                                    continue activate_block;
+                                }
+                            }
                         }
                     }
                 }
