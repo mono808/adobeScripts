@@ -10,8 +10,14 @@
         {
             type: 'shirts',            
             file : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master.indd'),
+            fileCC18 : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master_cc2018.indd'),
             scale : 6.5
         },
+        {
+            type: 'shirts-CC2018',            
+            file : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master_cc2018.indd'),
+            scale : 6.5
+        },        
         {
             type: 'accessoires',
             file : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/taschen/Ansicht_Accessoires_Master.indd'),
