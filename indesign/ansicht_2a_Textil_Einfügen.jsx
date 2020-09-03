@@ -62,7 +62,7 @@
         entry.onChanging = function ()
         {
             keyCount++;
-            if(keyCount < 4) return;
+            if(keyCount < 4 || entry.text.length < 4) return;
             var temp = String(entry.text).toLowerCase();
             var tempArray = [];
             for (var i = 0; i < names.length; i++) {
@@ -113,20 +113,22 @@
     var csroot = $.getenv("csroot");
     var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
     var doc = app.activeDocument;
-    var texFolders = [];
+
+    var placeToLayer = doc.layers.item('Textils');
+    placeToLayer = placeToLayer.isValid ? placeToLayer : doc.activeLayer;
+
     var finalSelection = [];
-    var sel = app.selection;
+
     var ignoreThoseFiles = /\.bridge/i;
     var allTexs = get_tex_files(texRoot, ignoreThoseFiles);
     allTexs.sort(function(a,b) {
         return a.displayName.toLowerCase() > b.displayName.toLowerCase();
     })
 
-
     // if something is selected,  place image into selected rectangles
-    if(sel.length > 0) {
-        for (var i=0, len=sel.length; i < len ; i++) {
-            var selItem = sel[i]
+    if(app.selection.length > 0) {
+        for (var i=0, len=app.selection.length; i < len ; i++) {
+            var selItem = app.selection[i];
             if(selItem.constructor.name === 'Rectangle') {
                 var selectedTex = show_type_ahead(allTexs, 'displayName', false);
                 if(selectedTex) {
@@ -146,10 +148,8 @@
     } else {
         var selectedTex = show_type_ahead(allTexs, 'displayName', true);
         if(selectedTex) {
-            var texLayer = doc.layers.item('Textils');
-            texLayer = texLayer.isValid ? texLayer : doc.activeLayer;
             for (var i = 0; i < selectedTex.length; i++) {
-                place_image(doc.layoutWindows[0].activePage, selectedTex[i], texLayer);
+                place_image(doc.layoutWindows[0].activePage, selectedTex[i], placeToLayer);
             }
         }
     }

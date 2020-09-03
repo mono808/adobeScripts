@@ -136,6 +136,7 @@
         var selectedLayerNames = show_type_ahead(graphicLayerNames);
 
         var visibleLayerNames = selectedLayerNames ? selectedLayerNames.concat(fixedLayerNames) : fixedLayerNames;
+        
         if(visibleLayerNames && visibleLayerNames.length > 0) {
             toggle_graphicLayers(myImage, visibleLayerNames);
         }
