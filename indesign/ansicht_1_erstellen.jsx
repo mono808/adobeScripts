@@ -1,4 +1,4 @@
-﻿#target indesign
+﻿//#target indesign
 function main () {
     
      
