@@ -241,7 +241,8 @@
             
             if (w.show() == 2) {
                 w.close();
-                exit();
+								return null;
+                //exit();
             }
 
             var script = list.selection.text;
@@ -259,6 +260,7 @@
 
     try {
         var script = get_a_script();
+				if(!script) return;
         switch (app.name) {
             case 'Adobe Illustrator' :
                 $.evalFile (script);
