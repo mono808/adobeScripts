@@ -1,10 +1,7 @@
-﻿#target photoshop
-
-function main() {
+﻿function main() {
            
     #include 'augment_objects.jsx'
     #include 'f_all.jsx'
-    #include 'f_ps.jsx'
     #include 'job_related.jsx'
     #include 'save_Options.jsx'
     
