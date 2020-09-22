@@ -122,11 +122,11 @@
         var win = new Window("dialog", "Neutral Ansicht erstellen?",undefined);
         this.windowRef = win;
         win.presetGroup = win.add("group",undefined,'presetGroup');
-        win.presetGroup.pdfButton = win.presetGroup.add("button",[15,15,105,100],"pdf");
-        win.presetGroup.jpgButton = win.presetGroup.add("button",[120, 15, 210, 100], "jpg");
+        win.presetGroup.pdfButton = win.presetGroup.add("button",[15,15,115,45],"pdf");
+        win.presetGroup.jpgButton = win.presetGroup.add("button",[130, 15, 230, 45], "jpg");
         win.styleGroup = win.add("group", undefined, "styleGroup");
-        win.styleGroup.normalBtn = win.styleGroup.add("button", [15,15,105,185], "Normal");
-        win.styleGroup.neutralBtn = win.styleGroup.add("button", [120, 15, 210, 185], "NEUTRAL");
+        win.styleGroup.normalBtn = win.styleGroup.add("button", [15,15,115,45], "Normal");
+        win.styleGroup.neutralBtn = win.styleGroup.add("button", [130, 15, 230, 45], "NEUTRAL");
         // Register event listeners that define the button behavior
         win.presetGroup.pdfButton.onClick = function () {
             returnValue.exportFormat = ExportFormat.PDF_TYPE;
@@ -154,12 +154,16 @@
         };
 
         // Display the window
-        win.show();
+        if(win.show() == 2) {
+            return null;
+        };
             
         return returnValue;
     }
 
     var exportStyle = exportStyleDialog();
+
+    if(!exportStyle) return;
 
     var layerToggle = f_id.layerToggle(['Intern', 'HL'])
     layerToggle.hide();
