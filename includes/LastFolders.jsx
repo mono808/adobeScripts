@@ -9,7 +9,7 @@
 
 function LastFolders () {
     var folders = [];
-    var txt = new File('~/lastFolders.txt');
+    var txt = new File('~/Documents/lastFolders.txt');
     var csroot = $.getenv("csroot");
     var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
     var screen = get_primary_screen();
