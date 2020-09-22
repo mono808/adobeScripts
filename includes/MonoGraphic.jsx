@@ -229,7 +229,7 @@
                         if(monoPrint.film) {
                             var monoFilm = new MonoFilm(monoPrint.film);
                             var sepPlacement = monoFilm.get_sepPos();
-                            monoFilm.filmDoc.close(SaveOptions.ASK);
+                            monoFilm.filmDoc.close(SaveOptions.NO);
                             result.sizeDif = previewPlacement.width - sepPlacement.width;
                             result.posDif = previewPlacement.deltaX - sepPlacement.deltaX;
                             result.placedDif = previewPlacement.percentage - sepPlacement.percentage;

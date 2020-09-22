@@ -4,7 +4,7 @@
 function main (report) 
 {
 
-    #include '/c/Program Files (x86)/Common Files/Adobe/Startup Scripts CS6/Adobe InDesign/indesign-8.0.jsx'
+    //#include '/c/Program Files (x86)/Common Files/Adobe/Startup Scripts CS6/Adobe InDesign/indesign-8.0.jsx'
     #include 'f_all.jsx'
     #include 'Job.jsx'
     #include 'Pathmaker.jsx'

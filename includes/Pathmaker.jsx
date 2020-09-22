@@ -41,8 +41,8 @@
     paths.templates       = paths.dv + '/scriptVorlagen/filme/';
     paths.vorlagen        = paths.dv + '/scriptVorlagen/filme/';
     paths.mock            = paths.dv + '/scriptVorlagen/ansicht/';
-    paths.mockShirtMaster = paths.dv + '/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master.indd';
-    paths.mockBagMaster   = paths.dv + '/scriptVorlagen/ansicht/taschen/Ansicht_Taschen_Master.indd';
+    paths.mockShirtMaster = paths.dv + '/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master_cc2018.indd';
+    paths.mockBagMaster   = paths.dv + '/scriptVorlagen/ansicht/taschen/Ansicht_Taschen_Master_cc2018.indd';
     
     paths.client_folder   = '../';
     paths.job_folder      = './';

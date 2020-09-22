@@ -32,34 +32,36 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich)
         ref = this.get_ref();
     }
 
-    if(ref == null) return ref;
+    if(ref == null) return null;
     
     //extract additional nfos from filename and folderstructure
     var tempNfo = null;
 
-    switch(ref.constructor.name) {
-        case 'Document' :
-            try{
-                ref = ref.fullName;  
-            } catch (e) {
-                var startFile = Folder($.getenv('csroot') + '/Kundendaten');
-                var saveFile = startFile.saveDlg ('Speicherort wählen'); 
-                //ref.saveAs(saveFile);
-                ref = saveFile;
-            }
-            
-        case 'File' :
-            //this.nfo.file = ref;
-            tempNfo = this.get_nfo_from_filename(ref);
-            this.add_to_nfo(tempNfo);
-            ref = ref.parent;
-        
-        case 'Folder' :
-            //this.nfo.folder = ref;
-            tempNfo = this.get_nfo_from_filepath(ref);
-            this.add_to_nfo(tempNfo);
-        break;
+    if(ref.constructor.name === 'Document') {
+        try{
+            ref = ref.fullName;  
+        } catch (e) {
+            ref = this.get_ref();
+            // var startFile = Folder($.getenv('csroot') + '/Kundendaten');
+            // var saveFile = startFile.saveDlg ('Speicherort wählen'); 
+            // //ref.saveAs(saveFile);
+            // ref = saveFile;
+        }
     }
+
+    if(ref.constructor.name === 'File') {
+        //this.nfo.file = ref;
+        tempNfo = this.get_nfo_from_filename(ref);
+        this.add_to_nfo(tempNfo);
+        ref = ref.parent;
+    }
+    
+    if(ref.constructor.name === 'Folder') {
+        //this.nfo.folder = ref;
+        tempNfo = this.get_nfo_from_filepath(ref);
+        this.add_to_nfo(tempNfo);
+    }
+
 
     if(!this.nfo.jobNr && nachdruckMoeglich) {
         this.nfo.jobNr = this.get_jobNr_from_user();
@@ -76,7 +78,7 @@ Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich)
     return this.nfo;
 };
 
-Job.prototype.get_ref = function () 
+Job.prototype.get_ref = function ()
 {
     // try to get a reference to a job from active documents or placed graphics
     var ref = null;

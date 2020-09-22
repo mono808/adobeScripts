@@ -911,6 +911,29 @@ MonoFilm.prototype.print = function ()
     this.print_to_postscript (this.filmDoc, psFile, 'monoFilms');
 };
 
+MonoFilm.prototype.print_direct = function ()
+{
+    if(!this.filmDoc.saved) {
+        alert('Film wurde noch nicht gespeichert, bitte erst abspeichern');
+        return;
+    }
+    var saveName = this.filmDoc.name.substring(0, this.filmDoc.name.lastIndexOf('.'));
+    var saveFolder = this.filmDoc.fullName.parent;
+     
+    var pdfName = saveName + '.pdf';
+    var pdfFile = new File(pm.path('filmOut') + pdfName);
+
+    var printerPreset = new PrinterPreset();
+    with(printerPreset) {
+        colorOutput = ColorOutputModes.SEPARATIONS;
+        allPrinterMarks = false;
+            
+
+    }
+
+    this.print_to_postscript (this.filmDoc, psFile, 'monoFilms');
+};
+
 MonoFilm.prototype.save = function (job, showDialog, close) 
 {
     var wxhRE = /\d{2,3}x\d{2,3}_/i;

@@ -62,10 +62,10 @@ function print_docs (myFiles)
         var doc = app.open(myFile,true);
         if(myFile.displayName.match(/Ansicht.*\.indd/i)) {
             doc.print(false, muPPreset);
-            doc.close(SaveOptions.ASK);
+            doc.close(SaveOptions.NO);
         } else {
             doc.print(false, fhPPreset);
-            doc.close(SaveOptions.YES);
+            doc.close(SaveOptions.NO);
         }
     }
 }

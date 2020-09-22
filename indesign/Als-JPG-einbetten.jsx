@@ -121,7 +121,7 @@ function ps_run (myArgs) {
 
 function indd_run () {
     if(app.selection.length > 0) {
-        for (var i=0, len=app.selection.length; i < len ; i++) {
+        for (var i=0, lenI=app.selection.length; i < lenI ; i++) {
             var selItem = app.selection[i];
             if(selItem.constructor.name === 'Rectangle') {
                 var graphic = selItem.graphics[0];
@@ -138,9 +138,9 @@ function indd_run () {
                 var filename = sourcePath.substring(0, sourcePath.lastIndexOf('.'));
                 var sourceExtension = sourcePath.substring(sourcePath.lastIndexOf('.'), sourcePath.length-1);
                 var destExtension = '.jpg';
-                for (var i=0, len=visibleOjectLayers.length; i < len ; i++) {
-                filename += '_-_';
-                filename += (encodeURI(visibleOjectLayers[i]));
+                for (var j=0, lenJ=visibleOjectLayers.length; j < lenJ ; j++) {
+                    filename += '_-_';
+                    filename += (encodeURI(visibleOjectLayers[j]));
                 };
 
                 var destPath = filename + destExtension;

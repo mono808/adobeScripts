@@ -147,8 +147,8 @@ baseDoc.get_totalArea = function() {
 
 baseDoc.place_on_film = function (sepFile, pos) {
 
-    var blankoFilmScript = File($.getenv('pcroot') + '/adobeScripts/indesign/Film_Blanko.jsx');
-    var finalizeScript = File($.getenv('pcroot') + '/adobeScripts/indesign/Film_Finalisieren.jsx');
+    var blankoFilmScript = File($.getenv('pcroot') + '/adobeScripts/indesign/Film-Vorlage-erstellen.jsx');
+    var finalizeScript = File($.getenv('pcroot') + '/adobeScripts/indesign/Film-finalisieren.jsx');
 
     indesign8.executeScriptFile(blankoFilmScript);
 
