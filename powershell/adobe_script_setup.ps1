@@ -1,2 +1,0 @@
-New-Item -Path "c:\Program Files\Adobe\Adobe Photoshop CS5 (64 Bit)\Presets\Scripts\monos_Scripts" -Type SymbolicLink -Value "c:\capri-stuff\adobescripts\"
-New-Item -Path "c:\Program Files\Adobe\Adobe Photoshop CS6 (64 Bit)\Presets\Scripts\monos_Scripts" -Type SymbolicLink -Value "c:\capri-stuff\adobescripts\"
