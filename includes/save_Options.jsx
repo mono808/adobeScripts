@@ -91,7 +91,7 @@
 
     ai_flx : function () {
         var options = new IllustratorSaveOptions();
-        options.compatibility = Compatibility.ILLUSTRATOR11;
+        options.compatibility = Compatibility.ILLUSTRATOR16;
         options.embedICCProfile = true;
         options.pdfCompatible = true;
         return options;
