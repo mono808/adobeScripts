@@ -149,7 +149,7 @@ baseDoc.place_on_film = function (sepFile, pos) {
     var blankoFilmScript = File($.getenv('pcroot') + '/adobeScripts/indesign/Film-Vorlage-erstellen.jsx');
     var finalizeScript = File($.getenv('pcroot') + '/adobeScripts/indesign/Film-finalisieren.jsx');
 
-    indesign8.executeScriptFile(blankoFilmScript);
+    indesign.executeScriptFile(blankoFilmScript);
 
     var myArgs = {};
     myArgs.sep = sepFile;
@@ -157,13 +157,13 @@ baseDoc.place_on_film = function (sepFile, pos) {
     myArgs.y = pos && pos.y ? pos.y.as('mm') : null;
 
     var bt = new BridgeTalk;
-    bt.target = 'Indesign-8.0';
+    bt.target = 'Indesign';
     bt.body = f_all.bt_position_sep_on_film.toSource() + "(" + myArgs.toSource() + ");";
     bt.onResult = function( inBT ) { $.writeln(inBT.body) };
     bt.onError = function( inBT ) { $.writeln(inBT.body) };
     bt.send(0);
 
-    indesign8.executeScriptFile(finalizeScript);
+    indesign.executeScriptFile(finalizeScript);
 
     return;
 };
