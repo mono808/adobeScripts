@@ -1,5 +1,4 @@
 ﻿#include './InteractSwitch.jsx'
-#include '/c/Program Files (x86)/Common Files/Adobe/Startup Scripts CS6/Adobe InDesign/indesign-8.0.jsx'
 
 
 if (!Array.prototype.includes) {
