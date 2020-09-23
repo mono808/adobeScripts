@@ -396,7 +396,7 @@
         if(myArgs.src && myArgs.dest)
         {
             var bt = new BridgeTalk;
-            bt.target = 'estoolkit';
+            bt.target = 'indesign';
             bt.body = copyFile.toSource() + "(" + myArgs.toSource() + ");";
             bt.onResult = function( inBT ) { done( null, inBT.body ); };
             bt.onError = function( inBT ) { done( 1, inBT.body ); };
