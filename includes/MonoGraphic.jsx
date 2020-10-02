@@ -163,10 +163,20 @@
                 var yFront = ref.parentPage.graphicLines.item('necklineFront').geometricBounds[0];
                 var yBack = ref.parentPage.graphicLines.item('necklineBack').geometricBounds[0];
             } catch(e) {
-                var yFront = ref.parentPage.guides.item('necklineFront').location;
-                var yBack = ref.parentPage.guides.item('necklineBack').location;
+                $.writeln ('cant locate neckline graphiclines (magenta dotted lines)');
+            }
+        
+            if(!yFront) {
+                try {        
+                    var yFront = ref.parentPage.guides.item('necklineFront').location;
+                    var yBack = ref.parentPage.guides.item('necklineBack').location;
+                } catch(e) {
+                    $.writeln('cant locate neckline guides');                
+                }
             }
 
+            if(!yFront) throw new Error('cant locate any neckline locators');
+            
             if(side === 'Front') {
                 var y = yFront;
             } else if (side === 'Back') {

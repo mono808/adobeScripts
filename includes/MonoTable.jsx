@@ -59,7 +59,7 @@
 
     var create_table = function (myPage) {
 
-        myTable = get_table(myPage);
+        var myTable = get_table(myPage);
         if(myTable && myTable.name)myTable.remove();
 
         var tFBounds = myDoc.masterSpreads.item('A-FixedStuff').pageItems.item('printTabFrame').geometricBounds;
