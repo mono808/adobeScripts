@@ -3,11 +3,6 @@
 
 (function () {
 
-	var runscript = {};
-	runscript.script_dir = scriptPath().path;
-	runscript.history = get_history();
-	runscript.history.recentScripts = removeDeletedItems (runscript.history.recentScripts);
-
 	//---------------------------------------------------------
 	// Get the directory that the script is run from
 
@@ -251,9 +246,17 @@
 	} // dialog
 
 
+
+
+	var runscript = {};
+	runscript.script_dir = scriptPath().path;
+	runscript.history = get_history();
+	runscript.history.recentScripts = removeDeletedItems (runscript.history.recentScripts);
+
 	try {
 		var script = get_a_script();
 		app.doScript (script);
+		app.activate();
 	} catch (e) {
 		alert (e.message + "\r(line " + e.line + ")");
 	}
