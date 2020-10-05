@@ -1,3 +1,4 @@
+﻿#target indesign
 #targetengine "session"
 
 // automatic switch workspace between ansicht and film    
@@ -5,9 +6,17 @@
     var myEventFunction = function (myEvent) {   
         if (myEvent.parent.constructor.name == 'LayoutWindow' ) {           
             if(app.activeDocument.name.indexOf('Ansicht') > -1) {
-                app.applyWorkspace('monoAnsicht');
+		try {
+                    app.applyWorkspace('Ansichten');
+		} catch(e) {
+		    $.writeln('could not load workspace "Ansichten"');
+		}
             } else if (app.activeDocument.name.indexOf('Film') > -1) {
-                app.applyWorkspace('monoFilms');
+		try {
+                    app.applyWorkspace('Filme');
+		} catch(e) {
+		    $.writeln('could not load workspace "Filme"');
+		}
             }
         }
     }
@@ -27,6 +36,7 @@
     }
 
    app.addEventListener("afterActivate", myEventFunction, false);
+    app.addEventListener("afterSave",myEventFunction,false);
 })();
 
 /* 

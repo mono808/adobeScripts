@@ -19,6 +19,13 @@ function main () {
     if(!job.nfo) return;
     var pm = new Pathmaker(job.nfo);
     //var typeahead = new Typeahead();
+    
+    try{
+        app.applyWorkspace('Ansichten');
+    } catch(e) {
+        $.writeln('could not load workspace "Ansichten"');
+    }
+    
     var mockup = new MonoMockup();
     
     mockup.create_mockupDoc();
@@ -30,7 +37,7 @@ function main () {
     mockup.show_shop_logo(job.nfo.shop);
     mockup.fill_job_infos(job.nfo);
 
-//~     var mockup = new MonoMockup(app.activeDocument);
+//  var mockup = new MonoMockup(app.activeDocument);
     var jobFolder = new JobFolder(job.nfo.folder);
     var monoPrints = jobFolder.get_prints();
 
