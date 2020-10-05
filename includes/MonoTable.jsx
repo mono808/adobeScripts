@@ -349,7 +349,7 @@
 		create_table : function (page, reset) {
             if(myTable && !reset) return myTable;
 
-			var myTable = create_table(page, true);
+			myTable = create_table(page, true);
 			return style_table(myTable);
 		},
 
