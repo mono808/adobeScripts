@@ -2,10 +2,5 @@
 /pantones.txt
 samplescripts/**
 launch.json
-<<<<<<< HEAD
-runscript.txt
-=======
-.vscode
 runscript.txt
 *~
->>>>>>> bf2ae7ec130241359eb5f00da49bfa25a6cebedf
