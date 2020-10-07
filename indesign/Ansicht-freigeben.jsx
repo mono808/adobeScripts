@@ -1,45 +1,58 @@
-﻿function select_docs (arrayOfFiles) {
+﻿#target indesign
+
+function select_docs (arrayOfFiles) {
     var result = {
-        action : undefined,
+        opts : {
+            printMock:   false,
+            printFH :    false,
+            printFilme : false
+        },
+    
         files : []
     }
 
     var checkBoxes = [];
+
     var w = new Window ("dialog");
     w.alignChildren = "fill";
     
-    var checkPnl = w.add("panel");
-    checkPnl.alignChildren = "left";
+    var filesPnl = w.add("panel");
+    filesPnl.alignChildren = "left";
+
+    for (var i = 0; i < arrayOfFiles.length; i++) {
+        checkBoxes.push(filesPnl.add ("checkbox", undefined, "\u00A0"+arrayOfFiles[i].displayName));
+    }    
+    
+    var optsPnl = w.add("panel");
+    optsPnl.alignChildren = "left";
+
+    optsPnl.printMock =     optsPnl.add("checkbox", undefined, "Ansicht drucken");
+    optsPnl.printFH =       optsPnl.add("checkbox", undefined, "Ansicht drucken");
+    optsPnl.printFilme =    optsPnl.add("checkbox", undefined, "Filme drucken");
     
     var btnGrp   = w.add("group");
     btnGrp.alignChildren = "fill";
-    
-    for (var i = 0; i < arrayOfFiles.length; i++) {
-        checkBoxes.push(checkPnl.add ("checkbox", undefined, "\u00A0"+arrayOfFiles[i].displayName));
-    }
-    
-    var print = btnGrp.add ("button", undefined, "Print");
-    print.onClick = function () {
-        for (var i = 0; i < checkBoxes.length; i++){
-            if(checkBoxes[i].value) {
-                result.files.push(arrayOfFiles[i]);
-            }
-        }
-        result.action = 'print';
-        w.close();
-    }
+        
 
-    var check = btnGrp.add ("button", undefined, "Check");
+    var check = btnGrp.add ("button", undefined, "OK");
     check.onClick = function () {
         for (var i = 0; i < checkBoxes.length; i++){
             if(checkBoxes[i].value) {
                 result.files.push(arrayOfFiles[i]);
             }
         }
-        result.action = 'check';
         w.close();
-    }    
-    
+    }
+
+    optsPnl.printMock.onClick = function () {
+        opts.printMock = this.value;
+    }
+    optsPnl.printFH.onClick = function () {
+        opts.printFH = this.value;
+    }
+    optsPnl.printFilme.onClick = function () {
+        opts.printFilme = this.value;
+    }
 
     var cancel = btnGrp.add("button", undefined, "Cancel");
     cancel.onClick = function () {
@@ -52,21 +65,12 @@
     return result;
 }
 
-function print_docs (myFiles)
-{
-    var fhPPreset = app.printerPresets.item('filmhuelle');
-    var muPPreset = app.printerPresets.item('printMockup');
-
+function print_docs (myFiles, printPreset) {
     for(var i = 0; i < myFiles.length; i++ ) {
         var myFile = myFiles[i];
         var doc = app.open(myFile,true);
-        if(myFile.displayName.match(/Ansicht.*\.indd/i)) {
-            doc.print(false, muPPreset);
-            doc.close(SaveOptions.NO);
-        } else {
-            doc.print(false, fhPPreset);
-            doc.close(SaveOptions.NO);
-        }
+        doc.print(false, printPreset);
+        doc.close(SaveOptions.NO);
     }
 }
 
@@ -133,8 +137,7 @@ function show_wawi_string_dialog (rowContents, job, copyToClipboard)
 }
 
 function main() {
-    
-     
+
     #include 'augment_objects.jsx'
     #include 'Job.jsx'
     #include 'f_all.jsx'
@@ -161,12 +164,13 @@ function main() {
     var iASwitch = new InteractSwitch();
     iASwitch.set('all');
 
-    var myDocs = jobFolder.get_mockups();
+    var ansichten = jobFolder.get_mockups();
     var filmhuelle = jobFolder.get_filmhuelle();
-    if(filmhuelle && filmhuelle.length > 0) myDocs.push(filmhuelle[0]);
+    var filme = jobFolder.get_filme();
+    //if(filmhuelle && filmhuelle.length > 0) ansichten.push(filmhuelle[0]);
 
-    var result = select_docs(myDocs);
-    if(result.files.length < 1) return;
+    var result = select_docs(ansichten);
+    //if(result.files.length < 1) return;
 
     var errors = [];
     var rowContents = [];
@@ -174,33 +178,30 @@ function main() {
     // loop through all files
     for (var i = 0; i < result.files.length; i++) {
         var myFile = result.files[i];
-        if(myFile.displayName.match(/Ansicht.*\.indd/i)) {
-            var monoMockup = new MonoMockup(app.open(myFile,true));
-            var layerToggle = f_id.layerToggle(['Intern']);
-            layerToggle.show();
-            for (var j = 0; j < monoMockup.doc.pages.length; j++) {
-                var monoTable = new MonoTable(monoMockup.doc.pages[j]);
-                var pageRowContents = monoTable.read_rows();
-                if(pageRowContents) {
-                    rowContents = rowContents.concat(pageRowContents);
-                }
+        var monoMockup = new MonoMockup(app.open(myFile,true));
+        var layerToggle = f_id.layerToggle(['Intern']);
+        layerToggle.show();
+        for (var j = 0; j < monoMockup.doc.pages.length; j++) {
+            var monoTable = new MonoTable(monoMockup.doc.pages[j]);
+            var pageRowContents = monoTable.read_rows();
+            if(pageRowContents) {
+                rowContents = rowContents.concat(pageRowContents);
             }
+        }
 
-            var monoGraphics = monoMockup.get_all_monoGraphics();
+        var monoGraphics = monoMockup.get_all_monoGraphics();
 
-            for (var k = 0; k < monoGraphics.length; k++) {
-                var mG = monoGraphics[k];
-                var checkResult = mG.check_size();
-                if((Math.abs(checkResult.sizeDif) > 2) || (Math.abs(checkResult.posDif) > 1.5) || Math.abs(checkResult.placedDif) > 1) {
-                    errors.push({mG:mG, result: checkResult});
-                }
+        for (var k = 0; k < monoGraphics.length; k++) {
+            var mG = monoGraphics[k];
+            var checkResult = mG.check_size();
+            if((Math.abs(checkResult.sizeDif) > 2) || (Math.abs(checkResult.posDif) > 1.5) || Math.abs(checkResult.placedDif) > 1) {
+                errors.push({mG:mG, result: checkResult});
             }
         }
     }
 
     if(errors.length > 0) {      
-        var alertStr = '';        
-
+        var alertStr = '';
         for (var i=0, len=errors.length; i < len ; i++) {
             var e = errors[i];
             alertStr += 'Motiv ';
@@ -214,11 +215,7 @@ function main() {
             if(Math.abs(e.result.sizeDif) > 2) {
                 alertStr += 'Größe abweichend um: ' + e.result.sizeDif.toFixed(1) + ' mm\r\r';
             }
-/* 
-            if(Math.abs(e.result.posDif) > 1) {
-                 alertStr += 'Platzierung abweichend um: ' + e.result.posDif.toFixed(1) + ' mm\r\r';
-            }
-*/
+
             if(Math.abs(e.result.placedDif) > 1) {
                 alertStr += 'Zentrierung abweichend!\r\r';
                 alertStr += e.result.previewPlacement.percentage.toFixed(1);
@@ -234,9 +231,21 @@ function main() {
         return null;}
     }
 
-    // objs containing the strings extracted from the mockup to copy to wawi    
-    if(result.action === 'print') {
-        print_docs(result.files);
+    if(result.opts.printMock) {
+        var mockPrintPreset = app.printerPresets.item('printMockup');
+        print_docs(result.files, mockPrintPreset);
+    }
+
+    if (result.opts.printFH) {
+        var fhPrintPreset = app.printerPresets.item('filmhuelle');    
+        print_docs(filmhuelle);        
+    }
+
+    if (result.opts.printFilme) {
+        for (var i=0, len=filme.length; i < len ; i++) {
+            var monoFilm = new MonoFilm(app.open(filme[i]));
+            monoFilm.print();
+        }
     }
 
     iASwitch.set('all');

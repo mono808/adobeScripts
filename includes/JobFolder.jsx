@@ -57,7 +57,7 @@ function JobFolder (folder) {
 
 	var printFolders = base.getFiles(is_printFolder);
 	var ansichtenFolder = new Folder(base + '/ansicht');
-	var filmhuellenFolder = new Folder(base + '/druckdaten-sd');
+	var druckdatenSD = new Folder(base + '/druckdaten-sd');
 	
 	var monoPrints = [];
 	for (var i = 0; i < printFolders.length; i++) {
@@ -87,7 +87,11 @@ function JobFolder (folder) {
 		},
 
 		get_filmhuelle : function () {
-			return filmhuellenFolder.getFiles('*ilmhuelle.indd');
+			return druckdatenSD.getFiles('*ilmhuelle.indd');
+		},
+
+		get_filme : function () {
+			return druckdatenSD.getFiles('_Film.indd');
 		}
 	}
 }
