@@ -91,7 +91,7 @@ function JobFolder (folder) {
 		},
 
 		get_filme : function () {
-			return druckdatenSD.getFiles('_Film.indd');
+			return druckdatenSD.getFiles('*_Film.indd');
 		}
 	}
 }
