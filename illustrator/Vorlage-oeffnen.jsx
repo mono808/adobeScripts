@@ -1,18 +1,20 @@
-﻿#target illustrator
+﻿//@target illustrator
+$.level = 1;
+
 function main ()
 {
-    #include 'Pathmaker.jsx'
-    #include 'Typeahead.jsx'
+    //@include 'require.jsx'
 
-    var pathmaker = new Pathmaker();
-    function check_if_file(aFile) {
+    var typeahead = require('typeahead');
+    var pathmaker = require('pathmaker');
+    
+    function isFile(aFile) {
         return aFile.constructor.name === 'File';
     }
 
-	var templates = pathmaker.folder('templates').getFiles(check_if_file);
+	var templates = pathmaker.folder('templates').getFiles(isFile);
 	templates.sort();
 
-    var typeahead = new Typeahead();
     var filesToOpen = typeahead.show_dialog(templates, 'displayName');
  
     for (var i = 0; i < filesToOpen.length; i++) {
