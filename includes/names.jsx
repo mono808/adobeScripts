@@ -1,5 +1,5 @@
-﻿function MonoNamer () {
-    this.printId = {
+﻿var names = {
+    printId : {
         lBrust   : 'linke Brust',
         rBrust   : 'rechte Brust',
         Front    : 'Vorderseite',
@@ -14,9 +14,9 @@
         BeutelAA : 'Tasche beidseitig',
         BeutelA  : 'Tasche Seite A',
         BeutelB  : 'Tasche Seite B'
-    };
+    },
 
-    this.color = {
+    color : {
         'Weiß1+2'  : 'Vordruck, Weiß',
         'UB+'      : 'Vordruck, Weiß',
         'UB+White' : 'Vordruck, Weiß',
@@ -26,9 +26,9 @@
         Silber     : 'Silber 1, Silber 2',
         Gold       : 'Gold 1, Gold 2',
         Unterleger : 'Vordruck',
-    };
+    },
 
-    this.posOrder = {
+    posOrder : {
         lBrust      : 1,
         rBrust      : 1,
         Brust       : 1,
@@ -51,9 +51,9 @@
         side        : 1,
         Back        : 2,
         BeutelB     : 2
-    };
+    },
 
-    this.side = {
+    side : {
         lBrust      : 'Front',
         rBrust      : 'Front',
         Brust       : 'Front',
@@ -76,9 +76,9 @@
         BeutelAA    : 'Front',
         BeutelA     : 'Front',
         BeutelB     : 'Back'
-    };
+    },
 
-    this.beutel = {
+    beutel : {
         XT001 : 'kurze Henkel',
         XT002 : 'kurze Henkel',
         XT003 : 'lange Henkel',
@@ -86,9 +86,9 @@
         WM101 : 'lange Henkel',
         WM110 : 'Turnbeutel',
         XT005 : 'ApoTasche'
-    };
+    },
 
-    this.tech = {
+    tech : {
         SD   : 'Siebdruck',
         FLX  : 'Flexdruck',
         FLO  : 'Flockdruck',
@@ -97,9 +97,9 @@
         DTAK : 'Digital-Flock',
         DTG  : 'Digital-Direkt',
         STK  : 'Einstickung'
-    };
+    },
 
-    this.screenCount = {
+    screenCount : {
         'UB+'               : 2,
         'Vordruck, Weiß'    : 2,
         'Silber'            : 2,
@@ -107,17 +107,17 @@
         'LiquidGold'        : 2,
         'Gold'              : 2,
         'UB+White'          : 2
-    };
-};
+    }
+}
 
-MonoNamer.prototype.get_array = function (namerTag, shortName) {
-    if(this.hasOwnProperty(namerTag)) {
-        var a = [],
-            p = null,
-            namer = this[namerTag];
-        for(p in namer) {
-            if(namer.hasOwnProperty(p)) {
-                a.push(shortName ? p : namer[p]);
+exports.get_array = function (topic, shortName) {
+    if(names[topic]) {
+        var a = [];
+        var p = null;
+        var topicNames = names[topic];
+        for(p in topicNames) {
+            if(topicNames.hasOwnProperty(p)) {
+                a.push(shortName ? p : topicNames[p]);
             }
         }
         return a;
@@ -125,25 +125,25 @@ MonoNamer.prototype.get_array = function (namerTag, shortName) {
     else {return null;}
 };
 
-MonoNamer.prototype.name = function (namer, strng) {
-    if(this.hasOwnProperty(namer) && this[namer].hasOwnProperty(strng)) {    
-        return this[namer][strng];
+exports.name = function (topic, strng) {
+    if(names[topic] && names[topic].hasOwnProperty(strng)) {    
+        return names[topic][strng];
     } else {
         return strng;
     }
 };
 
-MonoNamer.prototype.name_side = function (myString) {
-    if (this.side.hasOwnProperty(myString)) {
-        return this.side[myString];
+exports.name_side = function (myString) {
+    if (names.side.hasOwnProperty(myString)) {
+        return names.side[myString];
     } else {
         return 'Front';
     }
 };
 
-MonoNamer.prototype.name_screens = function (myString) {
-    if (this.screenCount.hasOwnProperty(myString)) {
-        return this.screenCount[myString];
+exports.name_screens = function (myString) {
+    if (names.screenCount.hasOwnProperty(myString)) {
+        return names.screenCount[myString];
     } else {
         return 1
     }

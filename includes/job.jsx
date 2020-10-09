@@ -1,85 +1,10 @@
-﻿#include './rE.jsx'
-#include './LastFolders.jsxinc'
-#include './f_all.jsx'
-#include './MonoNamer.jsx'
+﻿$.level = 1;
 
-function Job (ref, fullExtract, nachdruckMoeglich) 
-{
-	this.nfo = {
-		c2b : null,
-		client : null,
-		jobName : null,
-		doc : null,
-		file : null,
-		folder : null,
-		jobNr : null,
-		refNr : null,
-		printId : null,
-		shop : null,
-		tech : null,
-		wxh : null,
-	};
-    this.regExJobNr = rE.jobNr;
-    this.lastFolders = new LastFolders();
-    this.lastFolders.import_txt();
-    this.get_nfo(ref, fullExtract, nachdruckMoeglich);
-};
+var rE = require('rE');
+var lastFolders = require('lastFolders'); //#include './LastFolders.jsxinc'
+var names = require('names'); //#include './MonoNamer.jsx'
 
-Job.prototype.get_nfo = function (ref, fullExtract, nachdruckMoeglich) 
-{
-    //try to get a reference to a job from the activeDocument
-    if(!ref) {
-        ref = this.get_ref();
-    }
-
-    if(ref == null) return null;
-    
-    //extract additional nfos from filename and folderstructure
-    var tempNfo = null;
-
-    if(ref.constructor.name === 'Document') {
-        try{
-            ref = ref.fullName;  
-        } catch (e) {
-            ref = this.get_ref();
-            // var startFile = Folder($.getenv('csroot') + '/Kundendaten');
-            // var saveFile = startFile.saveDlg ('Speicherort wählen'); 
-            // //ref.saveAs(saveFile);
-            // ref = saveFile;
-        }
-    }
-
-    if(ref.constructor.name === 'File') {
-        //this.nfo.file = ref;
-        tempNfo = this.get_nfo_from_filename(ref);
-        this.add_to_nfo(tempNfo);
-        ref = ref.parent;
-    }
-    
-    if(ref.constructor.name === 'Folder') {
-        //this.nfo.folder = ref;
-        tempNfo = this.get_nfo_from_filepath(ref);
-        this.add_to_nfo(tempNfo);
-    }
-
-
-    if(!this.nfo.jobNr && nachdruckMoeglich) {
-        this.nfo.jobNr = this.get_jobNr_from_user();
-    } else {
-        this.nfo.jobNr = this.nfo.refNr;
-    }
-
-    // if full infos are needed and some are still missing,
-    // let the user choose manually
-    if(fullExtract && (!this.nfo.printId || !this.nfo.tech || !this.nfo.jobName)) {
-        tempNfo = this.get_nfo_from_user();
-        this.add_to_nfo(tempNfo);
-    }            
-    return this.nfo;
-};
-
-Job.prototype.get_ref = function ()
-{
+function get_ref () {
     // try to get a reference to a job from active documents or placed graphics
     var ref = null;
     var doc = null;
@@ -88,22 +13,22 @@ Job.prototype.get_ref = function ()
     if(doc) {
         switch (app.name) {
             case 'Adobe Illustrator' :
-                ref = this.get_ref_from_ai_doc(doc);
+                ref = get_ref_from_ai_doc(doc);
             break;
             
             case 'Adobe InDesign' :                
-                ref = this.get_ref_from_indd_doc(doc);
+                ref = get_ref_from_indd_doc(doc);
             break;
 
             case 'Adobe Photoshop' :
-                ref = this.get_ref_from_ps_doc(doc);
+                ref = get_ref_from_ps_doc(doc);
             break;
         }
     }
 
     // if no reference is found, try the lastFolders
     if(!ref) {
-        ref = this.lastFolders.show_dialog();
+        ref = lastFolders.show_dialog();
     }
 
     // try the old saveDialog if still no ref path
@@ -112,18 +37,18 @@ Job.prototype.get_ref = function ()
     }
 
     if(ref) {
-        this.lastFolders.add(ref);
+        lastFolders.add(ref);
         return ref;
     }
-};
+}
 
-Job.prototype.get_ref_from_indd_doc = function (doc) 
+function get_ref_from_indd_doc(doc) 
 {
     // if no docs are visible, dont try to get a ref 
     if(app.layoutWindows.length < 1) {return null}
     
     var ref = null;
-  
+
     //close leftover docs without a layoutwindow
     var i, maxI, myDoc;      
     for(i = 0, maxI = app.documents.length; i < maxI; i += 1) {
@@ -150,7 +75,7 @@ Job.prototype.get_ref_from_indd_doc = function (doc)
     return ref;
 };
 
-Job.prototype.get_ref_from_ps_doc = function (doc) 
+function get_ref_from_ps_doc(doc) 
 {
     var ref = null;
 
@@ -165,7 +90,7 @@ Job.prototype.get_ref_from_ps_doc = function (doc)
     return ref;
 };
 
-Job.prototype.get_ref_from_ai_doc = function (doc) 
+function get_ref_from_ai_doc(doc) 
 {
     var ref = null;
 
@@ -191,7 +116,7 @@ Job.prototype.get_ref_from_ai_doc = function (doc)
     return ref;
 };
 
-Job.prototype.get_nfo_from_filename = function (target) 
+function get_nfo_from_filename(target) 
 {
         var nfo = {};
                     
@@ -225,19 +150,19 @@ Job.prototype.get_nfo_from_filename = function (target)
         return nfo;
 };
 
-Job.prototype.get_nfo_from_filepath = function (fldr) 
+function get_nfo_from_filepath(fldr) 
 {
     if (fldr.constructor.name === 'File') {fldr = fldr.parent};
- 
-    var jobFolder = this.get_jobBaseFolder(fldr);
+
+    var jobFolder = get_jobBaseFolder(fldr);
     if(!jobFolder) return null;
 
     Folder.current = jobFolder;
-    
+
     var match = jobFolder.displayName.match(rE.jobNameNew);
     match = match ? match : jobFolder.displayName.match(rE.jobNameOld);
     match = match ? match : jobFolder.displayName.match(rE.jobNr);
-    
+
     var nfo = {};
     nfo.refNr   = match[1];
     nfo.shop    = match[2].indexOf('wm') != -1 ? 'wme' : 'cs';
@@ -249,18 +174,18 @@ Job.prototype.get_nfo_from_filepath = function (fldr)
     return nfo;
 };
 
-Job.prototype.get_nfo_from_user = function () 
+function get_nfo_from_user(nfo) 
 {
-    var mN = new MonoNamer();
+    var n = names;
     var result = {
-        printId : this.nfo.printId || null,
-        tech : this.nfo.tech || null,
-        jobName: this.nfo.jobName || null,
+        printId : nfo.printId || null,
+        tech : nfo.tech || null,
+        jobName: nfo.jobName || null,
     };
 
-    var techs = mN.get_array('tech', true),
-        ids = mN.get_array('printId', true),
-        jobNames = this.get_jobNames(this.nfo.folder);
+    var techs = n.get_array('tech', true),
+        ids = n.get_array('printId', true),
+        jobNames = get_jobNames(nfo.folder);
 
     var win = new Window('dialog', 'monos Print Id Dialog');
     win.orientation = 'column';
@@ -299,9 +224,9 @@ Job.prototype.get_nfo_from_user = function ()
         var idpnl = win.pgrp.idpnl;
         idpnl.alignChildren = 'fill';
         idpnl.opts = ids;
- 
+
         for (var i = 0, maxI = ids.length; i < maxI; i += 1) {
-            idpnl['rad_'+i] = idpnl.add("radiobutton", undefined, mN.name('printId', ids[i]));
+            idpnl['rad_'+i] = idpnl.add("radiobutton", undefined, n.name('printId', ids[i]));
 
             if(result.printId == ids[i]) {idpnl['rad_'+i].value = true;}
             idpnl['rad_'+i].onClick = helper(i);
@@ -323,7 +248,7 @@ Job.prototype.get_nfo_from_user = function ()
         techpnl.opts = techs;
 
         for (var i = 0, maxI = techs.length; i < maxI; i += 1) {
-            techpnl['rad_'+i] = techpnl.add("radiobutton", undefined, mN.name('tech', techs[i]));
+            techpnl['rad_'+i] = techpnl.add("radiobutton", undefined, n.name('tech', techs[i]));
             techpnl['rad_'+i].onClick = helper(i);
         };
     }
@@ -363,11 +288,11 @@ Job.prototype.get_nfo_from_user = function ()
         if(result.printId && result.tech && result.jobName) {
             win.close();                
         } else {
-        	var alertString = ('Diese Info(s) fehlen:\n');
-        	alertString += !result.printId  ? 'Druckposition\n' : '';
-        	alertString += !result.tech 	? 'Druckverfahren\n' : '';
-        	alertString += !result.jobName 	? 'JobName\n' : '';
-        	alertString += 'bitte auswählen!';
+            var alertString = ('Diese Info(s) fehlen:\n');
+            alertString += !result.printId  ? 'Druckposition\n' : '';
+            alertString += !result.tech 	? 'Druckverfahren\n' : '';
+            alertString += !result.jobName 	? 'JobName\n' : '';
+            alertString += 'bitte auswählen!';
             alert(alertString);
             return;
         }
@@ -381,24 +306,24 @@ Job.prototype.get_nfo_from_user = function ()
     win.show();
     //$.writeln(result.toSource());
     return result
-};
+}
 
-Job.prototype.get_jobBaseFolder = function (fld) 
+function get_jobBaseFolder (fld)
 {
-    if(fld.displayName.match(this.regExJobNr)) {
+    if (fld.displayName.match(rE.jobNr)) {
         return fld;
     } else if (fld.parent) {
-        return this.get_jobBaseFolder(fld.parent);
+        return get_jobBaseFolder(fld.parent);
     } else {
         return null;
     }
-};
+}
 
-Job.prototype.get_jobNames = function (jobfolder) 
+function get_jobNames (jobfolder)
 {
-    var jobfolders = jobfolder.parent.getFiles(rE.jobNr),
-        jobNames = [],
-        jobName;
+    var jobfolders = jobfolder.parent.getFiles(rE.jobNr);
+    var jobNames = [];
+    var jobName;
 
     for (var i = 0, maxI = jobfolders.length; i < maxI; i += 1) 
     {
@@ -414,9 +339,9 @@ Job.prototype.get_jobNames = function (jobfolder)
         }
     }
     return jobNames;
-};
+}
 
-Job.prototype.get_jobNr_from_user = function () 
+function get_jobNr_from_user ()
 {
 
     var result = {
@@ -478,35 +403,113 @@ Job.prototype.get_jobNr_from_user = function ()
     return result.jobNr;
 };
 
-Job.prototype.get_wxh = function () 
-{
-    var w = null,
-        h = null,
-        doc = app.activeDocument;
+var Job = function (ref, fullExtract, nachdruckMoeglich) {
+	var self = this;
 
-    switch (app.name) 
+    this.get_nfo = function (ref, fullExtract, nachdruckMoeglich) 
     {
-        case 'Adobe Illustrator' :
-            w = new UnitValue (doc.width, 'pt');
-            h = new UnitValue (doc.height, 'pt');
-            this.nfo.wxh = w.as('mm').toFixed(0) + 'x' + h.as('mm').toFixed(0);
-        break;
-        case 'Adobe Photoshop' :
-            w = doc.width;
-            h = doc.height;
-            this.nfo.wxh = w.as('mm').toFixed(0) + 'x' + h.as('mm').toFixed(0);
-        break;
-    }
-    return this.nfo.wxh;
-};
+        //try to get a reference to a job from the activeDocument
+        if(!ref) {
+            ref = get_ref();
+        }
 
-Job.prototype.add_to_nfo = function (newNfo) 
-{
-	if(newNfo) {
-        for(var p in this.nfo) {
-            if(this.nfo.hasOwnProperty(p) && !this.nfo[p] && newNfo[p]) {
-                this.nfo[p] = newNfo[p];
+        if(ref == null) return null;
+        
+        //extract additional nfos from filename and folderstructure
+        var tempNfo = null;
+
+        if(ref.constructor.name === 'Document') {
+            try{
+                ref = ref.fullName;  
+            } catch (e) {
+                ref = get_ref();
+                // var startFile = Folder($.getenv('csroot') + '/Kundendaten');
+                // var saveFile = startFile.saveDlg ('Speicherort wählen'); 
+                // //ref.saveAs(saveFile);
+                // ref = saveFile;
             }
         }
-	}
-};
+
+        if(ref.constructor.name === 'File') {
+            //this.nfo.file = ref;
+            tempNfo = get_nfo_from_filename(ref);
+            this.add_to_nfo(tempNfo);
+            ref = ref.parent;
+        }
+        
+        if(ref.constructor.name === 'Folder') {
+            //this.nfo.folder = ref;
+            tempNfo = get_nfo_from_filepath(ref);
+            this.add_to_nfo(tempNfo);
+        }
+
+
+        if(!this.nfo.jobNr && nachdruckMoeglich) {
+            this.nfo.jobNr = get_jobNr_from_user(this.nfo);
+        } else {
+            this.nfo.jobNr = this.nfo.refNr;
+        }
+
+        // if full infos are needed and some are still missing,
+        // let the user choose manually
+        if(fullExtract && (!this.nfo.printId || !this.nfo.tech || !this.nfo.jobName)) {
+            tempNfo = get_nfo_from_user(this.nfo);
+            this.add_to_nfo(tempNfo);
+        }            
+        return this.nfo;
+    };
+
+    this.get_wxh = function () 
+    {
+        var w = null,
+            h = null,
+            doc = app.activeDocument;
+
+        switch (app.name) 
+        {
+            case 'Adobe Illustrator' :
+                w = new UnitValue (doc.width, 'pt');
+                h = new UnitValue (doc.height, 'pt');
+                this.nfo.wxh = w.as('mm').toFixed(0) + 'x' + h.as('mm').toFixed(0);
+            break;
+            case 'Adobe Photoshop' :
+                w = doc.width;
+                h = doc.height;
+                this.nfo.wxh = w.as('mm').toFixed(0) + 'x' + h.as('mm').toFixed(0);
+            break;
+        }
+        return this.nfo.wxh;
+    };
+
+    this.add_to_nfo = function (newNfo) 
+    {
+        if(newNfo) {
+            for(var p in this.nfo) {
+                if(this.nfo.hasOwnProperty(p) && !this.nfo[p] && newNfo[p]) {
+                    this.nfo[p] = newNfo[p];
+                }
+            }
+        }
+    };
+
+    this.nfo = {
+		c2b : null,
+		client : null,
+		jobName : null,
+		doc : null,
+		file : null,
+		folder : null,
+		jobNr : null,
+		refNr : null,
+		printId : null,
+		shop : null,
+		tech : null,
+		wxh : null,
+	};
+
+    lastFolders.import_txt();
+    this.get_nfo(ref, fullExtract, nachdruckMoeglich);
+
+}
+
+exports = module.exports = Job;

@@ -1,4 +1,4 @@
-﻿var save_ops = {
+﻿var saveOptions = {
 
     previewPS : function () {
             var options = new PhotoshopSaveOptions ();
@@ -130,3 +130,5 @@
         return options;
     }
 };
+
+exports = module.exports = saveOptions;

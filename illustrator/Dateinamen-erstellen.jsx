@@ -1,17 +1,18 @@
-﻿#target illustrator
+﻿//@target illustrator
+$.level = 1;
 
 function main() {
 
-    #include "f_all.jsx"
-    #include 'Job.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'save_Options.jsx'
+    //@include 'require.jsx'
+
+    var f_all = require('f_all');
+    var pathmaker = require('pathmaker');
+    var job = require('job');
+    var saveOptions = require('saveOptions');
     
-    var job = new Job(null, true, false);
-    var pathmaker = new Pathmaker(job.nfo);
-  
-    f_all.saveFile (pathmaker.file('workingAi', job.nfo), save_ops.ai_sep(), false);
+    var myJob = new job(null, true, false);
+
+    f_all.saveFile (pathmaker.file('workingAi', myJob.nfo), saveOptions.ai_sep(), false);
 };
 
 if (app.documents.length > 0) {
