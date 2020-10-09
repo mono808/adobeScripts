@@ -3,7 +3,7 @@ This script gos through the selected Items / all pathItems
 and adds all used fill & strokecolors to the swatches palette
 */
 
-#target illustrator
+//@target illustrator
 
 function main () {
     var doc = app.activeDocument;

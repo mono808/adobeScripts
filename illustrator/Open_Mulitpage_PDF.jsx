@@ -1,5 +1,5 @@
-﻿#target illustrator
-#targetengine session
+﻿//@target illustrator
+//@targetengine session
 
 // script.name = AI_openMultiPagePDF_CS4_CS5_v1.02.jsx; 
 // script.description = opens a multipage PDF;
