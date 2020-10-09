@@ -7,10 +7,10 @@ function main() {
 
     var f_all = require('f_all');
     var pathmaker = require('pathmaker');
-    var job = require('job');
     var saveOptions = require('saveOptions');
-    
-    var myJob = new job(null, true, false);
+    var job = require('job');
+
+    job.set_nfo(null, true, false);
 
     f_all.saveFile (pathmaker.file('workingAi', myJob.nfo), saveOptions.ai_sep(), false);
 };
