@@ -1,22 +1,20 @@
-﻿#target illustrator
-
-#strict on
-$.strict = true;
-'use strict'
+﻿//@target illustrator
+$.level=1
 
 function main (report) 
 {
-    #include 'f_all.jsx'
-    #include 'SepAI.jsx'
-    #include 'Job.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'save_Options.jsx'
+    //@include 'require.jsx'
 
-    var job = new Job(null, true, false);
-    var pm = new Pathmaker();
+    var f_all = require('f_all');
+    var AI_sep = require('AI_sep');
+    var job = require('Job');
+    var paths = require('paths');
+    var saveOptions = require('saveOptions');
+
+    job.set_nfo(null, true, false);
 
     //-------------------------------------------------------
-    var sep = new SepAI(app.activeDocument);
+    var sep = new AI_sep(app.activeDocument);
 
     sep.fit_artboard_to_art('Motiv');
 
@@ -27,18 +25,18 @@ function main (report)
     sep.delete_layer('HilfsLayer');
     
     // save print file
-    var printFile = pm.file(job.nfo.tech.toLowerCase(), job.nfo);
+    var printFile = paths.file(job.nfo.tech.toLowerCase(), job.nfo);
     var saveOpts;
     switch (job.nfo.tech.toLowerCase()) {
-        case 'flx' : saveOpts = save_ops.ai_flx();
+        case 'flx' : saveOpts = saveOptions.ai_flx();
         break;
-        case 'flk' : saveOpts = save_ops.ai_flx();
+        case 'flo' : saveOpts = saveOptions.ai_flx();
         break;
-        case 'dtax' : saveOpts = save_ops.ai_dta();
+        case 'dtax' : saveOpts = saveOptions.ai_dta();
         break;
-        case 'dtak' : saveOpts = save_ops.ai_dta();
+        case 'dtao' : saveOpts = saveOptions.ai_dta();
         break;
-        case 'stk' : saveOpts = save_ops.ai_flx();
+        case 'stk' : saveOpts = saveOptions.ai_flx();
         break;   
     }
 

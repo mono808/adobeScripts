@@ -94,7 +94,7 @@
         FLO  : 'Flockdruck',
         SUB  : 'Sublimation',
         DTAX : 'Digital-Flex',
-        DTAK : 'Digital-Flock',
+        DTAO : 'Digital-Flock',
         DTG  : 'Digital-Direkt',
         STK  : 'Einstickung'
     },

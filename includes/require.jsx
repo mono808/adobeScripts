@@ -154,7 +154,7 @@ $.level = 2;
     // loaded.  Items must be an empty string or a string that ends with "/".
     // Will also include the PHOTOSHOP_PATH env var.
     // This is never replaced or destroyed
-    require.path = ['/c/monodev/adobescripts/includes/'];
+    require.path = ['/c/monodev/adobescripts/libs/'];
     // Flag to build the path array or not
     require.isPathBuilt = false;
 
