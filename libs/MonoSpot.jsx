@@ -1,4 +1,4 @@
-$.level = 1;
+﻿$.level = 1;
 
 function MonoSpot (name)
 {
@@ -21,4 +21,4 @@ function MonoSpot (name)
     }
 }
 
-module.exports = MonoSpot;
+exports = module.exports = MonoSpot;

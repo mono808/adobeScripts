@@ -1,6 +1,6 @@
 $.level = 1;
 
-function AI_base (doc) {
+function AiBase (doc) {
     this.doc = doc;
     this.saveOptions = {
         sep : function () {
@@ -77,7 +77,7 @@ function AI_base (doc) {
 
 }
 
-AI_base.prototype.recursive_delete_layer = function (ly) {
+AiBase.prototype.recursive_delete_layer = function (ly) {
     ly.locked = false;
     ly.visible = true;
 
@@ -101,7 +101,7 @@ AI_base.prototype.recursive_delete_layer = function (ly) {
     ly.remove();
 }
 
-AI_base.prototype.delete_layer = function (layer_name) {
+AiBase.prototype.delete_layer = function (layer_name) {
     try {
         var l = this.doc.layers.getByName(layer_name);
         this.recursive_delete_layer(l);
@@ -111,7 +111,7 @@ AI_base.prototype.delete_layer = function (layer_name) {
     }
 }
 
-AI_base.prototype.fit_artboard_to_art = function (artlayer_name) {
+AiBase.prototype.fit_artboard_to_art = function (artlayer_name) {
     try {
         var artLayer = this.doc.layers.getByName(artlayer_name)
     } catch (e) {
@@ -135,7 +135,7 @@ AI_base.prototype.fit_artboard_to_art = function (artlayer_name) {
     this.doc.fitArtboardToSelectedArt(0);
 }
 
-AI_base.prototype.get_items_on_layer = function (items, layer_name) {
+AiBase.prototype.get_items_on_layer = function (items, layer_name) {
     var itemsOnLayer = [];
     try {
         var l = this.doc.layers.getByName(layer_name);
@@ -156,4 +156,4 @@ AI_base.prototype.get_items_on_layer = function (items, layer_name) {
     return itemsOnLayer;
 }
 
-module.exports = AI_base;
+module.exports = AiBase;

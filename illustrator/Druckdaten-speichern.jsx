@@ -6,15 +6,15 @@ function main (report)
     //@include 'require.jsx'
 
     var f_all = require('f_all');
-    var AI_sep = require('AI_sep');
-    var job = require('Job');
+    var aiSep = require('AiSep');
+    var job = require('job');
     var paths = require('paths');
     var saveOptions = require('saveOptions');
 
     job.set_nfo(null, true, false);
 
     //-------------------------------------------------------
-    var sep = new AI_sep(app.activeDocument);
+    var sep = new aiSep(app.activeDocument);
 
     sep.fit_artboard_to_art('Motiv');
 

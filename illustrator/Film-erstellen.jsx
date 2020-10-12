@@ -1,25 +1,24 @@
-﻿#target illustrator
-#script MakeFilmAI
+﻿//@target illustrator
+
 
 function main (report) 
 {
 
-    //#include '/c/Program Files (x86)/Common Files/Adobe/Startup Scripts CS6/Adobe InDesign/indesign-8.0.jsx'
-    #include 'f_all.jsx'
-    #include 'Job.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'SepAI.jsx'
-    #include 'AreaDialog.jsx'
+    //@include 'require.jsx'
+    
+    var f_all = require ('f_all'); //#include 'f_all.jsx'    
+    var job = require('job');//#include 'Job.jsx'
+    var paths = require('paths');//#include 'Pathmaker.jsx'
+    var aiSep = require('AiSep');//#include 'SepAI.jsx'
+    var areaDialog = require('AreaDialog')//#include 'AreaDialog.jsx'
 
-    var job = new Job(null, true, false);
+    job.set_nfo(null, true, false);
     
-    var pm = new Pathmaker();
-    
-    var sep = new SepAI(app.activeDocument);
+    var sep = new aiSep(app.activeDocument);
     
     if(!sep.check()) return;
     
-    var workingFile = pm.file('workingAi', job.nfo);
+    var workingFile = paths.file('workingAi', job.nfo);
     f_all.saveFile (workingFile, sep.saveOpts, false);
     
     //sort pathItems by spotcolor, putting them into indivdual "spot arrays"
@@ -35,7 +34,7 @@ function main (report)
     // delete fluff and save final separation for film output
     app.doScript('Delete Fluff', 'Separation');
 
-    var sepFile = pm.file('sepAi', job.nfo);    
+    var sepFile = paths.file('sepAi', job.nfo);    
     f_all.saveFile (sepFile, sep.saveOpts, false);
     
     var sepPos = sep.get_sep_coordinates();
@@ -52,7 +51,7 @@ function main (report)
 
     if(sep.pathItems.length > 0) sep.change_spot_to_process_colors2();
 
-    var previewFile = pm.file('previewAi');
+    var previewFile = paths.file('previewAi');
     f_all.saveFile (previewFile, sep.saveOpts, false);
     
     //app.activeDocument.close();

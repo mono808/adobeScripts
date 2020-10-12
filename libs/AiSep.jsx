@@ -1,11 +1,11 @@
-$.level = 1;
+﻿$.level = 1;
 
-var AI_base = require('AI_base');
-var monoSpot = require('MonoSpot');
+var aiBase = require('AiBase');
+var MonoSpot = require('MonoSpot');
 var saveOptions = require('saveOptions');
 
-function AI_sep (initDoc) {
-    AI_base.call(this, initDoc);
+function AiSep (initDoc) {
+    aiBase.call(this, initDoc);
     this.saveOpts = new IllustratorSaveOptions();
     with(this.saveOpts) {
         compatibility = Compatibility.ILLUSTRATOR16;
@@ -22,10 +22,10 @@ function AI_sep (initDoc) {
     this.spots = [];
     this.sqpt2sqcm = new UnitValue(1,'pt').as('cm') * new UnitValue(1,'pt').as('cm');
 }
-AI_sep.prototype = Object.create(AI_base.prototype);
-AI_sep.prototype.constructor = AI_sep;
+AiSep.prototype = Object.create(aiBase.prototype);
+AiSep.prototype.constructor = AiSep;
 
-AI_sep.prototype.check = function (items)
+AiSep.prototype.check = function (items)
 {
     //separationReport
     var suspItems = {
@@ -90,7 +90,7 @@ AI_sep.prototype.check = function (items)
     return true;
 };
 
-AI_sep.prototype.get_totalArea = function ()
+AiSep.prototype.get_totalArea = function ()
 {
     //               1                    +
     //   bounds:  0     2     values:  -     +
@@ -121,7 +121,7 @@ AI_sep.prototype.get_totalArea = function ()
     this.totalArea = totalArea * this.sqpt2sqcm;
 };
 
-AI_sep.prototype.sort_by_spotColor = function (pIs)
+AiSep.prototype.sort_by_spotColor = function (pIs)
 {
     var i = pIs.length-1;
     while(i >= 0) {
@@ -171,7 +171,7 @@ AI_sep.prototype.sort_by_spotColor = function (pIs)
     }
 };
 
-AI_sep.prototype.delete_underbase2 = function ()
+AiSep.prototype.delete_underbase2 = function ()
 {
     var doc = this.doc;
     var removeFlag = false;
@@ -188,7 +188,7 @@ AI_sep.prototype.delete_underbase2 = function ()
     }
 };
 
-AI_sep.prototype.get_sep_coordinates = function ()
+AiSep.prototype.get_sep_coordinates = function ()
 {
     var doc = this.doc;
     var abRect = doc.artboards[0].artboardRect;
@@ -212,7 +212,7 @@ AI_sep.prototype.get_sep_coordinates = function ()
     return dist;
 };
 
-AI_sep.prototype.change_fillColor = function (itemsToCheck, oldSpot, newSpot)
+AiSep.prototype.change_fillColor = function (itemsToCheck, oldSpot, newSpot)
 {
     var tempColor = new SpotColor();
     tempColor.spot = newSpot;
@@ -234,7 +234,7 @@ AI_sep.prototype.change_fillColor = function (itemsToCheck, oldSpot, newSpot)
     return remainingItems;
 };
 
-AI_sep.prototype.create_colored_blob = function (spotColor)
+AiSep.prototype.create_colored_blob = function (spotColor)
 {
     app.redraw();
     var tempColor = new SpotColor();
@@ -257,7 +257,7 @@ AI_sep.prototype.create_colored_blob = function (spotColor)
     return blob;
 };
 
-AI_sep.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
+AiSep.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
 {
     var blob = this.create_colored_blob(spotColor);
     var presetStr = txtName ? txtName : 'Farbe X';
@@ -267,7 +267,7 @@ AI_sep.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
     return newName + ' ';
 };
 
-AI_sep.prototype.get_pantone_txt = function (panNr)
+AiSep.prototype.get_pantone_txt = function (panNr)
 {
     var check = panNr.match(/\d{3,4}/);
     if(check.length > 0) {
@@ -296,7 +296,7 @@ AI_sep.prototype.get_pantone_txt = function (panNr)
     }
 };
 
-AI_sep.prototype.add_to_pantone_txt = function (pantoneStr)
+AiSep.prototype.add_to_pantone_txt = function (pantoneStr)
 {
     var append_file = this.pantoneTxt;
     var pS = pantoneStr;
@@ -328,7 +328,7 @@ AI_sep.prototype.add_to_pantone_txt = function (pantoneStr)
     }
 };
 
-AI_sep.prototype.rename_pantone_colors = function ()
+AiSep.prototype.rename_pantone_colors = function ()
 {
     var panSpots = []; //spotcolors with default PANTONE name
 
@@ -360,7 +360,7 @@ AI_sep.prototype.rename_pantone_colors = function ()
     }
 };
 
-AI_sep.prototype.get_wxh = function ()
+AiSep.prototype.get_wxh = function ()
 {
     var doc = app.activeDocument;
     var w = new UnitValue (doc.width, 'pt');
@@ -368,7 +368,7 @@ AI_sep.prototype.get_wxh = function ()
     return w.as('mm').toFixed(0) + 'x' + h.as('mm').toFixed(0);
 };
 
-AI_sep.prototype.get_swatch = function (mySpot)
+AiSep.prototype.get_swatch = function (mySpot)
 {
     for (var i = 0; i < this.doc.swatches.length; i++) {
         var swatch = this.doc.swatches[i];
@@ -378,7 +378,7 @@ AI_sep.prototype.get_swatch = function (mySpot)
     }
 };
 
-AI_sep.prototype.change_spot_to_process_colors2 = function ()
+AiSep.prototype.change_spot_to_process_colors2 = function ()
 {
     for (var i = 0; i < this.spots.length; i++) {
         var monoSpot = this.spots[i];
@@ -409,4 +409,4 @@ AI_sep.prototype.change_spot_to_process_colors2 = function ()
     }
 };
 
-module.exports = AI_sep;
+module.exports = AiSep;
