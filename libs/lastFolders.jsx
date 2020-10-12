@@ -1,4 +1,12 @@
-﻿function get_primary_screen () {
+﻿
+var folders = [];
+var txt = new File('~/Documents/AdobeScripts/lastFolders.txt');
+var csroot = $.getenv("csroot");
+var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
+var screen = get_primary_screen();
+var maxFolder = (screen.bottom - screen.top)/38;
+
+function get_primary_screen () {
     var screens = $.screens;    
     for (var i=0, len=screens.length; i < len ; i++) {
         if(screens[i].primary === true) {
@@ -58,12 +66,15 @@ function set_folder_to_top (idx) {
         var tmp = fds.splice(idx,1);
         fds.unshift(tmp[0]);
     }
-    export_txt();
+    //export_txt();
 }
 
-function export_txt () {
-    var str = folders.toSource();
-    var success = write_file(txt, str);
+function export_txt (txtFile, folders) {
+    var paths = folders.map(function(folder) {
+        return folder.fullName;
+    })
+    var txt = paths.toSource();
+    var success = write_file(txtFile, txt);
     return success;
 }
 
@@ -98,22 +109,20 @@ function get_existing_folders (flds) {
     return existingFlds;
 }
 
-var folders = [];
-var txt = new File('~/Documents/lastFolders.txt');
-var csroot = $.getenv("csroot");
-var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
-var screen = get_primary_screen();
-var maxFolder = (screen.bottom - screen.top)/38;
-
-exports.import_txt = function () {
-    var str = read_file(txt);
-    var ev = eval(str);
+function import_txt (txtFile) {
+    var txt = read_file(txtFile);
+    var ev = eval(txt);
     if(ev instanceof Array && ev.length > 0) {
-        folders = ev;
+        ev = ev.map(function(path) {
+            return new Folder(path);
+        })
+        return ev;
+    } else {
+        return [];
     }
 }
 
-exports.add = function (ref) {
+function add (ref) {
     // get the folder from these possible inputs (file|document|folder)
     var fd = get_folder_from_ref(ref);
     if(!fd) return null;
@@ -138,11 +147,12 @@ exports.add = function (ref) {
     }
 
     // write the new lastFolders to hdd
-    export_txt();
+    export_txt(txt, folders);
 };
 
-exports.show_dialog = function() {
+function show_dialog () {
     var retval;
+    folders = import_txt(txt);
 
     // only show folders that exist on the local setup
     var fds = get_existing_folders(folders);
@@ -279,3 +289,8 @@ exports.show_dialog = function() {
         return null;
     }
 };
+
+// show_dialog();
+
+exports.show_dialog = show_dialog;
+exports.add = add;

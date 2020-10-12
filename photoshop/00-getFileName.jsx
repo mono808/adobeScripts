@@ -1,10 +1,10 @@
-﻿#target photoshop
+﻿//@#target photoshop
 
 function main() {
 
-     
-    #include 'augment_objects.jsx'
-    #include 'BaseDocPS.jsx'
+    //@include 'require.jsx'  
+    //#include 'augment_objects.jsx'
+    var psBase = require('PsBase');//#include 'BaseDocPS.jsx'
     #include 'Job.jsx'
     #include 'JobFolder.jsx'
     #include 'MonoNamer.jsx'

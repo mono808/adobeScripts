@@ -1,4 +1,6 @@
-﻿function AreaDialog (spotChans, totalArea) {
+﻿$.level = 1;
+
+function AreaDialog (spotChans, totalArea) {
     this.vthTab = {
         32 : 0.00721,
         43 : 0.00530,
@@ -185,4 +187,4 @@ AreaDialog.prototype.create_win = function (windowName)
     return win;
 };
 
-exports = modules.exports = AreaDialog;
+module.exports = AreaDialog;

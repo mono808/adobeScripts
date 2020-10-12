@@ -1,14 +1,6 @@
 ﻿#include './InteractSwitch.jsx'
 
 
-if(typeof Object.prototype.create !== 'function') {
-    Object.prototype.create = function(o) {
-        var F = function () {}
-        F.prototype = o;
-        return new F();
-    };
-}
-
 var baseDoc = {
     doc : null
 };

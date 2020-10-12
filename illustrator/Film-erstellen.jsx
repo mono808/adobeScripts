@@ -9,12 +9,12 @@ function main (report)
     var f_all = require ('f_all'); //#include 'f_all.jsx'    
     var job = require('job');//#include 'Job.jsx'
     var paths = require('paths');//#include 'Pathmaker.jsx'
-    var aiSep = require('AiSep');//#include 'SepAI.jsx'
+    var aiSiebdruck = require('AiSiebdruck');//#include 'SepAI.jsx'
     var areaDialog = require('AreaDialog')//#include 'AreaDialog.jsx'
 
     job.set_nfo(null, true, false);
     
-    var sep = new aiSep(app.activeDocument);
+    var sep = new aiSiebdruck(app.activeDocument);
     
     if(!sep.check()) return;
     

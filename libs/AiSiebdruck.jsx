@@ -4,7 +4,7 @@ var aiBase = require('AiBase');
 var MonoSpot = require('MonoSpot');
 var saveOptions = require('saveOptions');
 
-function AiSep (initDoc) {
+function AiSiebdruck (initDoc) {
     aiBase.call(this, initDoc);
     this.saveOpts = new IllustratorSaveOptions();
     with(this.saveOpts) {
@@ -22,10 +22,10 @@ function AiSep (initDoc) {
     this.spots = [];
     this.sqpt2sqcm = new UnitValue(1,'pt').as('cm') * new UnitValue(1,'pt').as('cm');
 }
-AiSep.prototype = Object.create(aiBase.prototype);
-AiSep.prototype.constructor = AiSep;
+AiSiebdruck.prototype = Object.create(aiBase.prototype);
+AiSiebdruck.prototype.constructor = AiSiebdruck;
 
-AiSep.prototype.check = function (items)
+AiSiebdruck.prototype.check = function (items)
 {
     //separationReport
     var suspItems = {
@@ -90,7 +90,7 @@ AiSep.prototype.check = function (items)
     return true;
 };
 
-AiSep.prototype.get_totalArea = function ()
+AiSiebdruck.prototype.get_totalArea = function ()
 {
     //               1                    +
     //   bounds:  0     2     values:  -     +
@@ -121,7 +121,7 @@ AiSep.prototype.get_totalArea = function ()
     this.totalArea = totalArea * this.sqpt2sqcm;
 };
 
-AiSep.prototype.sort_by_spotColor = function (pIs)
+AiSiebdruck.prototype.sort_by_spotColor = function (pIs)
 {
     var i = pIs.length-1;
     while(i >= 0) {
@@ -171,7 +171,7 @@ AiSep.prototype.sort_by_spotColor = function (pIs)
     }
 };
 
-AiSep.prototype.delete_underbase2 = function ()
+AiSiebdruck.prototype.delete_underbase2 = function ()
 {
     var doc = this.doc;
     var removeFlag = false;
@@ -188,7 +188,7 @@ AiSep.prototype.delete_underbase2 = function ()
     }
 };
 
-AiSep.prototype.get_sep_coordinates = function ()
+AiSiebdruck.prototype.get_sep_coordinates = function ()
 {
     var doc = this.doc;
     var abRect = doc.artboards[0].artboardRect;
@@ -212,7 +212,7 @@ AiSep.prototype.get_sep_coordinates = function ()
     return dist;
 };
 
-AiSep.prototype.change_fillColor = function (itemsToCheck, oldSpot, newSpot)
+AiSiebdruck.prototype.change_fillColor = function (itemsToCheck, oldSpot, newSpot)
 {
     var tempColor = new SpotColor();
     tempColor.spot = newSpot;
@@ -234,7 +234,7 @@ AiSep.prototype.change_fillColor = function (itemsToCheck, oldSpot, newSpot)
     return remainingItems;
 };
 
-AiSep.prototype.create_colored_blob = function (spotColor)
+AiSiebdruck.prototype.create_colored_blob = function (spotColor)
 {
     app.redraw();
     var tempColor = new SpotColor();
@@ -257,7 +257,7 @@ AiSep.prototype.create_colored_blob = function (spotColor)
     return blob;
 };
 
-AiSep.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
+AiSiebdruck.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
 {
     var blob = this.create_colored_blob(spotColor);
     var presetStr = txtName ? txtName : 'Farbe X';
@@ -267,7 +267,7 @@ AiSep.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
     return newName + ' ';
 };
 
-AiSep.prototype.get_pantone_txt = function (panNr)
+AiSiebdruck.prototype.get_pantone_txt = function (panNr)
 {
     var check = panNr.match(/\d{3,4}/);
     if(check.length > 0) {
@@ -296,7 +296,7 @@ AiSep.prototype.get_pantone_txt = function (panNr)
     }
 };
 
-AiSep.prototype.add_to_pantone_txt = function (pantoneStr)
+AiSiebdruck.prototype.add_to_pantone_txt = function (pantoneStr)
 {
     var append_file = this.pantoneTxt;
     var pS = pantoneStr;
@@ -328,7 +328,7 @@ AiSep.prototype.add_to_pantone_txt = function (pantoneStr)
     }
 };
 
-AiSep.prototype.rename_pantone_colors = function ()
+AiSiebdruck.prototype.rename_pantone_colors = function ()
 {
     var panSpots = []; //spotcolors with default PANTONE name
 
@@ -360,7 +360,7 @@ AiSep.prototype.rename_pantone_colors = function ()
     }
 };
 
-AiSep.prototype.get_wxh = function ()
+AiSiebdruck.prototype.get_wxh = function ()
 {
     var doc = app.activeDocument;
     var w = new UnitValue (doc.width, 'pt');
@@ -368,7 +368,7 @@ AiSep.prototype.get_wxh = function ()
     return w.as('mm').toFixed(0) + 'x' + h.as('mm').toFixed(0);
 };
 
-AiSep.prototype.get_swatch = function (mySpot)
+AiSiebdruck.prototype.get_swatch = function (mySpot)
 {
     for (var i = 0; i < this.doc.swatches.length; i++) {
         var swatch = this.doc.swatches[i];
@@ -378,7 +378,7 @@ AiSep.prototype.get_swatch = function (mySpot)
     }
 };
 
-AiSep.prototype.change_spot_to_process_colors2 = function ()
+AiSiebdruck.prototype.change_spot_to_process_colors2 = function ()
 {
     for (var i = 0; i < this.spots.length; i++) {
         var monoSpot = this.spots[i];
@@ -409,4 +409,4 @@ AiSep.prototype.change_spot_to_process_colors2 = function ()
     }
 };
 
-module.exports = AiSep;
+module.exports = AiSiebdruck;
