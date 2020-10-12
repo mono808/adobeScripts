@@ -104,9 +104,9 @@ $.level = 2;
             }
 
             var files = [];
-            files.push(current + '/' + id + require._ext);
-            files.push(current + '/' + id + '/index' + require._ext);
-            files.push(require.entry_module_dir + '/' + id + require._ext);
+            //files.push(current + '/' + id + require._ext);
+            //files.push(current + '/' + id + '/index' + require._ext);
+            //files.push(require.entry_module_dir + '/' + id + require._ext);
 
             for (var i = 0; i < require._path.length; i++) {
                 files.push(require._path[i] + '/' + id + require._ext);
