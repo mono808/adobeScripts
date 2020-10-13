@@ -1,6 +1,6 @@
 ﻿var saveOptions = {
 
-    previewPS : function () {
+    previewPs : function () {
             var options = new PhotoshopSaveOptions ();
             options.alphaChannels = false;
             options.spotColors = false;
@@ -9,7 +9,7 @@
             return options;
     },
 
-    backupPS : function () {
+    workingPs : function () {
             var options = new PhotoshopSaveOptions ();
             options.alphaChannels = true;
             options.spotColors = true;
@@ -18,7 +18,7 @@
             return options;
     },
 
-    sepPSPSD : function () {
+    sdPrintPsPsd : function () {
             var options = new PhotoshopSaveOptions ();
             options.alphaChannels = true;
             options.spotColors = true;
@@ -27,7 +27,7 @@
             return options;
     },
 
-    sepPS : function () {
+    sdPrintPsEps : function () {
         var ops = new DCS2_SaveOptions();
         with(ops){
             dCS = DCSType.NOCOMPOSITE;
@@ -44,7 +44,7 @@
         return ops;
     },
             
-    dtgPS : function () {
+    dtgPrintPS : function () {
         var options = new TiffSaveOptions();
         with(options){
             alphaChannels = false;
@@ -59,13 +59,32 @@
 
     // Illustrator
 
-    ai_sep : function () {
+    sdPrintAi : function () {
         var options = new IllustratorSaveOptions();
         with(options) {
             compatibility = Compatibility.ILLUSTRATOR16;
             embedICCProfile = true;
             pdfCompatible = true;
         }            
+        return options;
+    },
+
+    previewAi : function () {
+        var options = new IllustratorSaveOptions();
+        with(options) {
+            compatibility = Compatibility.ILLUSTRATOR16;
+            embedICCProfile = true;
+            pdfCompatible = true;
+        }            
+        return options;
+    },
+
+    workingAi : function () {
+        var options = new IllustratorSaveOptions();
+        with(options) {
+            embedICCProfile = true;
+            pdfCompatible = true;
+        }
         return options;
     },
 

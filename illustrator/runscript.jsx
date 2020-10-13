@@ -274,6 +274,7 @@
                 app.doScript (script);
             break;
         }
+        app.activate();
     } catch (e) {
         alert (e.message + "\r(line " + e.line + ")");
     }

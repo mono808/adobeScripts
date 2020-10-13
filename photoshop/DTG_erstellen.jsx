@@ -1,15 +1,13 @@
-﻿#target photoshop
+﻿//@target photoshop
 function main () {
 
-     
-    #include 'DTGDocPS.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'LastFolders.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'InteractSwitch.jsx'
-    #include 'ButtonList.jsx'
+    //@include 'require.jsx'
+    
+    var PsDtg = require('PsDtg');
+    var job = require('job');
+    var paths = require('paths');
+    var iaSwitch = require('interactionSwitch');
+    
 
     //var job = new Job(app.activeDocument, true);
     var pm = new Pathmaker();
@@ -19,7 +17,7 @@ function main () {
 
     var dtgObj = Object.create(dtgDocPS);
     dtgObj.startDoc = app.activeDocument;
-   
+
     if(dtgObj.check()) {
         dtgObj.make();
     }

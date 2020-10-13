@@ -1,81 +1,13 @@
 $.level = 1;
 
-function AiBase (doc) {
-    this.doc = doc;
-    this.saveOptions = {
-        sep : function () {
-            var options = new IllustratorSaveOptions();
-            with(options) {
-                compatibility = Compatibility.ILLUSTRATOR16;
-                embedICCProfile = true;
-                pdfCompatible = true;
-            }            
-            return options;
-        },
+var Base = require('BaseDoc');
 
-        dtg : function () {
-            var options = new ImageCaptureOptions();
-            with (options) {
-                options.antiAliasing = false;
-                options.transparency = true;
-                options.resolution = 300;
-                return options;
-            }
-        },
-
-        dtg_600 : function () {
-            var options = new ImageCaptureOptions();
-            with (options) {
-                options.antiAliasing = false;
-                options.transparency = true;
-                options.resolution = 600;
-                return options;
-            }
-        },
-
-        flx : function () {
-            var options = new IllustratorSaveOptions();
-            options.compatibility = Compatibility.ILLUSTRATOR16;
-            options.embedICCProfile = true;
-            options.pdfCompatible = true;
-            return options;
-        },
-
-        mockup_pdf : function () {
-            var options = new PDFSaveOptions();
-            options.pDFPreset = 'monosMockUpsSRGB';
-            // options.colorProfileID = ColorProfile.None;
-            // options.colorConversionID = ColorConversion.COLORCONVERSIONTODEST;
-            // options.colorDestinationID = ColorDestination.COLORDESTINATIONPROFILE;
-            // options.compatibility = PDFCompatibility.ACROBAT6;
-            // options.compressArt = true;        
-            // options.monochromeCompression = MonochromeCompression.None;
-            // options.optimization = true;
-            // options.preserveEditability = false;
-            // options.pDFChangesAllowed = PDFChangesAllowedEnum.CHANGE128COMMENTING;
-            return options;
-        },
-
-        dta : function () {
-            var options = new PDFSaveOptions();
-            options.compressArt = false;
-            options.pDFPreset = 'DTA2.2';
-            options.colorProfileID = ColorProfile.INCLUDEALLPROFILE;
-            options.compatibility = PDFCompatibility.ACROBAT5;
-            options.greyscaleCompression = CompressionQuality.ZIP8BIT;
-            options.colorCompression = CompressionQuality.ZIP8BIT;
-            options.monochromeCompression = MonochromeCompression.MONOZIP;
-            return options;
-        },
-
-        pdf : function() {
-            var options = new PDFSaveOptions();
-            options.preserveEditability = true;
-            return options;
-        }
-    }
-
+function AiBase (initDoc) {
+    Base.call(this, initDoc);
 }
+
+AiBase.prototype = Object.create(Base.prototype);
+AiBase.prototype.constructor = AiBase;
 
 AiBase.prototype.recursive_delete_layer = function (ly) {
     ly.locked = false;

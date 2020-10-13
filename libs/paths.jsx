@@ -1,17 +1,5 @@
-﻿function set_nfo (input) {
+﻿function set_paths () {
 
-    if(input.folder && input.folder.constructor.name == 'Folder') {Folder.current = input.folder}
-    for(var p in input) {
-        if(input.hasOwnProperty(p) && input[p]) {
-            nfo[p] = input[p];
-        }
-    }
-
-    set_paths();
-}
-
-function set_paths () {
-    
     varsSet = true;
     var p = paths;
     // Filetags
@@ -20,48 +8,48 @@ function set_paths () {
     } else {
         p.printTag       = nfo.printId + '_' + nfo.tech;
     }
-    
+
     p.docTag          = nfo.jobNr ? nfo.jobNr + '_' + nfo.jobName : Window.prompt('Please enter a descriptive Jobname');
-    
+
     // workingfiles
     p.workingAi         = p.working  + p.printTag + '_Working.ai';
     p.workingPs         = p.working  + p.printTag + '_Working.psd';
+    p.workingEps        = p.working  + p.printTag + '_Working.eps';
+    p.workingTif        = p.working  + p.printTag + '_Working.tif';
     p.backupPs          = p.working  + p.printTag + '_Backup.psd';
     p.backupAi          = p.working  + p.printTag + '_Backup.ai';
     p.previewAi         = p.previews + p.printTag + '_Preview.ai';
     p.previewPs         = p.previews + p.printTag + '_Preview.psd';
+    p.previewEps         = p.previews + p.printTag + '_Preview.eps';
 
     // druckdaten
-    p.sepAi             = p.ddSD  + p.printTag + '_Print.ai';
-    p.sepDCS2           = p.ddSD  + p.printTag + '_Print.eps';
-    p.sepPs             = p.ddSD  + p.printTag + '_Print.eps';
-    p.sepPsEPS          = p.ddSD  + p.printTag + '_Print.eps';
-    p.sepPsPSD          = p.ddSD  + p.printTag + '_Print.psd';
-    p.sd                = p.ddSD  + p.printTag + '_Print.ai';
-    p.dta               = p.ddDTA + p.printTag + '_Print.pdf';
-    p.dtax              = p.ddDTA + p.printTag + '_Print.pdf';
-    p.dtak              = p.ddDTA + p.printTag + '_Print.pdf';
-    p.flx               = p.ddFLX + p.printTag + '_Print.ai';
-    p.flo               = p.ddFLO + p.printTag + '_Print.ai';
-    p.dtg               = p.ddDTG + p.printTag + '_Print.tif';
-    p.stk               = p.ddDTG + p.printTag + '_Print.ai';
+    p.sdPrintAi         = p.ddSD  + p.printTag + '_Print.ai';
+    p.sdPrintEps        = p.ddSD  + p.printTag + '_Print.eps';
+    p.sdPrintPsd        = p.ddSD  + p.printTag + '_Print.psd';
+    p.dtaPrintPdf       = p.ddDTA + p.printTag + '_Print.pdf';
+    p.dtaxPrintPdf      = p.ddDTA + p.printTag + '_Print.pdf';
+    p.dtaoPrintPdf      = p.ddDTA + p.printTag + '_Print.pdf';
+    p.flxPrintAi        = p.ddFLX + p.printTag + '_Print.ai';
+    p.floPrintAi        = p.ddFLO + p.printTag + '_Print.ai';
+    p.dtgPrintTi        = p.ddDTG + p.printTag + '_Print.tif';
+    p.stkPrintAi        = p.ddDTG + p.printTag + '_Print.ai';
 
     // filmdaten
     p.film              = p.ddSD     + p.docTag  + '_' + p.printTag + '_Film.indd';
     p.filmPs            = p.filmIn   + p.docTag  + '_' + p.printTag + '_Film.ps';
     p.filmPdf           = p.filmOut  + p.docTag  + '_' + p.printTag + '_Film.pdf';
-    
+
     // ansicht
     p.mockUpPdf         = p.ansicht     + p.docTag  + '_Ansicht.pdf';
     p.mockUpIndd        = p.ansicht     + p.docTag  + '_Ansicht.indd';
     p.mockUpDist        = p.ansichtIn   + p.docTag  + '_Ansicht.ps';
-    p.mockUpPostDist    = p.ansichtOut  + p.docTag  + '_Ansicht.pdf';            
+    p.mockUpPostDist    = p.ansichtOut  + p.docTag  + '_Ansicht.pdf';
 
     // organisation
     p.filmhuelle        =   p.ddSD + p.docTag + '_Filmhuelle.indd';
 }
 
-function get_path (shortHand) 
+function get_path (shortHand)
 {
     if(!varsSet) set_paths();
     if(paths.hasOwnProperty(shortHand)) {return paths[shortHand];}
@@ -139,8 +127,19 @@ paths.ddSUB           = './Druckdaten-SUB/';
 paths.orga            = './Organisation/';
 paths.working         = './Working/';
 
+function set_nfo (input) {
 
-exports.folder = function (shortHand, nfoInput)
+    if(input.folder && input.folder.constructor.name == 'Folder') {Folder.current = input.folder}
+    for(var p in input) {
+        if(input.hasOwnProperty(p) && input[p]) {
+            nfo[p] = input[p];
+        }
+    }
+
+    set_paths();
+}
+
+function folder (shortHand, nfoInput)
 {
     if(nfoInput) set_nfo(nfoInput);
     var resolved_path = get_path(shortHand);
@@ -148,7 +147,7 @@ exports.folder = function (shortHand, nfoInput)
     else {return null}
 }
 
-exports.file = function (shortHand, nfoInput) 
+function file (shortHand, nfoInput)
 {
     if(nfoInput) set_nfo(nfoInput);
     var resolved_path = get_path(shortHand);
@@ -161,8 +160,13 @@ exports.file = function (shortHand, nfoInput)
     }
 }
 
-exports.path = function (shortHand, nfoInput) 
+function path (shortHand, nfoInput)
 {
     if(nfoInput) set_nfo(nfoInput);
     return get_path(shortHand);
 }
+
+exports.folder = folder;
+exports.path = path;
+exports.file = file;
+exports.set_nfo = set_nfo;
