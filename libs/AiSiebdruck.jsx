@@ -7,9 +7,9 @@ function AiSiebdruck (initDoc) {
     AiBase.call(this, initDoc);
 
     this.spots = [];
-    this.pathItems = this.get_items_on_layer(this.doc.pathItems, 'Motiv');
-    this.rasterItems = this.get_items_on_layer(this.doc.rasterItems, 'Motiv');
-    this.pageItems = this.get_items_on_layer(this.doc.pageItems, 'Motiv');
+    this.pathItems = AiBase.prototype.get_items_on_layer.call(this, this.doc.pathItems, 'Motiv');
+    this.rasterItems = AiBase.prototype.get_items_on_layer.call(this, this.doc.rasterItems, 'Motiv');
+    this.pageItems = AiBase.prototype.get_items_on_layer.call(this, this.doc.pageItems, 'Motiv');
     this.ubRegEx = /^(UB|UL|Unterleger|Vordruck|UB-Grey)$/i;
     this.sqpt2sqcm = new UnitValue(1,'pt').as('cm') * new UnitValue(1,'pt').as('cm');
     
