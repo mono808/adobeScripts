@@ -1,18 +1,10 @@
 ﻿var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
 var pantoneFile = new File(scriptDir + '/pantoneList.txt');
-
-//var pantoneFile = new File('~/Documents/AdobeScripts/pantoneList.txt');
 var pantoneFileLegacy = new File($.getenv('pcroot') + '/adobescripts/pantones.txt');
 
-var pantoneLib = import_pantoneList();
+var pantoneList = import_pantoneList();
 
-// import_pantones(pantoneFile);
-
-// import_old_file(oldFile);
-
-// export_pantone(pantoneFile, pantoneLib);
-
-exports.import_pantoneList_legacy = function () {
+function import_pantoneList_legacy () {
     var pF = pantoneFileLegacy;
     pF.open('r', undefined, undefined);
     pF.encoding = "UTF-8";
@@ -32,11 +24,9 @@ exports.import_pantoneList_legacy = function () {
         if(splitLine[1] === '') continue;
         var nr = splitLine[0];
         var name = splitLine[1];
-        add_pantone_color(nr, name);
+        add_color(nr, name);
     }
 }
-
-
 
 function read_file (aFile) {     
     if(aFile && aFile instanceof File) {
@@ -59,83 +49,57 @@ function write_file (aFile, content) {
     return success;
 }
 
-exports.import_pantoneList = function (aFile) {
+function import_pantoneList (aFile) {
     if (!pantoneFile.exists) return {};
     
     var imported = $.evalFile(pantoneFile);
     if(typeof(imported) !== 'object') return {};
     
     return imported;
-    
-//~     var content = read_file(aFile);
-//~     var ev = eval(content);
-//~     if(!ev.constructor.name =='Object') return {}; 
-//~     pantoneLib = ev;
 }
 
 function export_pantoneList () {
-    var str = pantoneLib.toSource();
+    var str = pantoneList.toSource();
     var result = write_file(pantoneFile, str);
     return result;
 }
 
-function analyze_pantone_string (pantoneString) {
-    pantoneString.replace('PANTONE ', '');
-
-    var nrOnlyRE = /^(\d{3,4})\s(C|U)$/i;
-
-    var match = pantoneString.match(panSpot.name);
-
-    // if the string contains more than numbers, it is already descriptive
-    if(!match) return pantoneString;
-
-    if (match.length == 3) {
-        
-        var userName = this.ask_user_for_new_colorname(panSpot, txtName);
-        userName += match[0];
-        if(!txtName) {
-            this.add_to_pantone_txt(userName)
-        };
-        panSpot.name = userName;
+function prompt_user(pantoneName, color) {
+    var msg = '';
+    if(color) {
+        msg += "Pantone " + pantoneName + " wurde schon benannt: " + color;
+        msg += '\r\rÜberschreiben oder mit Enter bestätigen';
+    } else {
+        msg += 'Farbname für ' + pantoneName + 'angeben:';
     }
 
+    var userInput = Window.prompt (msg , color || '', "mono's Pantone ReNamer");
+    
+    if(!userInput) return null;
+    
+    return String(userInput);
+
 }
-
-exports.get_pantone_color = function (pantoneName)
-{
-    pantoneString.replace('PANTONE ', '');
-
-    var nrOnlyRE = /^(\d{3,4})\s(C|U)$/i;
-
-    var match = pantoneString.match(panSpot.name);
-
-    // if the string contains more than numbers, it is already descriptive
-    if(!match) return pantoneString;
-
-    if (match.length == 3) {
-        
-        var userName = this.ask_user_for_new_colorname(panSpot, txtName);
-        userName += match[0];
-        if(!txtName) {
-            this.add_to_pantone_txt(userName)
-        };
-        panSpot.name = userName;
+function get_color(nr) {
+    if(!nr) return null;
+    if(pantoneList.hasOwnProperty(nr)) {
+        return pantoneList[nr];
     }
-};
-
-function prompt_user(oldName, newNamee) {
-        var msg = "Pantone " + nr + " already named: " + oldName;
-        msg += '\r\rReplace '+ oldName + ' with ' + newName + '?';
-        var replace = Window.confirm(msg,true);
-        if(!replace) return;
+    return null;
 }
+    
 
-function add_pantone_color(nr, newName)
-{
+function add_color(nr, newName, overwrite) {
     if(!nr || !newName) return;
     
-    if(pantoneLib.hasOwnProperty(nr)) {
-        var oldName = pantoneLib[nr];
+    if(overwrite) {
+        pantoneList[nr] = newName;
+        export_pantoneList();
+        return;
+    }
+    
+    if(pantoneList.hasOwnProperty(nr)) {
+        var oldName = pantoneList[nr];
         if(newName == oldName) return;
         
         var msg = "Pantone " + nr + " already named: " + oldName;
@@ -144,7 +108,72 @@ function add_pantone_color(nr, newName)
         if(!replace) return;
     }
 
-    pantoneLib[nr] = newName;
+    pantoneList[nr] = newName;
 
     export_pantoneList();
+}
+
+function create_colored_blob (color) {
+    app.redraw();
+    var doc = app.activeDocument;
+    var tempColor = new SpotColor();
+
+    try {
+        var cP = doc.activeView.centerPoint;
+        var zf = doc.activeView.zoom;
+        var size = 500/zf;
+    } catch (e) {
+        var cP = [0,0];
+        var zf = 1;
+        var size = 500/zf;
+        $.writeln('Illu PARMED, again... =/');
+    }
+    var blob = doc.pathItems.ellipse(cP[1]+size/2,  cP[0]-size/2,  size,  size);
+
+    //tempColor.spot = spotColor;
+    blob.fillColor = color;
+    blob.stroked = false;
+    return blob;
+}
+
+exports.rename_pantone = function (pantoneName, colorValue) {
+
+    if(pantoneName.indexOf('PANTONE ') == -1) return pantoneName;
+
+    var pantoneName = pantoneName.replace('PANTONE ', '');
+    var hasNoColorName = /^(\d{3,4})\s(C|U)$/i;
+    var match = pantoneName.match(hasNoColorName);
+
+    // if the string contains more than numbers, it is already descriptive
+    if(!match)  {
+        $.writeln(pantoneName + ' muss nicht umbenannt werden');
+        return pantoneName;
+    }
+
+    if (match.length == 3) {
+        if(app.name == 'Adobe Illustrator' && colorValue) {
+            var blob = create_colored_blob(colorValue);
+            app.redraw();
+        }
+
+        var nr = match[1];
+        var color = get_color (nr);
+        var userInput = prompt_user(match[0], color);
+
+        if(blob) {
+            blob.remove();
+            app.redraw();
+        }
+
+        if(userInput) {
+            if(color != userInput) {
+                add_color(nr,userInput,true);
+            }
+                
+            return userInput + ' ' + match[0];
+
+        } else {
+            return color + ' ' + match[0];
+        }
+    }
 };

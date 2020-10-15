@@ -1,6 +1,7 @@
 ﻿$.level = 1;
 
 var AiSiebdruck = require('AiSiebdruck');
+var pantoneList = require('pantoneList');
 var MonoSpot = require('MonoSpot');
 var saveOptions = require('saveOptions');
 
@@ -132,128 +133,14 @@ AiSiebdruckPrint.prototype.change_fillColor = function (itemsToCheck, oldSpot, n
     return remainingItems;
 };
 
-AiSiebdruckPrint.prototype.create_colored_blob = function (spotColor)
-{
-    app.redraw();
-    var tempColor = new SpotColor();
-
-    try {
-        var cP = this.doc.activeView.centerPoint;
-        var zf = this.doc.activeView.zoom;
-        var size = 500/zf;
-    } catch (e) {
-        var cP = [0,0];
-        var zf = 1;
-        var size = 500/zf;
-        $.writeln('Illu PARMED, again... =/');
-    }
-    var blob = this.doc.pathItems.ellipse(cP[1]+size/2,  cP[0]-size/2,  size,  size);
-
-    tempColor.spot = spotColor;
-    blob.fillColor = tempColor;
-    blob.stroked = false;
-    return blob;
-};
-
-AiSiebdruckPrint.prototype.ask_user_for_new_colorname = function  (spotColor, txtName)
-{
-    var blob = this.create_colored_blob(spotColor);
-    var presetStr = txtName ? txtName : 'Farbe X';
-    app.redraw();
-    var newName = String (Window.prompt ('Farbname für: ' + spotColor.name , presetStr, "mono's Pantone ReNamer"));
-    blob.remove();
-    return newName + ' ';
-};
-
-AiSiebdruckPrint.prototype.get_pantone_txt = function (panNr)
-{
-    var check = panNr.match(/\d{3,4}/);
-    if(check.length > 0) {
-        var nr = Number(check[0]);
-        var read_file = this.pantoneTxt;
-
-        read_file.open('r', undefined, undefined);
-        read_file.encoding = "UTF-8";
-        read_file.lineFeed = "Windows";
-
-        if (read_file !== '') {
-            var panStr = read_file.read();
-            var splitStr = panStr.split('\n');
-            var panArr = [];
-
-            for(var i=0, maxI = splitStr.length; i < maxI; i+=1) {
-                if(splitStr[i].indexOf('=') > -1) {
-                    var aColorArr = splitStr[i].split('=');
-                    panArr[aColorArr[0]] = aColorArr[1];
-                }
-            }
-
-            read_file.close();
-            return panArr[nr];
-        }
-    }
-};
-
-AiSiebdruckPrint.prototype.add_to_pantone_txt = function (pantoneStr)
-{
-    var append_file = this.pantoneTxt;
-    var pS = pantoneStr;
-    var color = pS.substring(0, pS.indexOf(' '));
-    var nArr = pS.match(/\d{3,4}/);
-    var nr = nArr[nArr.length-1];
-    var appendStr = '\n';
-
-    appendStr += nr;
-    appendStr += '=';
-    appendStr += color;
-
-    var out;
-    if (append_file !== '') {
-        out = append_file.open('a', undefined, undefined);
-        append_file.encoding = "UTF-8";
-        append_file.lineFeed = "Windows";
-    }
-
-    if (out !== false) {
-        if(append_file.write(appendStr)) {
-            $.writeln(color + ' ' + nr + ' added to TXT');
-            return true;
-        } else {
-            $.writeln('Could not add Pantone to TXT');
-            return false;
-        }
-        append_file.close();
-    }
-};
-
 AiSiebdruckPrint.prototype.rename_pantone_colors = function ()
 {
-    var panSpots = []; //spotcolors with default PANTONE name
-
     for (var i = 0, maxI = this.doc.spots.length; i < maxI; i+=1) {
         var spot = this.doc.spots[i];
-        if(spot.name.indexOf('PANTONE') > -1) {
-            spot.name = spot.name.replace('PANTONE ', '');
-            panSpots.push(spot);
-        }
-    }
-
-    var nrOnlyRE = /^\d{3,4}\s(C|U)$/i;
-    // FIXME: if user enters '', no nonbreaking space character is needed
-
-    for (var i = 0, maxI = panSpots.length; i < maxI; i+=1) {
-        var panSpot = panSpots[i];
-        var panNr = nrOnlyRE.exec(panSpot.name);
-
-        // if stripped spotName contains only sth like 574 C, let user name the color
-        if (panNr && panNr.length > 0) {
-            var txtName = this.get_pantone_txt(panNr[0]);
-            var userName = this.ask_user_for_new_colorname(panSpot, txtName);
-            userName += panNr[0];
-            if(!txtName) {
-                this.add_to_pantone_txt(userName)
-            };
-            panSpot.name = userName;
+        var oldSpotName = spot.name;
+        var newSpotName = pantoneList.rename_pantone(oldSpotName,spot.color);
+        if(newSpotName != oldSpotName) {
+            spot.name = newSpotName;
         }
     }
 };
