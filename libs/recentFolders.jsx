@@ -24,7 +24,7 @@ function get_primary_screen () {
 function select_dialog (path) {
     var fd = new Folder(path).selectDlg();
     if(fd.constructor.name == 'Folder') {
-        add(fd);
+        add_to_recentFolders(fd);
     }
     return fd;
 }
@@ -56,7 +56,7 @@ function get_folder_from_ref (ref) {
     return fd;            
 }
 
-function set_folder_to_top (idx) {
+function move_to_top (idx) {
     if(idx >= 0 && idx < lastFolders.length) {
         var tmp = lastFolders.splice(idx,1);
         lastFolders.unshift(tmp[0]);
@@ -86,7 +86,7 @@ function import_recentFolders () {
     }
 }
 
-function add (ref) {
+function add_to_recentFolders(ref) {
     // get the folder from these possible inputs (file|document|folder)
     var fd = get_folder_from_ref(ref);
     if(!fd) return null;
@@ -100,18 +100,16 @@ function add (ref) {
     var index = lastFolders.findIndex(function(lF){return lF.displayName == fd.displayName});
 
     if(index > -1) {                
-        set_folder_to_top(index);
+        move_to_top(index);
     } else {            
         // if not included, add to the front of the array
         lastFolders.unshift(fd);
-        
-        // remove the oldest folder if maximum is reached
-        if(lastFolders.length > maxDialogRowes) {
-            lastFolders.pop();
-        }
+    }
+    
+    if(lastFolders.length > maxDialogRowes) {
+        lastFolders.pop();
     }
 
-    // write the new recentFolders to hdd
     export_recentFolders();
 };
 
@@ -124,36 +122,6 @@ function show_dialog () {
         return subs;
     }
     
-    function update_dropdown(drp, fd) {
-        drp.removeAll();
-        var subFds = get_subfolders (fd);
-        for (var j = 0; j < subFds.length; j++) {
-            drp.add("item",subFds[j].displayName);
-        }
-        drp.selection = 0;
-    }
-
-    function update_group(grpIdx, fd) {
-        if(fd.parent) {
-            fds[grpIdx] = fd;
-            var fdGrp = fdPnl.grps[grpIdx];
-            var upTxt = fdGrp['uptxt'];
-            var upBtn = fdGrp['upbtn'];
-            var btn = fdGrp['btn'];
-            var drp = fdGrp['drp'];
-        
-            upTxt.text = fd.parent.displayName;
-            upBtn.onClick = up_helper(grpIdx,fd.parent);
-        
-            btn.text = fd.displayName;
-            btn.onClick = select_helper(grpIdx);
-            
-            var tmp = drp.onChange;
-            drp.onChange = function () {};
-            update_dropdown(drp, fd);
-            drp.onChange = tmp;
-        }
-    }
     // bounds = [left, top, right, bottom]
     var win = new Window("dialog", "Extracted Infos",undefined, {resizeable:true});
     this.windowRef = win;
@@ -165,41 +133,20 @@ function show_dialog () {
         var grps = fdPnl.grps = [];
 
         var select_helper = function (i) {
-            return function (e) {
+            return function () {
                 retval = fds[i];
                 win.close();
             }
         };
-
-        var up_helper = function (i, fd) {
-            return function (e) {
-                update_group(i, fd);
-            }
-        }
-
-        var down_helper = function (grpIdx) {
-            return function (e) {
-                var drp = grps[grpIdx]['drp'];
-                var subs = get_subfolders(fds[grpIdx]);
-                var item = drp.selection;
-                
-                for (var i = 0; i < subs.length; i++) {
-                    if(subs[i].displayName == item.text) {
-                        update_group(grpIdx, subs[i]);
-                        break;
-                    }
-                }
-            }
-        }
-    
-        var b2bHelper = function (buttonPath) {
-            var path = csroot + buttonPath;
+   
+        var browseHelper = function (path) {
             return function () {
-                retval = Folder(path).selectDlg('Select Job-Folder:');
-                if(retval) {
-                    add(retval);
+                var result = Folder(path).selectDlg('Select Job-Folder:');
+                if(result) {
+                    retval = result;
+                    //add_to_recentFolders(result);
+                    win.close();
                 }
-                win.close();
             }
         }
 
@@ -208,14 +155,10 @@ function show_dialog () {
             var fdGrp = grps[i] = fdPnl.add('group');
             var fd = fds[i];
             
-            var upTxt = fdGrp['uptxt'] = fdGrp.add('statictext {justify:"right"}');
-            upTxt.preferredSize.width = 150;
-            upTxt.text = fd.parent.displayName;
-            upTxt.alignment = 'center';
-
-            var upBtn = fdGrp['upbtn'] = fdGrp.add("button", undefined,'>>');
-            upBtn.preferredSize.width = 40;
-            upBtn.onClick = up_helper(i, fd.parent);
+            var parentTxt = fdGrp['parentTxt'] = fdGrp.add('statictext {justify:"right"}');
+            parentTxt.preferredSize.width = 150;
+            parentTxt.text = fd.parent.displayName;
+            parentTxt.alignment = 'center';
 
             var btn = fdGrp['btn'] = fdGrp.add("button {justify:'left'}");
             // var btn = fdGrp['btn'] = fdGrp.add("button", undefined,fd.displayName);
@@ -224,32 +167,27 @@ function show_dialog () {
             btn.justify ='left';
             btn.onClick = select_helper (i);
             
-            var dnBtn = fdGrp['dnBtn'] = fdGrp.add("button", undefined,'<<');
-            dnBtn.preferredSize.width = 40;
-            dnBtn.onClick = down_helper(i);
-            
-            var drp = fdGrp['drp'] = fdGrp.add("dropdownlist");
-            drp.preferredSize.width = 170;
-            update_dropdown (drp, fd);
-            drp.onChange = down_helper(i);
+            var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Dateibrowser hier');
+            //browseBtn.preferredSize.width = 100;
+            browseBtn.onClick = browseHelper (fd.fullName);
         }
         
         var b2bBtn = manualGrp.add("button", undefined, 'B2B');
         b2bBtn.preferredSize.width = 50;                
-        b2bBtn.onClick = b2bHelper('/kundendaten/b2b');
+        b2bBtn.onClick = browseHelper(csroot + '/kundendaten/b2b');
         
         var b2cBtn = manualGrp.add("button", undefined, 'B2C');
         b2cBtn.preferredSize.width = 50;
-        b2cBtn.onClick = b2bHelper('/kundendaten/b2c');
+        b2cBtn.onClick = browseHelper(csroot + '/kundendaten/b2c');
         
         var angBtn = manualGrp.add("button", undefined, 'ANG');
         angBtn.preferredSize.width = 50;
-        angBtn.onClick = b2bHelper('/angebotedaten');
+        angBtn.onClick = browseHelper(csroot + '/angebotedaten');
         
         var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
         
     if(win.show() != 2 && retval && retval instanceof Folder) {
-        add(retval);
+        add_to_recentFolders(retval);
         return retval;
         
     } else {
