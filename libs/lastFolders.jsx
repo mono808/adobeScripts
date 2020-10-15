@@ -1,6 +1,9 @@
 ﻿
+var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
+var userName = $.getenv('USERNAME').replace('.', '');
+var txt = new File(scriptDir + '/lastFolders_' + userName + '.txt');
+
 var folders = [];
-var txt = new File('~/Documents/AdobeScripts/lastFolders.txt');
 var csroot = $.getenv("csroot");
 var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
 var screen = get_primary_screen();
@@ -99,16 +102,6 @@ function write_file (aFile, str) {
     return success;
 }
 
-function get_existing_folders (flds) {
-    var existingFlds = [];
-    for (var i = 0; i < flds.length; i++) {
-        if(flds[i] instanceof Folder && flds[i].exists) {
-            existingFlds.push(flds[i]);
-        }
-    }
-    return existingFlds;
-}
-
 function import_txt (txtFile) {
     var txt = read_file(txtFile);
     var ev = eval(txt);
@@ -121,6 +114,17 @@ function import_txt (txtFile) {
         return [];
     }
 }
+
+function get_existing_folders (flds) {
+    var existingFlds = [];
+    for (var i = 0; i < flds.length; i++) {
+        if(flds[i] instanceof Folder && flds[i].exists) {
+            existingFlds.push(flds[i]);
+        }
+    }
+    return existingFlds;
+}
+
 
 function add (ref) {
     // get the folder from these possible inputs (file|document|folder)
