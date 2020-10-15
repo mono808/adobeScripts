@@ -93,7 +93,7 @@ function get_ref() {
     }
 
     if (ref) {
-        recentFolders.add(ref);
+        recentFolders.add_to_recentFolders(ref);
         return ref;
     }
 }
