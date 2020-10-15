@@ -1,5 +1,5 @@
 ﻿//@include 'require.jsx'
-
+$.level = 2;
 
 function setup() {
 
@@ -8,7 +8,10 @@ function setup() {
 function main(modjsx) {
     var m = require(modjsx);
 
-    alert(m.show_dialog());
+    var result = m.show_dialog();
+    
+    $.writeln(result);
+    $.writeln(result.constructor.name);
     
 }
 
@@ -16,4 +19,4 @@ function tearDown () {
 
 }
 
-main('lastFolders');
+main('recentFolders');

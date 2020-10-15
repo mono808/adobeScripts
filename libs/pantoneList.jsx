@@ -1,4 +1,6 @@
-﻿var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
+﻿var ioFile = require('ioFile');
+
+var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
 var pantoneFile = new File(scriptDir + '/pantoneList.txt');
 var pantoneFileLegacy = new File($.getenv('pcroot') + '/adobescripts/pantones.txt');
 
@@ -6,14 +8,9 @@ var pantoneList = import_pantoneList();
 
 function import_pantoneList_legacy () {
     var pF = pantoneFileLegacy;
-    pF.open('r', undefined, undefined);
-    pF.encoding = "UTF-8";
-    pF.lineFeed = "Windows";
+    var fileContent = ioFile.read_file(pF);
 
-    if (pF === '') return;
-
-    var panStr = pF.read();
-    var splitStr = panStr.split('\n');
+    var splitStr = fileContent.split('\n');
     var panArr = [];
 
     for(var i=0, maxI = splitStr.length; i < maxI; i+=1) {
@@ -28,31 +25,11 @@ function import_pantoneList_legacy () {
     }
 }
 
-function read_file (aFile) {     
-    if(aFile && aFile instanceof File) {
-        aFile.open('r', undefined, undefined);
-        aFile.encoding = "UTF-8";      
-        aFile.lineFeed = "Windows";
-        var success = aFile.read();
-        aFile.close();
-        return success;
-    }
-}
-
-function write_file (aFile, content) {
-    aFile.close();
-    var out = aFile.open('w', undefined, undefined);            
-    aFile.encoding = "UTF-8";
-    aFile.lineFeed = "Windows";
-    var success = aFile.write(content);
-    aFile.close();
-    return success;
-}
-
 function import_pantoneList (aFile) {
     if (!pantoneFile.exists) return {};
     
-    var imported = $.evalFile(pantoneFile);
+    var fileContent = ioFile.read_file(pantoneFile);
+    var imported = eval(fileContent);//$.evalFile(pantoneFile);
     if(typeof(imported) !== 'object') return {};
     
     return imported;
@@ -60,11 +37,17 @@ function import_pantoneList (aFile) {
 
 function export_pantoneList () {
     var str = pantoneList.toSource();
-    var result = write_file(pantoneFile, str);
+    var result = ioFile.write_file(pantoneFile, str);
     return result;
 }
 
-function prompt_user(pantoneName, color) {
+function prompt_user(pantoneName, color, colorValue) {
+
+    if(app.name == 'Adobe Illustrator' && colorValue) {
+        var blob = create_colored_blob(colorValue);
+        app.redraw();
+    }
+
     var msg = '';
     if(color) {
         msg += "Pantone " + pantoneName + " wurde schon benannt: " + color;
@@ -74,6 +57,11 @@ function prompt_user(pantoneName, color) {
     }
 
     var userInput = Window.prompt (msg , color || '', "mono's Pantone ReNamer");
+
+    if(blob) {
+        blob.remove();
+        app.redraw();
+    }
     
     if(!userInput) return null;
     
@@ -151,19 +139,10 @@ exports.rename_pantone = function (pantoneName, colorValue) {
     }
 
     if (match.length == 3) {
-        if(app.name == 'Adobe Illustrator' && colorValue) {
-            var blob = create_colored_blob(colorValue);
-            app.redraw();
-        }
 
         var nr = match[1];
         var color = get_color (nr);
         var userInput = prompt_user(match[0], color);
-
-        if(blob) {
-            blob.remove();
-            app.redraw();
-        }
 
         if(userInput) {
             if(color != userInput) {

@@ -1,13 +1,16 @@
-﻿
-var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
-var userName = $.getenv('USERNAME').replace('.', '');
-var txt = new File(scriptDir + '/lastFolders_' + userName + '.txt');
+﻿var ioFile = require('ioFile');
+var rE = require('rE');
 
-var folders = [];
-var csroot = $.getenv("csroot");
-var jobRE = new RegExp(/\d{1,5}(wme|wm|ang|cs|a)\d\d-0\d\d/i);
+var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
+var userName = $.getenv('USERNAME').replace('.', '').toLowerCase();
+var recentFoldersFile = new File(scriptDir + '/recentFolders_' + userName + '.txt');
+
+var lastFolders = import_recentFolders(recentFoldersFile);
+lastFolders = lastFolders.filter(function(fld) {return fld.exists});
+
+var csroot = (new Folder($.getenv("csroot"))).fullName;
 var screen = get_primary_screen();
-var maxFolder = (screen.bottom - screen.top)/38;
+var maxDialogRowes = (screen.bottom - screen.top)/38;
 
 function get_primary_screen () {
     var screens = $.screens;    
@@ -27,7 +30,7 @@ function select_dialog (path) {
 }
 
 function get_jobFolder (fld) {
-    if(fld.displayName.match(jobRE)) {
+    if(fld.displayName.match(rE.jobNr)) {
         return fld;
     } else if (fld.parent) {
         return get_jobFolder(fld.parent);
@@ -53,78 +56,35 @@ function get_folder_from_ref (ref) {
     return fd;            
 }
 
-function check_for_inclusion (fd) {
-    for (var i = 0; i < folders.length; i++) {
-        var storedFolder = folders[i];
-        if(encodeURI(fd.displayName) == encodeURI(storedFolder.displayName)) {
-            return i;
-        }
-    }
-    return false;
-}
-
 function set_folder_to_top (idx) {
-    if(idx >= 0 && idx < folders.length) {
-        var fds = folders;
-        var tmp = fds.splice(idx,1);
-        fds.unshift(tmp[0]);
+    if(idx >= 0 && idx < lastFolders.length) {
+        var tmp = lastFolders.splice(idx,1);
+        lastFolders.unshift(tmp[0]);
     }
-    //export_txt();
+    //export_recentFolders();
 }
 
-function export_txt (txtFile, folders) {
-    var paths = folders.map(function(folder) {
-        return folder.fullName;
+function export_recentFolders () {
+    var paths = lastFolders.map(function(fd) {
+        return fd.fullName;
     })
-    var txt = paths.toSource();
-    var success = write_file(txtFile, txt);
+    var str = paths.toSource();
+    var success = ioFile.write_file(recentFoldersFile, str);
     return success;
 }
 
-function read_file (aFile) {     
-    if(aFile && aFile instanceof File) {
-        aFile.open('r', undefined, undefined);
-        aFile.encoding = "UTF-8";      
-        aFile.lineFeed = "Windows";
-        var success = aFile.read();
-        aFile.close();
-        return success;
-    }
-}
-
-function write_file (aFile, str) {
-    aFile.close();
-    var out = aFile.open('w', undefined, undefined);            
-    aFile.encoding = "UTF-8";
-    aFile.lineFeed = "Windows";
-    var success = aFile.write(str);
-    aFile.close();
-    return success;
-}
-
-function import_txt (txtFile) {
-    var txt = read_file(txtFile);
-    var ev = eval(txt);
+function import_recentFolders () {
+    var str = ioFile.read_file(recentFoldersFile);
+    var ev = eval(str);
     if(ev instanceof Array && ev.length > 0) {
         ev = ev.map(function(path) {
-            return new Folder(path);
-        })
+            return new Folder(path)
+        });
         return ev;
     } else {
         return [];
     }
 }
-
-function get_existing_folders (flds) {
-    var existingFlds = [];
-    for (var i = 0; i < flds.length; i++) {
-        if(flds[i] instanceof Folder && flds[i].exists) {
-            existingFlds.push(flds[i]);
-        }
-    }
-    return existingFlds;
-}
-
 
 function add (ref) {
     // get the folder from these possible inputs (file|document|folder)
@@ -137,29 +97,27 @@ function add (ref) {
     fd = jobFolder ? jobFolder : fd;
     
     // check if this folder is already in the lastFolder
-    var idx = check_for_inclusion(fd);
-    if(idx !== false) {                
-        set_folder_to_top(idx);
+    var index = lastFolders.findIndex(function(lF){return lF.displayName == fd.displayName});
+
+    if(index > -1) {                
+        set_folder_to_top(index);
     } else {            
         // if not included, add to the front of the array
-        folders.unshift(fd);
+        lastFolders.unshift(fd);
         
         // remove the oldest folder if maximum is reached
-        if(folders.length > maxFolder) {
-            folders.pop();
+        if(lastFolders.length > maxDialogRowes) {
+            lastFolders.pop();
         }
     }
 
-    // write the new lastFolders to hdd
-    export_txt(txt, folders);
+    // write the new recentFolders to hdd
+    export_recentFolders();
 };
 
 function show_dialog () {
     var retval;
-    folders = import_txt(txt);
-
-    // only show folders that exist on the local setup
-    var fds = get_existing_folders(folders);
+    var fds = lastFolders;
     
     function get_subfolders (fd) {
         var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
@@ -196,8 +154,8 @@ function show_dialog () {
             drp.onChange = tmp;
         }
     }
-
-    var win = new Window("dialog", "Extracted Infos",undefined, {resizeable:true});  // bounds = [left, top, right, bottom]
+    // bounds = [left, top, right, bottom]
+    var win = new Window("dialog", "Extracted Infos",undefined, {resizeable:true});
     this.windowRef = win;
 
         var manualGrp = win[manualGrp] = win.add("group", undefined);
@@ -233,8 +191,19 @@ function show_dialog () {
                 }
             }
         }
+    
+        var b2bHelper = function (buttonPath) {
+            var path = csroot + buttonPath;
+            return function () {
+                retval = Folder(path).selectDlg('Select Job-Folder:');
+                if(retval) {
+                    add(retval);
+                }
+                win.close();
+            }
+        }
 
-        var maxLength = fds.length < maxFolder ? fds.length : maxFolder;
+        var maxLength = fds.length < maxDialogRowes ? fds.length : maxDialogRowes;
         for (var i = 0; i < maxLength; i++) {
             var fdGrp = grps[i] = fdPnl.add('group');
             var fd = fds[i];
@@ -267,22 +236,16 @@ function show_dialog () {
         
         var b2bBtn = manualGrp.add("button", undefined, 'B2B');
         b2bBtn.preferredSize.width = 50;                
-        b2bBtn.onClick = function () {                    
-            retval = Folder(csroot + '/kundendaten/b2b').selectDlg('Select Job-Folder:');
-            win.close();
-        }
+        b2bBtn.onClick = b2bHelper('/kundendaten/b2b');
+        
         var b2cBtn = manualGrp.add("button", undefined, 'B2C');
         b2cBtn.preferredSize.width = 50;
-        b2cBtn.onClick = function () {                    
-            retval = Folder(csroot + '/kundendaten/b2c').selectDlg('Select Job-Folder:');
-            win.close();
-        }
+        b2cBtn.onClick = b2bHelper('/kundendaten/b2c');
+        
         var angBtn = manualGrp.add("button", undefined, 'ANG');
         angBtn.preferredSize.width = 50;
-        angBtn.onClick = function () {
-            retval = Folder(csroot + '/angebotedaten').selectDlg('Select Job-Folder:');
-            win.close();
-        }
+        angBtn.onClick = b2bHelper('/angebotedaten');
+        
         var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
         
     if(win.show() != 2 && retval && retval instanceof Folder) {
@@ -294,7 +257,7 @@ function show_dialog () {
     }
 };
 
-// show_dialog();
+//~ show_dialog();
 
 exports.show_dialog = show_dialog;
 exports.add = add;

@@ -88,9 +88,9 @@ PsDtg.prototype.make = function (saveFile, saveOpts) {
         var saveFile = new File(saveFolder + '/' + saveName);        
         
     } catch (e) {
-        var lastFolders = new LastFolders();
-        lastFolders.import_txt();
-        var saveFolder = lastFolders.show_dialog();
+        var recentFolders = new recentFolders();
+        recentFolders.import_txt();
+        var saveFolder = recentFolders.show_dialog();
         var saveFile = new File(saveFolder + '/Druckdaten-DTG/' + this.sourceDoc.name).saveDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');
         //saveFile = saveFile.saveDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');        
     }

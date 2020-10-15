@@ -2,7 +2,7 @@
 
 var f_all = require('f_all');
 var rE = require('rE');
-var lastFolders = require('lastFolders');
+var recentFolders = require('recentFolders');
 var names = require('names');
 
 var nfo = {};
@@ -82,9 +82,9 @@ function get_ref() {
         }
     }
 
-    // if no reference is found, try the lastFolders
+    // if no reference is found, try the recentFolders
     if (!ref) {
-        ref = lastFolders.show_dialog();
+        ref = recentFolders.show_dialog();
     }
 
     // try the old saveDialog if still no ref path
@@ -93,7 +93,7 @@ function get_ref() {
     }
 
     if (ref) {
-        lastFolders.add(ref);
+        recentFolders.add(ref);
         return ref;
     }
 }
