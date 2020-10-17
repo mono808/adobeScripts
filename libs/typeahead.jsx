@@ -1,12 +1,4 @@
-﻿function create_names_array (array, propertyToList) {            
-    var names = [];
-    for(var i = 0; i < array.length; i++) {
-        names.push(array[i][propertyToList]);
-    }
-    return names;
-}
-
-function get_member (haystack, needle, propertyToCheck) {
+﻿function get_member (haystack, needle, propertyToCheck) {
     for (var i = 0; i < haystack.length; i++) {
         var val = propertyToCheck ? haystack[i][propertyToCheck] : haystack[i];                   
         if( val == needle) {
@@ -16,9 +8,9 @@ function get_member (haystack, needle, propertyToCheck) {
     return null;
 }
 
-exports.show_dialog = function (array, propertyToList) {
+exports.show_dialog = function (array, propertyToList, multiselect) {
     if(propertyToList) {
-        var names = create_names_array(array, propertyToList);
+        var names = array.map(function(elem) {return elem[propertyToList]})
     } else {
         var names = array;
     }
@@ -28,7 +20,7 @@ exports.show_dialog = function (array, propertyToList) {
     var w = new Window ('dialog {text: "Quick select", alignChildren: "fill"}');
     var entry = w.add ('edittext {active: true}');
     var dummy = w.add ('panel {alignChildren: "fill"}');
-    var list = dummy.add ('listbox', [0,0,250,250], names, {multiselect: true});
+    var list = dummy.add ('listbox', [0,0,250,250], names, {multiselect: multiselect});
     entry.onChanging = function ()
     {
         keyCount++;
