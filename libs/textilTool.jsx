@@ -177,11 +177,11 @@ function toggle_graphicLayers (myImage, visibleLayerNames) {
         if(visibleLayerNames.includes(gL.name)) {
             if(gL.currentVisibility) continue;
             gL.currentVisibility = true;
-            gLO = rect.graphics.item(0).graphicLayerOptions;
+            if(!gLO.isValid) gLO = rect.graphics.item(0).graphicLayerOptions;
         } else {
             if(!gL.currentVisibility) continue;
             gL.currentVisibility = false;
-            gLO = rect.graphics.item(0).graphicLayerOptions;
+            if(!gLO.isValid) gLO = rect.graphics.item(0).graphicLayerOptions;
         }
     }
 }

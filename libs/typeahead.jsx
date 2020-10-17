@@ -1,14 +1,4 @@
-﻿function get_member (haystack, needle, propertyToCheck) {
-    for (var i = 0; i < haystack.length; i++) {
-        var val = propertyToCheck ? haystack[i][propertyToCheck] : haystack[i];                   
-        if( val == needle) {
-            return haystack[i];
-        }
-    }
-    return null;
-}
-
-exports.show_dialog = function (array, propertyToList, multiselect) {
+﻿exports.show_dialog = function (array, propertyToList, multiselect) {
     if(propertyToList) {
         var names = array.map(function(elem) {return elem[propertyToList]})
     } else {
@@ -55,10 +45,16 @@ exports.show_dialog = function (array, propertyToList, multiselect) {
         if(!propertyToList) return selected;
 
         // if not simply returning the selected text, get the corresponding object
-        var returnArray = [];               
-        for (var i = 0; i < selected.length; i++) {
-            returnArray.push(get_member(array, selected[i], propertyToList));
+        var returnArray = [];
+        var isSelected = function(elem) {
+            return elem[propertyToList] = selected[i];
         }
+        returnArray = selected.map(function(elem){
+            return array.find(function (item){
+                return (item[propertyToList] === elem);
+            })
+        })
+
         return returnArray;
     }
     w.close();
