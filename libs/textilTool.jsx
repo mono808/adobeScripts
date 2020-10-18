@@ -8,11 +8,6 @@ var ignoreThoseFiles = /\.bridge/i;
 var fixedLayerNames = ["Shirt","Naht","Tasche","Beutel","Hintergrund"];
 var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
 
-var doc = app.activeDocument;
-var texLayer = doc.layers.item('Textils');
-texLayer = texLayer.isValid ? texLayer : doc.activeLayer;
-var texFiles;
-
 function find_files (dir, filter) {
     return find_files_sub (dir, [], filter);
 }
@@ -53,6 +48,10 @@ function place_image (parent, image, layer) {
 }
 
 function add_textiles(staySelected) {
+
+    var doc = app.activeDocument;
+    var texLayer = doc.layers.item('Textils');
+    texLayer = texLayer.isValid ? texLayer : doc.activeLayer;
 
     var placedItems = [];
     var placedItem;

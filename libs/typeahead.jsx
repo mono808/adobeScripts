@@ -1,13 +1,29 @@
-﻿exports.show_dialog = function (array, propertyToList, multiselect) {
+﻿function arrayify (inputElements) {
+    var arr = [];
+    for (var i=0, len=inputElements.length; i < len ; i++) {
+        arr.push(inputElements[i]);
+    };
+    return arr;
+}
+
+exports.show_dialog = function (inputElements, propertyToList, multiselect, dialogTitle) {
+    
+    var names;
     if(propertyToList) {
-        var names = array.map(function(elem) {return elem[propertyToList]})
+        if(inputElements.constructor.name != 'Array') 
+            inputElements = arrayify(inputElements);
+
+        names = inputElements.map(function(elem) {return elem[propertyToList]});
+
     } else {
-        var names = array;
+        names = inputElements;
     }
+
     var selected = [];
     var temp;
     var keyCount = 0;
-    var w = new Window ('dialog {text: "Quick select", alignChildren: "fill"}');
+    var dialogTitle = dialogTitle || 'Quick select';
+    var w = new Window ('dialog {text: dialogTitle, alignChildren: "fill"}');
     var entry = w.add ('edittext {active: true}');
     var dummy = w.add ('panel {alignChildren: "fill"}');
     var list = dummy.add ('listbox', [0,0,250,250], names, {multiselect: multiselect});
@@ -50,7 +66,7 @@
             return elem[propertyToList] = selected[i];
         }
         returnArray = selected.map(function(elem){
-            return array.find(function (item){
+            return inputElements.find(function (item){
                 return (item[propertyToList] === elem);
             })
         })
