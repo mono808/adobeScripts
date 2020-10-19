@@ -236,13 +236,13 @@
     }
 
     if(result.opts.printMock) {
-        var mockPrintPreset = app.printerPresets.item('printMockup');
-        print_docs(result.files, mockPrintPreset);
+        var printPreset = app.printerPresets.item('printMockup');
+        print_docs(result.files, printPreset);
     }
 
     if (result.opts.printFH) {
-        var fhPrintPreset = app.printerPresets.item('filmhuelle');    
-        print_docs(filmhuelle);
+        var printPreset = app.printerPresets.item('filmhuelle');    
+        print_docs(filmhuelle, printPreset);
     }
 
     if (result.opts.printFilme) {
