@@ -498,20 +498,6 @@ MonoMockup.prototype.get_all_monoGraphics = function ()
     return monoGraphics;
 };
 
-MonoMockup.prototype.save = function (saveFile) {
-    if(app.activeDocument.saved === false) {
-        if(saveFile.exists) {
-            var msg = 'Ansicht ' + saveFile.displayName + ' existiert, bitte neuen Dateinamen angegeben\r';
-            msg += 'oder Enter zum überschreiben)';
-            var newName = Window.prompt(msg, saveFile.displayName);
-            var newFile = new File(saveFile.parent.fullName + '/' + newName);
-            f_all.saveFile(newFile, undefined, false);
-        } else {
-            f_all.saveFile(saveFile, undefined, false);
-        }
-    }
-};
-
 MonoMockup.prototype.create_ui = function (rowObjs, job)
 {
     var dialogName = "WaWi Infos nachtragen zu ->  ";

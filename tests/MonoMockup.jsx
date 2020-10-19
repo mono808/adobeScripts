@@ -5,25 +5,22 @@
 function setup() {
     app.documents.everyItem().close(SaveOptions.NO);
 //~     var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
-//~     var inputFile = new File(scriptDir + '/input/mockup.indd');
 //~     app.open(inputFile);
+//~     var inputFile = new File(scriptDir + '/input/mockup.indd');
 }
 
 function main(modjsx) {
 
     var f_all = require('f_all');
-    var saveOptions = require('saveOptions');
+    
     var job = require('job');
     var jobFolder = require('jobFolder');
     var paths = require('paths');
     var names = require('names');
-    var jobFolder = require('jobFolder');
-    var MonoMockup = require('MonoMockup');
-    var texTool = require('textilTool');
     
+    var MonoMockup = require('MonoMockup');
     var MonoPrint = require('MonoPrint');
-    var MonoFilm = require('MonoFilm');
-    var MonoSep = require('MonoSep');
+    var saveOptions = require('saveOptions');
 
     job.set_nfo(null,false);
     if(!job.nfo) return;
@@ -46,7 +43,6 @@ function main(modjsx) {
     mockup.show_shop_logo(job.nfo.shop);
     mockup.fill_job_infos(job.nfo);
 
-//  var mockup = new MonoMockup(app.activeDocument);
     jobFolder.set_folder(job.nfo.folder);
     var monoPrints = jobFolder.get_prints();
 

@@ -1,10 +1,10 @@
 ﻿//@target indesign
+//@include 'require.jsx'
 
-function main () {
+(function () {
     
-    //@include 'require.jsx'
-
     var f_all = require('f_all');
+    
     var job = require('job');
     var jobFolder = require('jobFolder');
     var paths = require('paths');
@@ -12,14 +12,11 @@ function main () {
     
     var MonoMockup = require('MonoMockup');
     var MonoPrint = require('MonoPrint');
-    var MonoFilm = require('MonoFilm');
-    var MonoSep = require('MonoSep');
-    var texTool = require('textilTool');
     var saveOptions = require('saveOptions');
 
-    var job = new Job(null,false);
+    job.set_nfo(null,false);
     if(!job.nfo) return;
-    var pm = new Pathmaker(job.nfo);
+    paths.set_nfo(job.nfo);
     
     try{
         app.applyWorkspace('Ansichten');
@@ -33,18 +30,16 @@ function main () {
     mockup.init();
     mockup.import_pages();
 
-    mockup.save();
+    mockup.save_doc(paths.file('mockUpIndd'));
 
     mockup.show_shop_logo(job.nfo.shop);
     mockup.fill_job_infos(job.nfo);
 
+    jobFolder.set_folder(job.nfo.folder);
     var monoPrints = jobFolder.get_prints();
 
     mockup.place_prints_on_page (monoPrints);
 
     mockup.add_preview_page();
     
-    //mockup.save();
-};
-
-main();
+})();
