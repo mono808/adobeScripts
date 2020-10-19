@@ -39,7 +39,7 @@ PasserFab.prototype.create_centerMark = function (xy, name)
         y = xy[1],
         noC = this.noColor,
         regC = this.regColor;
-      
+
     // create Kreuz
 
     var circle =    this.page.ovals.add(this.regLayer, undefined, undefined,        {strokeWeight:pS.stroke2, fillColor:noC, strokeColor:regC, geometricBounds: [y-pS.circle/2, x-pS.circle/2, y+pS.circle/2, x+pS.circle/2]});
@@ -51,7 +51,7 @@ PasserFab.prototype.create_centerMark = function (xy, name)
     pGroup.push(circle,gLH,gLHhair,gLV,gLVhair);
     centerMark = this.page.groups.add(pGroup);
     centerMark.name = name;
-   
+
     this.doc.activeLayer = oldActiveLayer;
     return centerMark;
 };
@@ -85,7 +85,7 @@ PasserFab.prototype.create_regMark = function (xy)
 
     var vBounds = [y-pS.cross, x-pS.stroke/2, y+pS.cross, x+pS.stroke/2];
     var hBounds = [y-pS.stroke/2, x-pS.cross, y+pS.stroke/2, x+pS.cross];
-     
+
     // create Kreuz
     var vRec = this.page.rectangles.add({itemLayer: this.regLayer, fillColor:regC, strokeColor:noC, geometricBounds: vBounds });
     var hRec = this.page.rectangles.add({itemLayer: this.regLayer, fillColor:regC, strokeColor:noC, geometricBounds: hBounds });

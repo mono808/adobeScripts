@@ -5,6 +5,14 @@ function makeCommand (string) {
     return cmd;
 }
 
+function reflect_props (obj) {
+    var props = obj.reflect.properties;
+    props.sort(function(a,b) {return a.name < b.name});
+    props.forEach(function(p) {
+        $.writeln(p.name)
+        });
+}
+
 function saveBAT (saveThis) {
     try {
         var pathToClipboardDoc = "~/Documents/copyToClipboard.bat";
