@@ -10,7 +10,8 @@ lastFolders = lastFolders.filter(function(fld) {return fld.exists});
 
 var csroot = (new Folder($.getenv("csroot"))).fullName;
 var screen = get_primary_screen();
-var maxDialogRowes = (screen.bottom - screen.top)/38;
+var maxDialogRowes = (screen.bottom - screen.top)/40;
+var maxRecentFolders = 200;
 
 function get_primary_screen () {
     var screens = $.screens;    
@@ -61,7 +62,6 @@ function move_to_top (idx) {
         var tmp = lastFolders.splice(idx,1);
         lastFolders.unshift(tmp[0]);
     }
-    //export_recentFolders();
 }
 
 function export_recentFolders () {
@@ -87,6 +87,7 @@ function import_recentFolders () {
 }
 
 function add_to_recentFolders(ref) {
+    
     // get the folder from these possible inputs (file|document|folder)
     var fd = get_folder_from_ref(ref);
     if(!fd) return null;
@@ -106,7 +107,7 @@ function add_to_recentFolders(ref) {
         lastFolders.unshift(fd);
     }
     
-    if(lastFolders.length > maxDialogRowes) {
+    if(lastFolders.length > maxRecentFolders) {
         lastFolders.pop();
     }
 
@@ -123,7 +124,7 @@ function show_dialog () {
     }
     
     // bounds = [left, top, right, bottom]
-    var win = new Window("dialog", "Extracted Infos",undefined, {resizeable:true});
+    var win = new Window("dialog", "Extracted Infos",undefined, {resizeable:true, scrollable:true});
     this.windowRef = win;
 
         var manualGrp = win[manualGrp] = win.add("group", undefined);
@@ -144,7 +145,6 @@ function show_dialog () {
                 var result = Folder(path).selectDlg('Select Job-Folder:');
                 if(result) {
                     retval = result;
-                    //add_to_recentFolders(result);
                     win.close();
                 }
             }
@@ -161,14 +161,12 @@ function show_dialog () {
             parentTxt.alignment = 'center';
 
             var btn = fdGrp['btn'] = fdGrp.add("button {justify:'left'}");
-            // var btn = fdGrp['btn'] = fdGrp.add("button", undefined,fd.displayName);
             btn.preferredSize.width = 400;
             btn.text = fd.displayName;
             btn.justify ='left';
             btn.onClick = select_helper (i);
             
             var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Dateibrowser hier');
-            //browseBtn.preferredSize.width = 100;
             browseBtn.onClick = browseHelper (fd.fullName);
         }
         

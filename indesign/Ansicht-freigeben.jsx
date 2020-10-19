@@ -1,26 +1,12 @@
-﻿#target indesign
-
+﻿//@target indesign
+//@include 'require.jsx'
 
 
 (function () {
 
-    #include 'augment_objects.jsx'
-    #include 'Job.jsx'
-    #include 'f_all.jsx'
-    #include 'f_id.jsx'
-    #include 'JobFolder.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'MonoGraphic.jsx'
-    #include 'MonoPrint.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'MonoTable.jsx'
-    #include 'MonoFilm.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
-    #include 'InteractSwitch.jsx'
-    #include 'save_Options.jsx'
+    ///////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////
+    // FUNCTIONS
 
     var select_docs = function (arrayOfFiles) {
         var result = {
@@ -88,7 +74,7 @@
         w.show ();
 
         return result;
-    }
+    };
 
     var print_docs = function (myFiles, printPreset) {
         for(var i = 0; i < myFiles.length; i++ ) {
@@ -97,7 +83,7 @@
             doc.print(false, printPreset);
             doc.close(SaveOptions.NO);
         }
-    }
+    };
 
     var generate_wawi_strings = function (rowContent) {
         var resStrings = [];
@@ -124,7 +110,7 @@
         rowStrings.wawi = wawiString;
 
         return rowStrings;
-    }
+    };
 
     var show_wawi_string_dialog = function (rowContents, job, copyToClipboard) {
         var result = null;
@@ -148,7 +134,7 @@
                 aPnl.wawiGroup.wawiText.preferredSize = [500, 25];
                 aPnl.wawiGroup.copyButton = aPnl.wawiGroup.add('button', undefined, 'copy to clipboard');
                 aPnl.wawiGroup.copyButton.onClick = function () {
-                        copyToClipboard.copy(this.parent.wawiText.text);
+                        copyToClipboard(this.parent.wawiText.text);
                     }
             }
         
@@ -157,21 +143,31 @@
 
 
         win.show();
-    }
+    };
     
-    ///////////////////////////////////////////////////////////////////   
+    ///////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////
     // START SCRIPT
-    ///////////////////////////////////////////////////////////////////   
-    ///////////////////////////////////////////////////////////////////
 
-    var job = new Job(null,false);
+
+    var job = require('job');
+    var jobFolder = require('jobFolder');
+    var paths = require('paths');
+    var f_all = require('f_all');
+    var f_id = require('f_id');
+
+    var MonoMockup = require('MonoMockup');
+    var MonoTable = require('MonoTable');
+    var MonoFilm = require('MonoFilm');
+
+    var interactSwitch = require('InteractionSwitch');
+
+    job.set_nfo(null,false);
     if(!job.nfo.folder) return;
-    var pm = new Pathmaker(job.nfo);
-    var jobFolder = new JobFolder(job.nfo.folder);
+    paths.set_nfo(job.nfo);
+    jobFolder.set_folder(job.nfo.folder);
 
-    var iASwitch = new InteractSwitch();
-    iASwitch.set('all');
+    interactSwitch.set('all');
 
     var ansichten = jobFolder.get_mockups();
     var filmhuelle = jobFolder.get_filmhuelle();
@@ -184,7 +180,6 @@
     var errors = [];
     var rowContents = [];
     
-    // loop through all files
     for (var i = 0; i < result.files.length; i++) {
         var myFile = result.files[i];
         var monoMockup = new MonoMockup(app.open(myFile,true));
@@ -257,7 +252,7 @@
         }
     }
 
-    iASwitch.set('all');
+    interactSwitch.set('all');
     
     if(rowContents.length > 0) {
         show_wawi_string_dialog(rowContents, job, f_all.copyToClipboard);
