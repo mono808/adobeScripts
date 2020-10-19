@@ -1,7 +1,9 @@
 *.swp
+libs/*.txt
+*~
 /pantones.txt
 samplescripts/**
 launch.json
 runscript.txt
-*~
 tests/output/**
+libs/recentFolders_januntiedt.txt
