@@ -1,4 +1,5 @@
 ﻿var names = require('names');
+var MonoSep = require('MonoSep');
 
 function MonoFilm (initObj, hidden)
 {

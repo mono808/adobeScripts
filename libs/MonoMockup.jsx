@@ -5,6 +5,7 @@ var IdBase = require('IdBase');
 var names = require('names');
 var csroot = Folder($.getenv("csroot"));
 var MonoGraphic = require('MonoGraphic');
+var MonoFilm = require('MonoFilm');
 
 function MonoMockup (initDoc) 
 {

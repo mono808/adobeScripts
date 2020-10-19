@@ -41,7 +41,6 @@ function main(modjsx) {
     mockup.init();
     mockup.import_pages();
 
-
     mockup.save_doc(paths.file('mockUpIndd'));
 
     mockup.show_shop_logo(job.nfo.shop);
