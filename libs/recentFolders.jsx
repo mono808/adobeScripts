@@ -114,31 +114,33 @@ function add_to_recentFolders(ref) {
     export_recentFolders();
 };
 
-function get_subfolders (fd) {
-    var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
-    return subs;
-}
 
-function select_helper (i) {
-    return function () {
-        retval = fds[i];
-        win.close();
+
+function show_dialog () {
+    
+    function get_subfolders (fd) {
+        var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
+        return subs;
     }
-}
 
-function browseHelper (path) {
-    return function () {
-        var result = Folder(path).selectDlg('Select Job-Folder:');
-        if(result) {
-            retval = result;
+    function select_helper (i) {
+        return function () {
+            retval = lastFolders[i];
             win.close();
         }
     }
-}
 
-function show_dialog () {
+    function browse_Helper (path) {
+        return function () {
+            var result = Folder(path).selectDlg('Select Job-Folder:');
+            if(result) {
+                retval = result;
+                win.close();
+            }
+        }
+    }
+
     var retval;
-    var fds = lastFolders;  
     
     // bounds = [left, top, right, bottom]
     var win = new Window("dialog", "Extracted Infos",undefined);
@@ -152,28 +154,26 @@ function show_dialog () {
     var fdG = p.add("group");
     fdG.orientation = "column";
     fdG.alignment = "left";
-    fdG.maximumSize.height = fds.length*50;
-
+    fdG.maximumSize.height = lastFolders.length*50;
 
     var b2bBtn = manualGrp.add("button", undefined, 'B2B');
     b2bBtn.preferredSize.width = 50;                
-    b2bBtn.onClick = browseHelper(csroot + '/kundendaten/b2b');
+    b2bBtn.onClick = browse_Helper(csroot + '/kundendaten/b2b');
     
     var b2cBtn = manualGrp.add("button", undefined, 'B2C');
     b2cBtn.preferredSize.width = 50;
-    b2cBtn.onClick = browseHelper(csroot + '/kundendaten/b2c');
+    b2cBtn.onClick = browse_Helper(csroot + '/kundendaten/b2c');
     
     var angBtn = manualGrp.add("button", undefined, 'ANG');
     angBtn.preferredSize.width = 50;
-    angBtn.onClick = browseHelper(csroot + '/angebotedaten');
+    angBtn.onClick = browse_Helper(csroot + '/angebotedaten');
     
     var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
 
-
-    var maxLength = fds.length < maxDialogRowes ? fds.length : maxDialogRowes;
+    var maxLength = lastFolders.length < maxDialogRowes ? lastFolders.length : maxDialogRowes;
     for (var i = 0; i < maxLength; i++) {
         var fdGrp = fdG.add('group');
-        var fd = fds[i];
+        var fd = lastFolders[i];
         
         var parentTxt = fdGrp['parentTxt'] = fdGrp.add('statictext {justify:"right"}');
         parentTxt.preferredSize.width = 150;
@@ -187,7 +187,7 @@ function show_dialog () {
         btn.onClick = select_helper (i);
         
         var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Dateibrowser hier');
-        browseBtn.onClick = browseHelper (fd.fullName);
+        browseBtn.onClick = browse_Helper (fd.fullName);
     }
 
     var scrollBar = p.add("scrollbar");
