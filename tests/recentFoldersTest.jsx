@@ -11,7 +11,7 @@ function main(modjsx) {
     var result = m.show_dialog();
     
     $.writeln(result);
-    $.writeln(result.constructor.name);
+    //$.writeln(result.constructor.name);
     
 }
 

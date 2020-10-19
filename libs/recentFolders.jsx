@@ -10,7 +10,7 @@ lastFolders = lastFolders.filter(function(fld) {return fld.exists});
 
 var csroot = (new Folder($.getenv("csroot"))).fullName;
 var screen = get_primary_screen();
-var maxDialogRowes = (screen.bottom - screen.top)/40;
+var maxDialogRowes = 100;
 var maxRecentFolders = 200;
 
 function get_primary_screen () {
@@ -114,75 +114,96 @@ function add_to_recentFolders(ref) {
     export_recentFolders();
 };
 
+function get_subfolders (fd) {
+    var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
+    return subs;
+}
+
+function select_helper (i) {
+    return function () {
+        retval = fds[i];
+        win.close();
+    }
+}
+
+function browseHelper (path) {
+    return function () {
+        var result = Folder(path).selectDlg('Select Job-Folder:');
+        if(result) {
+            retval = result;
+            win.close();
+        }
+    }
+}
+
 function show_dialog () {
     var retval;
-    var fds = lastFolders;
-    
-    function get_subfolders (fd) {
-        var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
-        return subs;
-    }
+    var fds = lastFolders;  
     
     // bounds = [left, top, right, bottom]
-    var win = new Window("dialog", "Extracted Infos",undefined, {resizeable:true, scrollable:true});
+    var win = new Window("dialog", "Extracted Infos",undefined);
     this.windowRef = win;
 
-        var manualGrp = win[manualGrp] = win.add("group", undefined);
-        var fdPnl = win[fdPnl] = win.add("panel", undefined);
-        
-        fdPnl.alignChildren = 'left';
-        var grps = fdPnl.grps = [];
+    var manualGrp = win[manualGrp] = win.add("group", undefined);
+    
+    var p = win.add("panel" , undefined);
+    p.size = [750,800];
 
-        var select_helper = function (i) {
-            return function () {
-                retval = fds[i];
-                win.close();
-            }
-        };
-   
-        var browseHelper = function (path) {
-            return function () {
-                var result = Folder(path).selectDlg('Select Job-Folder:');
-                if(result) {
-                    retval = result;
-                    win.close();
-                }
-            }
-        }
+    var fdG = p.add("group");
+    fdG.orientation = "column";
+    fdG.alignment = "left";
+    fdG.maximumSize.height = fds.length*50;
 
-        var maxLength = fds.length < maxDialogRowes ? fds.length : maxDialogRowes;
-        for (var i = 0; i < maxLength; i++) {
-            var fdGrp = grps[i] = fdPnl.add('group');
-            var fd = fds[i];
-            
-            var parentTxt = fdGrp['parentTxt'] = fdGrp.add('statictext {justify:"right"}');
-            parentTxt.preferredSize.width = 150;
-            parentTxt.text = fd.parent.displayName;
-            parentTxt.alignment = 'center';
 
-            var btn = fdGrp['btn'] = fdGrp.add("button {justify:'left'}");
-            btn.preferredSize.width = 400;
-            btn.text = fd.displayName;
-            btn.justify ='left';
-            btn.onClick = select_helper (i);
-            
-            var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Dateibrowser hier');
-            browseBtn.onClick = browseHelper (fd.fullName);
-        }
+    var b2bBtn = manualGrp.add("button", undefined, 'B2B');
+    b2bBtn.preferredSize.width = 50;                
+    b2bBtn.onClick = browseHelper(csroot + '/kundendaten/b2b');
+    
+    var b2cBtn = manualGrp.add("button", undefined, 'B2C');
+    b2cBtn.preferredSize.width = 50;
+    b2cBtn.onClick = browseHelper(csroot + '/kundendaten/b2c');
+    
+    var angBtn = manualGrp.add("button", undefined, 'ANG');
+    angBtn.preferredSize.width = 50;
+    angBtn.onClick = browseHelper(csroot + '/angebotedaten');
+    
+    var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
+
+
+    var maxLength = fds.length < maxDialogRowes ? fds.length : maxDialogRowes;
+    for (var i = 0; i < maxLength; i++) {
+        var fdGrp = fdG.add('group');
+        var fd = fds[i];
         
-        var b2bBtn = manualGrp.add("button", undefined, 'B2B');
-        b2bBtn.preferredSize.width = 50;                
-        b2bBtn.onClick = browseHelper(csroot + '/kundendaten/b2b');
+        var parentTxt = fdGrp['parentTxt'] = fdGrp.add('statictext {justify:"right"}');
+        parentTxt.preferredSize.width = 150;
+        parentTxt.text = fd.parent.displayName;
+        parentTxt.alignment = 'center';
+
+        var btn = fdGrp['btn'] = fdGrp.add("button {justify:'left'}");
+        btn.preferredSize.width = 400;
+        btn.text = fd.displayName;
+        btn.justify ='left';
+        btn.onClick = select_helper (i);
         
-        var b2cBtn = manualGrp.add("button", undefined, 'B2C');
-        b2cBtn.preferredSize.width = 50;
-        b2cBtn.onClick = browseHelper(csroot + '/kundendaten/b2c');
-        
-        var angBtn = manualGrp.add("button", undefined, 'ANG');
-        angBtn.preferredSize.width = 50;
-        angBtn.onClick = browseHelper(csroot + '/angebotedaten');
-        
-        var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
+        var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Dateibrowser hier');
+        browseBtn.onClick = browseHelper (fd.fullName);
+    }
+
+    var scrollBar = p.add("scrollbar");
+    scrollBar.preferredSize.width = 50;
+    scrollBar.stepdelta = 50;
+    scrollBar.maximumSize.height = p.maximumSize.height;
+
+    scrollBar.onChanging = function () {
+        fdG.location.y = -1 * this.value;
+    }
+
+    win.onShow = function() {
+        scrollBar.size = [20,p.size.height];
+        scrollBar.location = [p.size.width-20, 0];
+        scrollBar.maxvalue = fdG.size.height-p.size.height+20;
+    };        
         
     if(win.show() != 2 && retval && retval instanceof Folder) {
         add_to_recentFolders(retval);
