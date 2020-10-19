@@ -63,7 +63,8 @@ function get_ref() {
     var ref = null;
     var doc = null;
     try {
-        doc = app.activeDocument
+        if(app.documents.length > 0)
+            doc = app.activeDocument;
     } catch (e) {}
 
     if (doc) {
