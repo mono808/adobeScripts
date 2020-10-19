@@ -105,8 +105,6 @@ function get_ref_from_indd_doc(doc) {
         return null
     }
 
-    var ref = null;
-
     //close leftover docs without a layoutwindow
     var i, maxI, myDoc;
     for (i = 0, maxI = app.documents.length; i < maxI; i += 1) {
@@ -117,20 +115,25 @@ function get_ref_from_indd_doc(doc) {
     }
 
     if (doc.name.match(rE.print)) {
-        ref = doc;
-    } else if (doc.allGraphics.length > 0) {
-        try {
-            var checkThis = doc.layers.item('motivEbene');
-            var checkthis = checkThis.name;
-            ref = new File(checkThis.allGraphics[0].properties.itemLink.filePath);
-        } catch (e) {
-            ref = doc;
+        return doc;
+    }
+    
+    if (doc.allGraphics.length > 0) {
+        var motivLayer = doc.layers.item('motivEbene');
+        if(motivLayer.isValid) {
+            var myGraphic = motivLayer.allGraphics[0];
+            if(myGraphic.isValid)
+                return new File(myGraphic.properties.itemLink.filePath);
+        } else {
+            return doc;
         }
-    } else if (doc.saved && rE.printTag.test(doc.filePath.fullName)) {
-        ref = doc;
     }
 
-    return ref;
+    if (doc.saved && rE.printTag.test(doc.filePath.fullName)) {
+        return doc;
+    }
+
+    return null;
 }
 
 function get_ref_from_ps_doc(doc) {
