@@ -1,24 +1,25 @@
-﻿//#target indesign
+﻿//@target indesign
+
 function main () {
     
-     
-    #include 'f_all.jsx'    
-    #include 'save_Options.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'MonoPrint.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'MonoFilm.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
+    //@include 'require.jsx'
+
+    var f_all = require('f_all');
+    var job = require('job');
+    var jobFolder = require('jobFolder');
+    var paths = require('paths');
+    var names = require('names');
     
+    var MonoMockup = require('MonoMockup');
+    var MonoPrint = require('MonoPrint');
+    var MonoFilm = require('MonoFilm');
+    var MonoSep = require('MonoSep');
+    var texTool = require('textilTool');
+    var saveOptions = require('saveOptions');
+
     var job = new Job(null,false);
     if(!job.nfo) return;
     var pm = new Pathmaker(job.nfo);
-    //var typeahead = new Typeahead();
     
     try{
         app.applyWorkspace('Ansichten');
