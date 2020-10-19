@@ -38,8 +38,6 @@ function main () {
     mockup.show_shop_logo(job.nfo.shop);
     mockup.fill_job_infos(job.nfo);
 
-//  var mockup = new MonoMockup(app.activeDocument);
-    var jobFolder = new JobFolder(job.nfo.folder);
     var monoPrints = jobFolder.get_prints();
 
     mockup.place_prints_on_page (monoPrints);

@@ -10,7 +10,8 @@ lastFolders = lastFolders.filter(function(fld) {return fld.exists});
 
 var csroot = (new Folder($.getenv("csroot"))).fullName;
 var screen = get_primary_screen();
-var maxDialogRowes = (screen.bottom - screen.top)/38;
+var maxDialogRowes = 100;
+var maxRecentFolders = 200;
 
 function get_primary_screen () {
     var screens = $.screens;    
@@ -61,7 +62,6 @@ function move_to_top (idx) {
         var tmp = lastFolders.splice(idx,1);
         lastFolders.unshift(tmp[0]);
     }
-    //export_recentFolders();
 }
 
 function export_recentFolders () {
@@ -87,6 +87,7 @@ function import_recentFolders () {
 }
 
 function add_to_recentFolders(ref) {
+    
     // get the folder from these possible inputs (file|document|folder)
     var fd = get_folder_from_ref(ref);
     if(!fd) return null;
@@ -106,85 +107,103 @@ function add_to_recentFolders(ref) {
         lastFolders.unshift(fd);
     }
     
-    if(lastFolders.length > maxDialogRowes) {
+    if(lastFolders.length > maxRecentFolders) {
         lastFolders.pop();
     }
 
     export_recentFolders();
 };
 
+
+
 function show_dialog () {
-    var retval;
-    var fds = lastFolders;
     
     function get_subfolders (fd) {
         var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
         return subs;
     }
-    
-    // bounds = [left, top, right, bottom]
-    var win = new Window("dialog", "Extracted Infos",undefined, {resizeable:true});
-    this.windowRef = win;
 
-        var manualGrp = win[manualGrp] = win.add("group", undefined);
-        var fdPnl = win[fdPnl] = win.add("panel", undefined);
-        
-        fdPnl.alignChildren = 'left';
-        var grps = fdPnl.grps = [];
+    function select_helper (i) {
+        return function () {
+            retval = lastFolders[i];
+            win.close();
+        }
+    }
 
-        var select_helper = function (i) {
-            return function () {
-                retval = fds[i];
+    function browse_Helper (path) {
+        return function () {
+            var result = Folder(path).selectDlg('Select Job-Folder:');
+            if(result) {
+                retval = result;
                 win.close();
             }
-        };
-   
-        var browseHelper = function (path) {
-            return function () {
-                var result = Folder(path).selectDlg('Select Job-Folder:');
-                if(result) {
-                    retval = result;
-                    //add_to_recentFolders(result);
-                    win.close();
-                }
-            }
         }
+    }
 
-        var maxLength = fds.length < maxDialogRowes ? fds.length : maxDialogRowes;
-        for (var i = 0; i < maxLength; i++) {
-            var fdGrp = grps[i] = fdPnl.add('group');
-            var fd = fds[i];
-            
-            var parentTxt = fdGrp['parentTxt'] = fdGrp.add('statictext {justify:"right"}');
-            parentTxt.preferredSize.width = 150;
-            parentTxt.text = fd.parent.displayName;
-            parentTxt.alignment = 'center';
+    var retval;
+    
+    // bounds = [left, top, right, bottom]
+    var win = new Window("dialog", "Extracted Infos",undefined);
+    this.windowRef = win;
 
-            var btn = fdGrp['btn'] = fdGrp.add("button {justify:'left'}");
-            // var btn = fdGrp['btn'] = fdGrp.add("button", undefined,fd.displayName);
-            btn.preferredSize.width = 400;
-            btn.text = fd.displayName;
-            btn.justify ='left';
-            btn.onClick = select_helper (i);
-            
-            var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Dateibrowser hier');
-            //browseBtn.preferredSize.width = 100;
-            browseBtn.onClick = browseHelper (fd.fullName);
-        }
+    var manualGrp = win[manualGrp] = win.add("group", undefined);
+    
+    var p = win.add("panel" , undefined);
+    p.size = [750,800];
+
+    var fdG = p.add("group");
+    fdG.orientation = "column";
+    fdG.alignment = "left";
+    fdG.maximumSize.height = lastFolders.length*50;
+
+    var b2bBtn = manualGrp.add("button", undefined, 'B2B');
+    b2bBtn.preferredSize.width = 50;                
+    b2bBtn.onClick = browse_Helper(csroot + '/kundendaten/b2b');
+    
+    var b2cBtn = manualGrp.add("button", undefined, 'B2C');
+    b2cBtn.preferredSize.width = 50;
+    b2cBtn.onClick = browse_Helper(csroot + '/kundendaten/b2c');
+    
+    var angBtn = manualGrp.add("button", undefined, 'ANG');
+    angBtn.preferredSize.width = 50;
+    angBtn.onClick = browse_Helper(csroot + '/angebotedaten');
+    
+    var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
+
+    var maxLength = lastFolders.length < maxDialogRowes ? lastFolders.length : maxDialogRowes;
+    for (var i = 0; i < maxLength; i++) {
+        var fdGrp = fdG.add('group');
+        var fd = lastFolders[i];
         
-        var b2bBtn = manualGrp.add("button", undefined, 'B2B');
-        b2bBtn.preferredSize.width = 50;                
-        b2bBtn.onClick = browseHelper(csroot + '/kundendaten/b2b');
+        var parentTxt = fdGrp['parentTxt'] = fdGrp.add('statictext {justify:"right"}');
+        parentTxt.preferredSize.width = 150;
+        parentTxt.text = fd.parent.displayName;
+        parentTxt.alignment = 'center';
+
+        var btn = fdGrp['btn'] = fdGrp.add("button {justify:'left'}");
+        btn.preferredSize.width = 400;
+        btn.text = fd.displayName;
+        btn.justify ='left';
+        btn.onClick = select_helper (i);
         
-        var b2cBtn = manualGrp.add("button", undefined, 'B2C');
-        b2cBtn.preferredSize.width = 50;
-        b2cBtn.onClick = browseHelper(csroot + '/kundendaten/b2c');
-        
-        var angBtn = manualGrp.add("button", undefined, 'ANG');
-        angBtn.preferredSize.width = 50;
-        angBtn.onClick = browseHelper(csroot + '/angebotedaten');
-        
-        var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
+        var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Dateibrowser hier');
+        browseBtn.onClick = browse_Helper (fd.fullName);
+    }
+
+    var scrollBar = p.add("scrollbar");
+    scrollBar.preferredSize.width = 50;
+    scrollBar.stepdelta = 50;
+    scrollBar.maximumSize.height = p.maximumSize.height;
+
+    scrollBar.onChanging = function () {
+        fdG.location.y = -1 * this.value;
+    }
+
+    win.onShow = function() {
+        scrollBar.size = [20,p.size.height];
+        scrollBar.location = [p.size.width-20, 0];
+        scrollBar.maxvalue = fdG.size.height-p.size.height+20;
+    };        
         
     if(win.show() != 2 && retval && retval instanceof Folder) {
         add_to_recentFolders(retval);

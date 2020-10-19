@@ -8,7 +8,6 @@ var base;
 var printFolders;
 var ansichtenFolder;
 var druckdatenSD;
-
 var monoPrints = [];
 
 function get_jobFolder (fld) {
@@ -70,7 +69,6 @@ function set_folder(folder) {
     ansichtenFolder = new Folder(base + '/ansicht');
     druckdatenSD = new Folder(base + '/druckdaten-sd');
 
-    monoPrints = [];
     for (var i = 0; i < printFolders.length; i++) {
         get_monoPrints(printFolders[i]);
     }
@@ -106,3 +104,5 @@ exports.set_folder = set_folder;
 exports.get_files = get_files;
 exports.get_prints = get_prints;
 exports.get_mockups = get_mockups;
+exports.get_filmhuelle = get_filmhuelle;
+exports.get_filme = get_filme;

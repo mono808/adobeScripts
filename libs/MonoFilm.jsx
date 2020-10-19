@@ -1,4 +1,6 @@
-﻿function MonoFilm (initObj, hidden)
+﻿var names = require('names');
+
+function MonoFilm (initObj, hidden)
 {
     this.hidden = hidden || false;
     this.filmWidth = 420;
@@ -376,7 +378,6 @@ MonoFilm.prototype.add_spotInfo_numbered = function ()
     colorText.allowArbitraryHyphenation;
   
     var spots = this.get_all_spotColors();
-    var mN = new MonoNamer();
     var charIndex = 0;           
 
     for (var i = 0; i < spots.length; i += 1)  {
@@ -387,7 +388,7 @@ MonoFilm.prototype.add_spotInfo_numbered = function ()
         spotString += '/';
         spotString += spots.length;
         spotString += '\xa0';
-        spotString += mN.name('color', (spot.name));
+        spotString += names.name('color', (spot.name));
         spotString = spotString.replace(/\s/g, '\xa0');
         
         colorTF.contents += spotString;
@@ -418,14 +419,14 @@ MonoFilm.prototype.add_spotInfo2 = function ()
     colorText.allowArbitraryHyphenation;
   
     var spots = this.get_all_spotColors();
-    var mN = new MonoNamer();
+
     var charIndex = 2;
     var divString = ' | ';
 
     for (var i = 0; i < spots.length; i += 1)  {
         
         var spot = spots[i];
-        var spotString = mN.name('color', (spot.name)).replace(/\s/g, '\xa0');
+        var spotString = names.name('color', (spot.name)).replace(/\s/g, '\xa0');
         
         colorTF.contents += spotString;
         var spotChars = colorText.characters.itemByRange(charIndex, charIndex + spotString.length-1);
@@ -591,15 +592,15 @@ MonoFilm.prototype.get_all_spotColors = function ()
 MonoFilm.prototype.get_spotNames = function (longNames) 
 {
     var spots = this.get_all_spotColors();
-    var names = [];
-    var mN = new MonoNamer();
+    var renamed = [];
+
     for (var i = 0; i < spots.length; i++) {
-        var colorName = longNames ? mN.name('color', spots[i].name) : spots[i].name;
+        var colorName = longNames ? names.name('color', spots[i].name) : spots[i].name;
         colorName = colorName.replace(/\s/g, '\xa0');
-        names.push(colorName);
+        renamed.push(colorName);
     }
 
-    return names;
+    return renamed;
 };
 
 MonoFilm.prototype.select_all_printable_pageItems = function () 
@@ -828,14 +829,13 @@ MonoFilm.prototype.add_jobInfo = function (job)
 
     var infoTF = this.create_text_frame(this.layers.info, 'infoTextFrame');
     var infoText = infoTF.texts[0];
-    var mN = new MonoNamer();
        
     infoText.fillColor = this.colors.reg;
     infoText.hyphenation = false;
       
     var jobString = '';
     if(job.nfo.client && job.nfo.jobNr && job.nfo.jobName && job.nfo.printId) {
-        var printId = mN.name('printId', job.nfo.printId);
+        var printId = names.name('printId', job.nfo.printId);
         jobString += job.nfo.client + ' | ' + job.nfo.jobNr + '_' + job.nfo.jobName + '\n' + printId;
     } else {
         jobString += this.sep.name.substring(0, this.sep.name.lastIndexOf('.'));
@@ -866,7 +866,6 @@ MonoFilm.prototype.add_spotInfo_numbered = function ()
     colorText.allowArbitraryHyphenation;
   
     var spots = this.get_all_spotColors();
-    var mN = new MonoNamer();
     var charIndex = 0;           
 
     for (var i = 0; i < spots.length; i += 1)  {
@@ -877,7 +876,7 @@ MonoFilm.prototype.add_spotInfo_numbered = function ()
         spotString += '/';
         spotString += spots.length;
         spotString += '\xa0';
-        spotString += mN.name('color', (spot.name));
+        spotString += names.name('color', (spot.name));
         spotString = spotString.replace(/\s/g, '\xa0');
         
         colorTF.contents += spotString;

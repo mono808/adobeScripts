@@ -15,7 +15,7 @@ function main() {
     paths.set_nfo(job.nfo);
     
     var baseDoc = new BaseDoc(app.activeDocument);
-    baseDoc.save_doc(paths.file('workingAi'), saveOptions.ai_sep(), false);
+    baseDoc.save_doc(paths.file('workingAi'), saveOptions.sdPrintAi(), false);
 };
 
 if (app.documents.length > 0) {
