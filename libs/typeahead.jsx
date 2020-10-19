@@ -1,34 +1,32 @@
-﻿function create_names_array (array, propertyToList) {            
-    var names = [];
-    for(var i = 0; i < array.length; i++) {
-        names.push(array[i][propertyToList]);
-    }
-    return names;
+﻿function arrayify (inputElements) {
+    var arr = [];
+    for (var i=0, len=inputElements.length; i < len ; i++) {
+        arr.push(inputElements[i]);
+    };
+    return arr;
 }
 
-function get_member (haystack, needle, propertyToCheck) {
-    for (var i = 0; i < haystack.length; i++) {
-        var val = propertyToCheck ? haystack[i][propertyToCheck] : haystack[i];                   
-        if( val == needle) {
-            return haystack[i];
-        }
-    }
-    return null;
-}
-
-exports.show_dialog = function (array, propertyToList) {
+exports.show_dialog = function (inputElements, propertyToList, multiselect, dialogTitle) {
+    
+    var names;
     if(propertyToList) {
-        var names = create_names_array(array, propertyToList);
+        if(inputElements.constructor.name != 'Array') 
+            inputElements = arrayify(inputElements);
+
+        names = inputElements.map(function(elem) {return elem[propertyToList]});
+
     } else {
-        var names = array;
+        names = inputElements;
     }
+
     var selected = [];
     var temp;
     var keyCount = 0;
-    var w = new Window ('dialog {text: "Quick select", alignChildren: "fill"}');
+    var dialogTitle = dialogTitle || 'Quick select';
+    var w = new Window ('dialog {text: dialogTitle, alignChildren: "fill"}');
     var entry = w.add ('edittext {active: true}');
     var dummy = w.add ('panel {alignChildren: "fill"}');
-    var list = dummy.add ('listbox', [0,0,250,250], names, {multiselect: true});
+    var list = dummy.add ('listbox', [0,0,250,250], names, {multiselect: multiselect});
     entry.onChanging = function ()
     {
         keyCount++;
@@ -63,10 +61,16 @@ exports.show_dialog = function (array, propertyToList) {
         if(!propertyToList) return selected;
 
         // if not simply returning the selected text, get the corresponding object
-        var returnArray = [];               
-        for (var i = 0; i < selected.length; i++) {
-            returnArray.push(get_member(array, selected[i], propertyToList));
+        var returnArray = [];
+        var isSelected = function(elem) {
+            return elem[propertyToList] = selected[i];
         }
+        returnArray = selected.map(function(elem){
+            return inputElements.find(function (item){
+                return (item[propertyToList] === elem);
+            })
+        })
+
         return returnArray;
     }
     w.close();
