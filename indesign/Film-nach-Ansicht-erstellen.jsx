@@ -1,25 +1,26 @@
-﻿#target indesign
+﻿//@target indesign
+//@include 'require.jsx'
 
-
-
-function main () {
+(function () {
     
-     
-    #include 'augment_objects.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'MonoFilm.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'MonoGraphic.jsx'
-    #include 'MonoTextil.jsx'
-    #include 'MonoPrint.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'PasserFab.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
+    if(!app.activeDocument) {
+        alert('Bitte Ansicht öffnen und Separation anwählen');
+        return;
+    }
+    
+    if(app.activeDocument.selection.length < 1) {
+        alert('Bitte erst eine Grafik auswählen');
+        return;
+    }
 
+    var job = require('job');
+    var paths = require('paths');
+    var MonoFilm = require('MonoFilm');
+
+    job.set_nfo(null, false);
+    paths.set_nfo(job.nfo);
+
+    var monoFilm = new MonoFilm(myDoc);
     var mockUpDoc = app.activeDocument;
     
     for (var i = 0; i < mockUpDoc.selection.length; i++) {
@@ -40,22 +41,4 @@ function main () {
         monoFilm.save(job);
         monoFilm.print(job, true, false);
     }
-}
-
-function check() {
-    if(!app.activeDocument) {
-        alert('Bitte Ansicht öffnen und Separation anwählen');
-        return false;
-    }
-    
-    if(app.activeDocument.selection.length < 1) {
-        alert('Bitte erst eine Grafik auswählen');
-        return false;
-    }
-
-    return true;
-}
-
-if(check()){
-    main();
-}
+})();

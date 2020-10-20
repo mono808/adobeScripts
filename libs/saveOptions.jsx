@@ -82,6 +82,7 @@
     workingAi : function () {
         var options = new IllustratorSaveOptions();
         with(options) {
+            compatibility = Compatibility.ILLUSTRATOR16;            
             embedICCProfile = true;
             pdfCompatible = true;
         }
@@ -106,14 +107,6 @@
             options.resolution = 600;
             return options;
         }
-    },
-
-    ai_flx : function () {
-        var options = new IllustratorSaveOptions();
-        options.compatibility = Compatibility.ILLUSTRATOR16;
-        options.embedICCProfile = true;
-        options.pdfCompatible = true;
-        return options;
     },
 
     ai_mockup_pdf : function () {

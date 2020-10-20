@@ -1,4 +1,6 @@
-﻿function MonoTable (initPage) {
+﻿var names = require('names');
+
+function MonoTable (initPage) {
 
     var init = function (myPage) {
         if(myPage) {
@@ -46,15 +48,13 @@
     }
 
     var get_table = function (myPage) {
-        try {
-            var myTF = myPage.textFrames.item('printTableFrame');
-            var check = myTF.name;
-            var myTable = myTF.tables.item(0);
-            check = myTable.name;
-            return myTable;
-        } catch(e) {
-            return null;
-        }
+        var myTF = myPage.textFrames.item('printTableFrame');
+        if (!myTF.isValid) return null;
+        
+        var myTable = myTF.tables.item(0);
+        if(!myTable.isValid) return null;
+
+        return myTable;
     };
 
     var create_table = function (myPage) {
@@ -230,16 +230,15 @@
 
     var read_monoGraphic = function (monoGraphic) {
         var rC = {};
-        var monoNamer = new MonoNamer();
         var colors = monoGraphic.get_colors(true);
 
         rC.textilName = monoGraphic.get_textil_name();
         rC.textilColor = monoGraphic.get_textil_color();
-        rC.printId = monoNamer.name('printId', monoGraphic.get_printId());
+        rC.printId = names.name('printId', monoGraphic.get_printId());
         rC.width = monoGraphic.get_width().toFixed(0) + ' x ' + monoGraphic.get_height().toFixed(0);
         rC.height = monoGraphic.get_height().toFixed(0);
         rC.stand = monoGraphic.get_stand();
-        rC.tech = monoNamer.name('tech', monoGraphic.get_tech());
+        rC.tech = names.name('tech', monoGraphic.get_tech());
         rC.colors = (colors && colors.length > 0) ? colors.join(', ') : 'kA';
         rC.id = monoGraphic.get_id();
 

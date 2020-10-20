@@ -36,14 +36,14 @@ function sendScriptToPhotoshop (PSfunction, scriptArgs) {
 
 
 function read_file (aFile) {     
-  if(aFile && aFile instanceof File) {
+    if(aFile && aFile instanceof File) {
         aFile.open('r', undefined, undefined);
         aFile.encoding = "UTF-8";      
         aFile.lineFeed = "Windows";
         var success = aFile.read();
         aFile.close();
         return success;
-  }
+    }
 }
 
 function get_graphicLayerNames (myImage) {

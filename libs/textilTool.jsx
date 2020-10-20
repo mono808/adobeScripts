@@ -32,7 +32,7 @@ function get_tex_files (dir, filter) {
         return a.displayName.toLowerCase() > b.displayName.toLowerCase();
     })
     return result;
-};
+}
 
 function get_tex_folder () {
     var texFolders = texRoot.getFiles (function (a) {return a instanceof Folder});

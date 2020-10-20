@@ -1,4 +1,4 @@
-﻿function PasserFab (filmType, xCenter, sep)
+﻿function RegmarkTool (filmType, xCenter, sep)
 {
     this.settings = {
         stroke1 : 0.25,
@@ -26,7 +26,7 @@
     }
 };
 
-PasserFab.prototype.create_centerMark = function (xy, name)
+RegmarkTool.prototype.create_centerMark = function (xy, name)
 {
     var pS = this.settings;
 
@@ -56,7 +56,7 @@ PasserFab.prototype.create_centerMark = function (xy, name)
     return centerMark;
 };
 
-PasserFab.prototype.create_regMark = function (xy)
+RegmarkTool.prototype.create_regMark = function (xy)
 {
     var pS  = {
         stroke : 0.35,
@@ -96,7 +96,7 @@ PasserFab.prototype.create_regMark = function (xy)
     return regMark;
 };
 
-PasserFab.prototype.get_regMarkCoordinates = function ()
+RegmarkTool.prototype.get_regMarkCoordinates = function ()
 {
     var sepHeight = this.sep.get_height(),
         sepWidth = this.sep.get_width(),
@@ -135,7 +135,7 @@ PasserFab.prototype.get_regMarkCoordinates = function ()
     return cPs;
 };
 
-PasserFab.prototype.add_centerMarks = function () 
+RegmarkTool.prototype.add_centerMarks = function () 
 {
     var sepBounds = this.sep.graphic.geometricBounds;
     var pS = this.settings;
@@ -146,7 +146,7 @@ PasserFab.prototype.add_centerMarks = function ()
     var bottomMark = this.create_centerMark(cBottom, 'bottomMark');
 };
 
-PasserFab.prototype.add_regMarks = function (positions)
+RegmarkTool.prototype.add_regMarks = function (positions)
 {
     var coords = this.get_regMarkCoordinates();
     var pos, passer;
@@ -155,3 +155,5 @@ PasserFab.prototype.add_regMarks = function (positions)
         this.create_regMark(coords[pos]);
     }
 };
+
+exports = module.exports = RegmarkTool;

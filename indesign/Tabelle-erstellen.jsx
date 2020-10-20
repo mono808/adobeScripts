@@ -1,20 +1,21 @@
-﻿#target indesign
+﻿//@target indesign
+//@include 'require.jsx'
 function main () {
 
-     
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'MonoFilm.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'MonoGraphic.jsx'
-    #include 'MonoTextil.jsx'
-    #include 'MonoTable.jsx'
-    #include 'MonoPrint.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
+    var f_all = require('f_all');
+    
+    var job = require('job');
+    var jobFolder = require('jobFolder');
+    var paths = require('paths');
+    var names = require('names');
+    
+    var MonoMockup = require('MonoMockup');
+    var MonoTable = require('MonoTable');
+    var saveOptions = require('saveOptions');
+
+    job.set_nfo(null,false);
+    if(!job.nfo) return;
+    paths.set_nfo(job.nfo);
     
     var monoMockup = new MonoMockup();
     monoMockup.init(app.activeDocument);
@@ -24,7 +25,7 @@ function main () {
     
 	var monoTable = new MonoTable(myPage);
 	monoTable.create_table(myPage, true);
-   
+
     for(var i = 0; i < monoGraphics.length; i++) {
         monoTable.add_row(monoGraphics[i]);
     }

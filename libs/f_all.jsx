@@ -26,6 +26,47 @@ function saveBAT (saveThis) {
     } catch (err) { return null }
 }
 
+exports.BT_send_script = function (targetApp, script, scriptArgs, waitSec, callBack) {
+    var retval = true;
+
+    // Create the message object
+    var bt = new BridgeTalk();
+
+    bt.target = targetApp;
+    if(scriptArgs) {
+        bt.body = "var SnpSentMessage = {}; SnpSentMessage.main = " + script.toString() + ";";
+        bt.body += "var retval = SnpSentMessage.main(";
+        bt.body += scriptArgs.toSource();
+        $.writeln(scriptArgs.toSource());
+        bt.body += ");";
+        bt.body += "retval;";
+    } else {
+        bt.body = script.toString();
+    }
+    
+    bt.onError = function(errObj)
+    {
+        $.writeln('BT returned an error:\n');
+        $.writeln(errObj.body);
+    }
+
+    if(callBack) {
+        bt.onResult = callBack;
+    } else {
+        bt.onResult = function(resObj)
+        {
+            // The result of executing the code is the last line of the script that was executed in the target
+            $.writeln('BridgeTalk result:' + resObj.body);
+            retval = eval(resObj.body);
+        }
+    }
+
+    // Send the message, wait max 30 sec for response
+    var wait = waitSec || 0;
+    bt.send(wait);
+    
+    return retval;
+}
 
 exports.is_number = function (n) {
     return !isNaN(parseFloat(n)) && isFinite(n);

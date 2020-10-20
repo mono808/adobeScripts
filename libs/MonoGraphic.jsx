@@ -1,5 +1,6 @@
 ﻿var MonoPrint = require('MonoPrint');
 var MonoFilm = require('MonoFilm');
+var MonoTextil = require('MonoTextil');
 
 function MonoGraphic (myGraphic)
 {

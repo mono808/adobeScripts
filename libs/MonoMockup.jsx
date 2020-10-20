@@ -372,12 +372,11 @@ MonoMockup.prototype.copy_spreads = function (sourceDoc,destDoc, pages2copy)
         dupedSpreads.push(dupedSpread);
     }
     
-    try {
-        var defaultSpread = destDoc.masterSpreads.item('A-Musterseite');
+
+    var defaultSpread = destDoc.masterSpreads.item('A-Musterseite');
+    if(defaultSpread.isValid)
         defaultSpread.remove();
-    } catch (e) {
-        $.writeln(e)
-    };
+
 
     if(destDoc.pages.item(0).pageItems.length == 0) {
         destDoc.pages.item(0).remove();
@@ -672,11 +671,9 @@ MonoMockup.prototype.copyStyles = function (source, dest)
 MonoMockup.prototype.copyLayers = function (source, dest)
 {
     for(var i = 0, maxI = source.layers.length; i < maxI; i += 1) {
-        var sourceLayer = source.layers[i],
-            destLayer;
-        try {
-            destLayer = dest.layers.item(sourceLayer.name).name;
-        } catch(e) {
+        var sourceLayer = source.layers[i];
+        var destLayer = dest.layers.item(sourceLayer.name);
+        if(!destLayer.isValid) {
             destLayer = dest.layers.add({name: sourceLayer.name});
             destLayer.move(LocationOptions.AT_END);
         };

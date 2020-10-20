@@ -67,15 +67,14 @@ function checkCreateStyle (type, name)
         break;
     }
     
-    if(!newStyle) {
-        try {
-            newStyle = existingStyles.item(name);
-            var check = newStyle.name;
-        } catch (myError){  
-            newStyle = existingStyles.add({name:name});
+    if(!newStyle) {       
+        newStyle = existingStyles.item(name);
+        if(newStyle.isValid) {
+            return newStyle;
+        } else{  
+            return existingStyles.add({name:name});
         }
     }
-    return newStyle;
 }
 
 function createStyles (doc) 

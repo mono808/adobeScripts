@@ -1,5 +1,6 @@
 ﻿var names = require('names');
 var MonoSep = require('MonoSep');
+var RegmarkTool = require('RegmarkTool');
 
 function MonoFilm (initObj, hidden)
 {
@@ -42,14 +43,14 @@ MonoFilm.prototype.init = function (initDoc) {
     this.filmDoc = initDoc;
     this.filmFile = initDoc.saved ? initDoc.fullName : null;
     this.filmPage = initDoc.pages.item(0);
-    this.masterSpread  = initDoc.masterSpreads.item('A-Musterseite');   
-    try {
-        var bgColor = initDoc.colors.itemByName('bgColor');
-        var check = bgColor.name;        
-    } catch(e) {
-        var bgColor = initDoc.colors.add(this.backgroundColor);
+    this.masterSpread  = initDoc.masterSpreads.item('A-Musterseite');
+    var bgColor = initDoc.colors.itemByName('bgColor');
+    if(bgColor.isValid) {
+        this.colors.bg = bgColor;
+    } else {
+        this.colors.bg = initDoc.colors.add(this.backgroundColor);
     }
-    this.colors.bg = bgColor;
+
     this.colors.reg = initDoc.colors.item('Registration');
     this.colors.none = initDoc.swatches.item('None');
 
@@ -165,12 +166,10 @@ MonoFilm.prototype.check_create_layer = function (/* ... */)
         var target = arguments[0];       
         for(var i=0; i < arguments.length; i ++) {
             var name = arguments[i];
-            try {
-                var l = this.filmDoc.layers.itemByName(name);
-                //$.writeln(l.name);
-                if(l.name != target) {l.name = target}
-                return l;
-            } catch (e) {}
+            var l = this.filmDoc.layers.itemByName(name);
+            if(!l.isValid) continue;
+            if(l.name != target) {l.name = target}
+            return l;
         }
     }
     return this.filmDoc.layers.add({name:target});
@@ -270,10 +269,10 @@ MonoFilm.prototype.add_regmarks = function ()
 {    
     var type = this.get_sep_type();   
     var regMarks = type === 'Bags' ? [0,2,4,6] : [0,2,4,6];
-    var passerFab = new PasserFab(type, this.vLine.location, this.sep);
+    var regmarkTool = new RegmarkTool(type, this.vLine.location, this.sep);
         
     if(regMarks && regMarks.length > 0 && this.get_all_spotColors().length > 1) {
-        passerFab.add_regMarks(regMarks);
+        regmarkTool.add_regMarks(regMarks);
     }
 };
 
@@ -281,9 +280,9 @@ MonoFilm.prototype.create_regmark = function ()
 {    
     var regMarks = [3];
     var type = this.get_sep_type();
-    var passerFab = new PasserFab(type, this.vLine.location, this.sep);
+    var regmarkTool = new RegmarkTool(type, this.vLine.location, this.sep);
         
-    passerFab.add_regMarks(regMarks);
+    regmarkTool.add_regMarks(regMarks);
 
 };
 
@@ -813,8 +812,8 @@ MonoFilm.prototype.add_centermarks = function ()
 {       
     var type = this.get_sep_type();
    
-    var passerFab = new PasserFab(type, this.vLine.location, this.sep);
-    passerFab.add_centerMarks();   
+    var regmarkTool = new RegmarkTool(type, this.vLine.location, this.sep);
+    regmarkTool.add_centerMarks();
 };
 
 MonoFilm.prototype.add_pictogram = function () {
@@ -893,7 +892,7 @@ MonoFilm.prototype.add_spotInfo_numbered = function ()
     return colorTF;
 };
 
-MonoFilm.prototype.print = function ()
+MonoFilm.prototype.print = function (filmInPath, filmOutPath)
 {
     if(!this.filmDoc.saved) {
         alert('Film wurde noch nicht gespeichert, bitte erst abspeichern');
@@ -903,10 +902,10 @@ MonoFilm.prototype.print = function ()
     var saveFolder = this.filmDoc.fullName.parent;
      
     var pdfName = saveName + '.pdf';
-    var pdfFile = new File(pm.path('filmOut') + pdfName);
+    var pdfFile = new File(filmOutPath + pdfName);
     
     var psName = saveName + '.ps';
-    var psFile = new File(pm.path('filmIn') + psName);
+    var psFile = new File(filmInPath + psName);
 
     this.print_to_postscript (this.filmDoc, psFile, 'monoFilms');
 };
