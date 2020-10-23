@@ -1,6 +1,4 @@
-﻿$.level = 1;
-
-var PsSiebdruck = require('PsSiebdruck');
+﻿var PsSiebdruck = require('PsSiebdruck');
 var buttonList = require('buttonList');
 
 function PsSiebdruckPrint (initDoc) {

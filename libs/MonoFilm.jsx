@@ -14,7 +14,6 @@ function MonoFilm (initObj, hidden)
         name:'bgColor'
     };
     this.guideRecs = [
-        //{w:this.filmWidth,h:this.filmHeight,name:'bg',align:'bg', fillColor:'bgColor'},
         {w:420,h:550,name:'max',align:'top', fillColor:'bgColor'},
         {w:300,h:420,name:'a3',align:'top'},
         {w:120,h:300,name:'ar',align:'top'},
@@ -83,13 +82,10 @@ MonoFilm.prototype.init = function (initDoc) {
     this.layers.guides = this.check_create_layer('hilfsLayer', 'guides');
     this.layers.sep    = this.check_create_layer('motivEbene', 'sep');
     this.layers.info    = this.check_create_layer('infoEbene', 'job');
-    //this.layers.info = this.check_create_layer('farbenEbene', 'colors');
-    //this.layers.info    = this.check_create_layer('passerEbene', 'reg');
     
     initDoc.activeLayer = this.layers.sep;
 
     this.get_sep();
-    //if(!this.hidden) this.type = this.get_type();
 };
 
 MonoFilm.prototype.create_template = function () 
@@ -797,17 +793,6 @@ MonoFilm.prototype.add_hairLines = function () {
 
 };
 
-
-
-/////////////////////////////////////////////////////////////////////////////////////////
-//
-//    TEMPORARY INTERFACE
-//
-/////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
 MonoFilm.prototype.add_centermarks = function () 
 {       
     var type = this.get_sep_type();
@@ -939,7 +924,6 @@ MonoFilm.prototype.save = function (job, showDialog, close)
     var saveFolder = this.sep.folder;
     var saveName = this.sep.name.substring(0, this.sep.name.lastIndexOf('.'));
 
-    //saveName = saveName.replace(/_(sep|print|druck)/i, '').replace(wxhRE, '');
     saveName = saveName.replace(/_(sep|print|druck)/i, '')
     saveName += '_Film.indd';
 

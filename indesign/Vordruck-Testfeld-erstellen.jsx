@@ -1,7 +1,7 @@
 ﻿#target indesign
 
 function main() {
-    var ul = /Unterleger/,
+    var ul = /Unterleger|Vordruck/,
         doc = app.activeDocument;
 
     for (var s = 0, lenS = doc.swatches.length; s < lenS; s++) {
@@ -33,6 +33,7 @@ function main() {
                     break;
                                                                
                     case 'Unterleger':                        
+                    case 'Vordruck':
                         var ulRect = myPage.textFrames.add();
                         ulRect.fillColor = color;
                         ulRect.strokeColor = doc.swatches[0];

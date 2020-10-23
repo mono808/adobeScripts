@@ -1,9 +1,7 @@
 ﻿var typeahead = require('typeahead');
 var paths = require('paths');
 
-
-var csroot = $.getenv("csroot");
-csroot = Folder(csroot).fullName;
+var csroot = Folder($.getenv("csroot")).fullName;
 var ignoreThoseFiles = /\.bridge/i;
 var fixedLayerNames = ["Shirt","Naht","Tasche","Beutel","Hintergrund"];
 var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
@@ -57,7 +55,13 @@ function add_textiles(staySelected) {
     var placedItem;
     // if something is selected,  place image into selected rectangles
     var texFiles = get_tex_files(texRoot, ignoreThoseFiles);
-    var selectedTex = typeahead.show_dialog(texFiles, 'displayName', true);
+    var selectedTex = typeahead.show_dialog(texFiles, 'displayName', true, 'Textilien wählen');
+
+    if(!selectedTex || selectedTex.length < 1) {
+        alert('Script cancelled, no textiles to place selected');
+        return;
+    }
+
     var targetItems = app.selection;
     targetItems = targetItems.filter(function(item){return item.constructor.name == 'Rectangle' })
     
@@ -134,7 +138,9 @@ function flatten_textiles (mySelection) {
 
         if(graphic.imageTypeName !== 'Photoshop' && graphic.imageTypeName !== 'PDF') return;
 
-        var visibleOjectLayers = get_graphicLayerNames(graphic);
+        var skipHiddenLayers = true;
+        var skipFixedLayers = true;
+        var visibleOjectLayers = get_graphicLayerNames(graphic, skipHiddenLayers, skipFixedLayers);
         var sourcePath = graphic.itemLink.filePath;
 
         /* create filename containing the visible object layers */
@@ -149,15 +155,8 @@ function flatten_textiles (mySelection) {
 
         var destPath = filename + destExtension;
 
-        var btArgs = {};
-        btArgs.sourcePath = encodeURI(sourcePath);
-        btArgs.destPath = encodeURI(destPath);
-        btArgs.visibleOjectLayers = visibleOjectLayers;
-
         var jpgFile = new File(decodeURI(destPath));
-        
         graphic.exportFile(ExportFormat.JPG, jpgFile, false);
-        // var jpgPath = sendScriptToPhotoshop(ps_run, btArgs);
 
         changeImage(graphic, jpgFile);
         jpgFile.remove();

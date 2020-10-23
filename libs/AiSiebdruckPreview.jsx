@@ -1,6 +1,4 @@
-﻿$.level = 1;
-
-var AiSiebdruck = require('AiSiebdruck');
+﻿var AiSiebdruck = require('AiSiebdruck');
 var MonoSpot = require('MonoSpot');
 
 function AiSiebdruckPreview (initDoc) {

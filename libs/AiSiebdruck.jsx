@@ -1,6 +1,4 @@
-﻿$.level = 1;
-
-var AiBase = require('AiBase');
+﻿var AiBase = require('AiBase');
 var MonoSpot = require('MonoSpot');
 
 function AiSiebdruck (initDoc) {

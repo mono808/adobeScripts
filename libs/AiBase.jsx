@@ -1,5 +1,3 @@
-$.level = 1;
-
 var Base = require('BaseDoc');
 
 function AiBase (initDoc) {

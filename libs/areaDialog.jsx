@@ -1,6 +1,4 @@
-﻿$.level = 1;
-
-function AreaDialog (spotChans, totalArea) {
+﻿function AreaDialog (spotChans, totalArea) {
     this.vthTab = {
         32 : 0.00721,
         43 : 0.00530,

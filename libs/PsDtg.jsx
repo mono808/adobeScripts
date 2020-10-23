@@ -1,6 +1,4 @@
-﻿$.level = 1;
-
-var PsBase = require('PsBase');
+﻿var PsBase = require('PsBase');
 
 function PsDtg (initDoc) {
     PsBase.call(this, initDoc);

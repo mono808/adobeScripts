@@ -1,6 +1,4 @@
-﻿$.level = 1;
-
-function MonoSpot (name)
+﻿function MonoSpot (name)
 {
     this.name = name;
     this.spot;

@@ -33,12 +33,20 @@
     return desc;
   }
 
-  var enqueue = (function(nativePromise, nativeSetImmediate) {
+  var enqueue = (function (nativePromise, nativeSetImmediate) {
     if (nativePromise)
-      return function(job) { nativePromise.resolve().then(function() { job(); }); };
+      return function (job) {
+        nativePromise.resolve().then(function () {
+          job();
+        });
+      };
     if (nativeSetImmediate)
-      return function(job) { nativeSetImmediate(job); };
-    return function(job) { setTimeout(job, 0); };
+      return function (job) {
+        nativeSetImmediate(job);
+      };
+    return function (job) {
+      setTimeout(job, 0);
+    };
   }(global['Promise'], global['setImmediate']));
 
   function define(o, p, v, override) {
@@ -75,27 +83,27 @@
 
   // Snapshot intrinsic functions
   var $isNaN = global.isNaN,
-      $parseInt = global.parseInt,
-      $parseFloat = global.parseFloat;
+    $parseInt = global.parseInt,
+    $parseFloat = global.parseFloat;
 
   var E = Math.E,
-      LOG10E = Math.LOG10E,
-      LOG2E = Math.LOG2E,
-      abs = Math.abs,
-      ceil = Math.ceil,
-      exp = Math.exp,
-      floor = Math.floor,
-      log = Math.log,
-      max = Math.max,
-      min = Math.min,
-      pow = Math.pow,
-      random = Math.random,
-      sqrt = Math.sqrt;
+    LOG10E = Math.LOG10E,
+    LOG2E = Math.LOG2E,
+    abs = Math.abs,
+    ceil = Math.ceil,
+    exp = Math.exp,
+    floor = Math.floor,
+    log = Math.log,
+    max = Math.max,
+    min = Math.min,
+    pow = Math.pow,
+    random = Math.random,
+    sqrt = Math.sqrt;
 
   var orig_match = String.prototype.match,
-      orig_replace = String.prototype.replace,
-      orig_search = String.prototype.search,
-      orig_split = String.prototype.split;
+    orig_replace = String.prototype.replace,
+    orig_search = String.prototype.search,
+    orig_split = String.prototype.split;
 
   // These are used for implementing the polyfills, but not exported.
 
@@ -105,17 +113,18 @@
     var secretKey = ObjectCreate(null);
 
     function conceal(o) {
-      var oValueOf = o.valueOf, secrets = ObjectCreate(null);
+      var oValueOf = o.valueOf,
+        secrets = ObjectCreate(null);
       Object.defineProperty(o, 'valueOf', {
-          value: (function(secretKey) {
-            return function (k) {
-              return (k === secretKey) ? secrets : oValueOf.apply(o, arguments);
-            };
-          }(secretKey)),
+        value: (function (secretKey) {
+          return function (k) {
+            return (k === secretKey) ? secrets : oValueOf.apply(o, arguments);
+          };
+        }(secretKey)),
         configurable: true,
         writeable: true,
         enumerable: false
-        });
+      });
       return secrets;
     }
 
@@ -125,10 +134,10 @@
     }
 
     return {
-      clear: function() {
+      clear: function () {
         secretKey = ObjectCreate(null);
       },
-      remove: function(key) {
+      remove: function (key) {
         var secrets = reveal(key);
         if (secrets && HasOwnProperty(secrets, 'value')) {
           delete secrets.value;
@@ -136,15 +145,15 @@
         }
         return false;
       },
-      get: function(key, defaultValue) {
+      get: function (key, defaultValue) {
         var secrets = reveal(key);
         return (secrets && HasOwnProperty(secrets, 'value')) ? secrets.value : defaultValue;
       },
-      has: function(key) {
+      has: function (key) {
         var secrets = reveal(key);
         return Boolean(secrets && HasOwnProperty(secrets, 'value'));
       },
-      set: function(key, value) {
+      set: function (key, value) {
         var secrets = reveal(key) || conceal(key);
         secrets.value = value;
       }
@@ -170,17 +179,17 @@
   // NOTE: Not secure, nor is obj[$$symbol] hidden from Object.keys()
 
   var symbolForKey;
-  (function() {
+  (function () {
     var secret = Object.create(null);
     var symbolMap = {};
-    symbolForKey = function(k) {
+    symbolForKey = function (k) {
       return symbolMap[k];
     };
 
     var GlobalSymbolRegistry = [];
 
     function unique(bits) {
-      return Array(bits + 1).join('x').replace(/x/g, function() {
+      return Array(bits + 1).join('x').replace(/x/g, function () {
         return random() < 0.5 ? '\u200C' : '\u200D'; // JWNJ / ZWJ
       });
     }
@@ -213,7 +222,10 @@
         if (SameValue(e['[[key]]'], stringKey)) return e['[[symbol]]'];
       }
       var newSymbol = Symbol(key);
-      GlobalSymbolRegistry.push({'[[key]]': stringKey, '[[symbol]]': newSymbol});
+      GlobalSymbolRegistry.push({
+        '[[key]]': stringKey,
+        '[[symbol]]': newSymbol
+      });
       return newSymbol;
     });
 
@@ -266,7 +278,10 @@
         var desc = s['[[Description]]'];
         return 'Symbol(' + (desc === undefined ? '' : desc) + s['[[SymbolData]]'] + ')';
       },
-      configurable: true, writeable: true, enumerable: false });
+      configurable: true,
+      writeable: true,
+      enumerable: false
+    });
 
     // 19.4.3.3 Symbol.prototype.valueOf ( )
     Object.defineProperty(Symbol.prototype, 'valueOf', {
@@ -281,7 +296,10 @@
         //if (!('[[SymbolData]]' in s)) throw TypeError();
         //return s['[[SymbolData]]'];
       },
-      configurable: true, writeable: true, enumerable: false });
+      configurable: true,
+      writeable: true,
+      enumerable: false
+    });
 
     // 19.4.3.4 Symbol.prototype [ @@toStringTag ]
     // (Done later to polyfill partial implementations)
@@ -304,25 +322,30 @@
   // "Type(x)" is used as shorthand for "the type of x"...
   function Type(v) {
     switch (typeof v) {
-    case 'undefined': return 'undefined';
-    case 'boolean': return 'boolean';
-    case 'number': return 'number';
-    case 'string': return 'string';
-    case 'symbol': return 'symbol';
-    default:
-      if (v === null) return 'null';
-      if (v instanceof global.Symbol) return 'symbol';
-      return 'object';
+      case 'undefined':
+        return 'undefined';
+      case 'boolean':
+        return 'boolean';
+      case 'number':
+        return 'number';
+      case 'string':
+        return 'string';
+      case 'symbol':
+        return 'symbol';
+      default:
+        if (v === null) return 'null';
+        if (v instanceof global.Symbol) return 'symbol';
+        return 'object';
     }
   }
 
   // 6.1.5.1 Well-Known Symbols
   var $$iterator = global.Symbol.iterator,
-      $$match = global.Symbol.match,
-      $$replace = global.Symbol.replace,
-      $$search = global.Symbol.search,
-      $$split = global.Symbol.split,
-      $$toStringTag = global.Symbol.toStringTag;
+    $$match = global.Symbol.match,
+    $$replace = global.Symbol.replace,
+    $$search = global.Symbol.search,
+    $$split = global.Symbol.split,
+    $$toStringTag = global.Symbol.toStringTag;
 
   //----------------------------------------
   // 7 Abstract Operations
@@ -350,22 +373,34 @@
   }
 
   // 7.1.5 ToInt32 ( argument )
-  function ToInt32(v) { return v >> 0; }
+  function ToInt32(v) {
+    return v >> 0;
+  }
 
   // 7.1.6 ToUint32 ( argument )
-  function ToUint32(v) { return v >>> 0; }
+  function ToUint32(v) {
+    return v >>> 0;
+  }
 
   // 7.1.7 ToInt16 ( argument )
-  function ToInt16(v) { return (v << 16) >> 16; }
+  function ToInt16(v) {
+    return (v << 16) >> 16;
+  }
 
   // 7.1.8 ToUint16 ( argument )
-  function ToUint16(v) { return v & 0xFFFF; }
+  function ToUint16(v) {
+    return v & 0xFFFF;
+  }
 
   // 7.1.9 ToInt8 ( argument )
-  function ToInt8(v) { return (v << 24) >> 24; }
+  function ToInt8(v) {
+    return (v << 24) >> 24;
+  }
 
   // 7.1.10 ToUint8 ( argument )
-  function ToUint8(v) { return v & 0xFF; }
+  function ToUint8(v) {
+    return v & 0xFF;
+  }
 
   // 7.1.11 ToUint8Clamp ( argument )
   function ToUint8Clamp(argument) {
@@ -412,7 +447,9 @@
   // 7.2.2 IsArray ( argument )
 
   // 7.2.3 IsCallable ( argument )
-  function IsCallable(o) { return typeof o === 'function'; }
+  function IsCallable(o) {
+    return typeof o === 'function';
+  }
 
   // 7.2.4 IsConstructor ( argument )
   function IsConstructor(o) {
@@ -439,17 +476,17 @@
   function SameValue(x, y) {
     if (typeof x !== typeof y) return false;
     switch (typeof x) {
-    case 'undefined':
-      return true;
-    case 'number':
-      if (x !== x && y !== y) return true;
-      if (x === 0 && y === 0) return 1/x === 1/y;
-      return x === y;
-    case 'boolean':
-    case 'string':
-    case 'object':
-    default:
-      return x === y;
+      case 'undefined':
+        return true;
+      case 'number':
+        if (x !== x && y !== y) return true;
+        if (x === 0 && y === 0) return 1 / x === 1 / y;
+        return x === y;
+      case 'boolean':
+      case 'string':
+      case 'object':
+      default:
+        return x === y;
     }
   }
 
@@ -457,16 +494,16 @@
   function SameValueZero(x, y) {
     if (typeof x !== typeof y) return false;
     switch (typeof x) {
-    case 'undefined':
-      return true;
-    case 'number':
-      if (x !== x && y !== y) return true;
-      return x === y;
-    case 'boolean':
-    case 'string':
-    case 'object':
-    default:
-      return x === y;
+      case 'undefined':
+        return true;
+      case 'number':
+        if (x !== x && y !== y) return true;
+        return x === y;
+      case 'boolean':
+      case 'string':
+      case 'object':
+      default:
+        return x === y;
     }
   }
 
@@ -550,7 +587,7 @@
   }
 
   // 7.4.5 IteratorStep ( iterator )
-  function IteratorStep( iterator, value ) {
+  function IteratorStep(iterator, value) {
     var result = IteratorNext(iterator, value);
     var done = result['done'];
     if (Boolean(done) === true) return false;
@@ -558,7 +595,7 @@
   }
 
   // 7.4.6 IteratorClose( iterator, completion )
-  function IteratorClose( iterator, completion ) {
+  function IteratorClose(iterator, completion) {
     //console.assert(Type(iterator) === 'object');
     var _return = GetMethod(iterator, 'return');
     if (_return === undefined) return completion;
@@ -594,7 +631,9 @@
 
   // 8.4.1 EnqueueJob ( queueName, job, arguments)
   function EnqueueJob(queueName, job, args) {
-    var fn = function() { job.apply(undefined, args); };
+    var fn = function () {
+      job.apply(undefined, args);
+    };
     enqueue(fn);
   }
 
@@ -613,7 +652,7 @@
     if (Object(obj) !== obj) return e;
     var visited = new Set;
     while (obj !== null) {
-      Object.getOwnPropertyNames(obj).forEach(function(name) {
+      Object.getOwnPropertyNames(obj).forEach(function (name) {
         if (!visited.has(name)) {
           var desc = Object.getOwnPropertyDescriptor(obj, name);
           if (desc) {
@@ -651,7 +690,7 @@
   // 19.1.2.1 Object.assign ( target, ...sources )
   define(
     Object, 'assign',
-    function assign(target, /*...*/sources) {
+    function assign(target, /*...*/ sources) {
       var to = ToObject(target);
       if (arguments.length < 2) return to;
 
@@ -682,13 +721,15 @@
   // 19.1.2.5 Object.freeze ( O )
   // 19.1.2.6 Object.getOwnPropertyDescriptor ( O, P )
 
-  (function() {
+  (function () {
     var nativeSymbols = (typeof global.Symbol() === 'symbol'),
-        $getOwnPropertyNames = Object.getOwnPropertyNames,
-        $keys = Object.keys,
-        $window_names = (typeof window === 'object' ? $getOwnPropertyNames(window) : []);
+      $getOwnPropertyNames = Object.getOwnPropertyNames,
+      $keys = Object.keys,
+      $window_names = (typeof window === 'object' ? $getOwnPropertyNames(window) : []);
 
-    function isStringKey(k) { return !symbolForKey(k); }
+    function isStringKey(k) {
+      return !symbolForKey(k);
+    }
 
     // 19.1.2.7 Object.getOwnPropertyNames ( O )
     define(
@@ -760,13 +801,13 @@
   // 19.1.3.6 Object.prototype.toString ( )
   var o_p_ts = Object.prototype.toString;
   define(Object.prototype, 'toString',
-       function() {
-         var o = strict(this);
-         if (o === Object(o) && $$toStringTag in o) {
-           return '[object ' + o[$$toStringTag] + ']';
-         }
-         return o_p_ts.apply(o, arguments);
-       });
+    function () {
+      var o = strict(this);
+      if (o === Object(o) && $$toStringTag in o) {
+        return '[object ' + o[$$toStringTag] + ']';
+      }
+      return o_p_ts.apply(o, arguments);
+    });
 
   // 19.1.3.7 Object.prototype.valueOf ( )
   // 19.1.4 Properties of Object Instances
@@ -1012,12 +1053,12 @@
     Math, 'cbrt',
     function cbrt(x) {
       x = Number(x);
-      if ($isNaN(x/x)) {
+      if ($isNaN(x / x)) {
         return x;
       }
-      var r = pow(abs(x), 1/3);
-      var t = x/r/r;
-      return r + (r * (t-r) / (2*r + t));
+      var r = pow(abs(x), 1 / 3);
+      var t = x / r / r;
+      return r + (r * (t - r) / (2 * r + t));
     });
 
   // 20.2.2.10 Math.ceil ( x )
@@ -1028,7 +1069,7 @@
     function clz32(x) {
       function clz8(x) {
         return (x & 0xf0) ? (x & 0x80 ? 0 : x & 0x40 ? 1 : x & 0x20 ? 2 : 3) :
-        (x & 0x08 ? 4 : x & 0x04 ? 5 : x & 0x02 ? 6 : x & 0x01 ? 7 : 8);
+          (x & 0x08 ? 4 : x & 0x04 ? 5 : x & 0x02 ? 6 : x & 0x01 ? 7 : 8);
       }
       x = ToUint32(x);
       return x & 0xff000000 ? clz8(x >> 24) :
@@ -1074,7 +1115,7 @@
       if ($isNaN(x)) {
         return NaN;
       }
-      if (1/x === +Infinity || 1/x === -Infinity || x === +Infinity || x === -Infinity) {
+      if (1 / x === +Infinity || 1 / x === -Infinity || x === +Infinity || x === -Infinity) {
         return x;
       }
       return (new Float32Array([x]))[0];
@@ -1085,7 +1126,8 @@
     Math, 'hypot',
     function hypot() {
       var values = [];
-      var m = 0, sawNaN = false;
+      var m = 0,
+        sawNaN = false;
       for (var i = 0; i < arguments.length; ++i) {
         var n = abs(Number(arguments[i]));
         if (n === Infinity) return n;
@@ -1110,11 +1152,11 @@
       var a = ToUint32(x);
       var b = ToUint32(y);
       // (slow but accurate)
-      var ah  = (a >>> 16) & 0xffff;
+      var ah = (a >>> 16) & 0xffff;
       var al = a & 0xffff;
-      var bh  = (b >>> 16) & 0xffff;
+      var bh = (b >>> 16) & 0xffff;
       var bl = b & 0xffff;
-      return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0)|0);
+      return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);
     }, ('imul' in Math && Math.imul(1, 0x80000000) === 0) // Safari 7 bug
   );
 
@@ -1186,7 +1228,7 @@
     function tanh(x) {
       x = Number(x);
       var n = pow(E, 2 * x) - 1,
-          d = pow(E, 2 * x) + 1;
+        d = pow(E, 2 * x) + 1;
       if (SameValue(x, -0))
         return x;
       return (n === d) ? 1 : n / d; // Handle Infinity/Infinity
@@ -1285,9 +1327,12 @@
   // 21 Text Processing
   // ---------------------------------------
 
-  var string_regexp_dispatch = (function() {
-    var faux = {}, secret = Symbol();
-    faux[Symbol.match] = function() { return secret; };
+  var string_regexp_dispatch = (function () {
+    var faux = {},
+      secret = Symbol();
+    faux[Symbol.match] = function () {
+      return secret;
+    };
     return ("").match(faux) === secret;
   }());
 
@@ -1300,16 +1345,16 @@
   // 21.1.2.2 String.fromCodePoint ( ...codePoints )
   define(
     String, 'fromCodePoint',
-    function fromCodePoint(/*...codePoints*/) {
+    function fromCodePoint( /*...codePoints*/ ) {
       var codePoints = arguments,
-          length = codePoints.length,
-          elements = [],
-          nextIndex = 0;
+        length = codePoints.length,
+        elements = [],
+        nextIndex = 0;
       while (nextIndex < length) {
         var next = codePoints[nextIndex];
         var nextCP = Number(next);
         if (!SameValue(nextCP, ToInteger(nextCP)) ||
-            nextCP < 0 || nextCP > 0x10FFFF) {
+          nextCP < 0 || nextCP > 0x10FFFF) {
           throw RangeError('Invalid code point ' + nextCP);
         }
         if (nextCP < 0x10000) {
@@ -1329,7 +1374,7 @@
   // 21.1.2.4 String.raw ( template , ...substitutions )
   define(
     String, 'raw',
-    function raw(template /*, ...substitutions*/) {
+    function raw(template /*, ...substitutions*/ ) {
       var substitutions = [].slice.call(arguments, 1);
 
       var cooked = Object(template);
@@ -1537,8 +1582,8 @@
     function next() {
       var o = ToObject(this);
       var s = String(o['[[IteratedString]]']),
-          index = o['[[StringIteratorNextIndex]]'],
-          len = s.length;
+        index = o['[[StringIteratorNextIndex]]'],
+        len = s.length;
       if (index >= len) {
         set_internal(o, '[[StringIteratorNextIndex]]', Infinity);
         return CreateIterResultObject(undefined, true);
@@ -1592,7 +1637,7 @@
   if (!('flags' in RegExp.prototype)) {
     Object.defineProperty(
       RegExp.prototype, 'flags', {
-        get: function() {
+        get: function () {
           var s = String(this);
           return s.substring(s.lastIndexOf('/') + 1);
         }
@@ -1603,7 +1648,7 @@
   // 21.2.5.5 get RegExp.prototype.ignoreCase
 
   // 21.2.5.6 RegExp.prototype [ @@match ] ( string )
-  define(RegExp.prototype, $$match, function(string) {
+  define(RegExp.prototype, $$match, function (string) {
     var o = strict(this);
     return orig_match.call(string, o);
   });
@@ -1611,13 +1656,13 @@
   // 21.2.5.7 get RegExp.prototype.multiline
 
   // 21.2.5.8 RegExp.prototype [ @@replace ] ( string, replaceValue )
-  define(RegExp.prototype, $$replace, function(string, replaceValue) {
+  define(RegExp.prototype, $$replace, function (string, replaceValue) {
     var o = strict(this);
     return orig_replace.call(string, o, replaceValue);
   });
 
   // 21.2.5.9 RegExp.prototype [ @@search ] ( string )
-  define(RegExp.prototype, $$search, function(string) {
+  define(RegExp.prototype, $$search, function (string) {
     var o = strict(this);
     return orig_search.call(string, o);
   });
@@ -1625,7 +1670,7 @@
   // 21.2.5.10 get RegExp.prototype.source
 
   // 21.2.5.11 RegExp.prototype [ @@split ] ( string, limit )
-  define(RegExp.prototype, $$split, function(string, limit) {
+  define(RegExp.prototype, $$split, function (string, limit) {
     var o = strict(this);
     return orig_split.call(string, o, limit);
   });
@@ -1672,7 +1717,7 @@
       }
       var usingIterator = GetMethod(items, $$iterator);
       if (usingIterator !== undefined) {
-         if (IsConstructor(c)) {
+        if (IsConstructor(c)) {
           var a = new c();
         } else {
           a = new Array(0);
@@ -1721,12 +1766,13 @@
   // 22.1.2.3 Array.of ( ...items )
   define(
     Array, 'of',
-    function of() {
+    function of () {
       var items = arguments;
 
       var lenValue = items.length;
       var len = ToUint32(lenValue);
-      var c = strict(this), a;
+      var c = strict(this),
+        a;
       if (IsConstructor(c)) {
         a = new c(len);
         a = ToObject(a);
@@ -1751,7 +1797,7 @@
   // 22.1.3.3 Array.prototype.copyWithin (target, start [ , end ] )
   define(
     Array.prototype, 'copyWithin',
-    function copyWithin(target, start/*, end*/) {
+    function copyWithin(target, start /*, end*/ ) {
       var end = arguments[2];
 
       var o = ToObject(this);
@@ -1808,7 +1854,7 @@
 
   // 22.1.3.4 Array.prototype.entries ( )
   var nativeArrayIteratorMethods =
-        ('entries' in Array.prototype && 'next' in [].entries());
+    ('entries' in Array.prototype && 'next' in [].entries());
 
   define(
     Array.prototype, 'entries',
@@ -1821,9 +1867,9 @@
   // 22.1.3.6 Array.prototype.fill (value [ , start [ , end ] ] )
   define(
     Array.prototype, 'fill',
-    function fill(value/*, start, end*/) {
+    function fill(value /*, start, end*/ ) {
       var start = arguments[1],
-          end = arguments[2];
+        end = arguments[2];
 
       var o = ToObject(this);
       var lenVal = o.length;
@@ -1943,7 +1989,7 @@
   define(
     Array.prototype, $$iterator,
     Array.prototype.values
-    );
+  );
 
   // 22.1.3.31 Array.prototype [ @@unscopables ]
   // 22.1.4 Properties of Array Instances
@@ -1973,12 +2019,12 @@
       var o = strict(this);
       if (Type(o) !== 'object') throw TypeError();
       var a = o['[[IteratedObject]]'],
-          index = o['[[ArrayIteratorNextIndex]]'],
-          itemKind = o['[[ArrayIterationKind]]'],
-          lenValue = a.length,
-          len = ToUint32(lenValue),
-          elementKey,
-          elementValue;
+        index = o['[[ArrayIteratorNextIndex]]'],
+        itemKind = o['[[ArrayIterationKind]]'],
+        lenValue = a.length,
+        len = ToUint32(lenValue),
+        elementKey,
+        elementValue;
       if (itemKind.indexOf('sparse') !== -1) {
         var found = false;
         while (!found && index < len) {
@@ -2019,325 +2065,326 @@
   // See typedarray.js for TypedArray polyfill
 
   ['Int8Array', 'Uint8Array', 'Uint8ClampedArray',
-   'Int16Array', 'Uint16Array',
-   'Int32Array', 'Uint32Array',
-   'Float32Array', 'Float64Array'].forEach(function ($TypedArrayName$) {
-     if (!($TypedArrayName$ in global))
-       return;
-     var $TypedArray$ = global[$TypedArrayName$];
+    'Int16Array', 'Uint16Array',
+    'Int32Array', 'Uint32Array',
+    'Float32Array', 'Float64Array'
+  ].forEach(function ($TypedArrayName$) {
+    if (!($TypedArrayName$ in global))
+      return;
+    var $TypedArray$ = global[$TypedArrayName$];
 
-     // 22.2.1 The %TypedArray% Intrinsic Object
-     // 22.2.1.1 %TypedArray% ( length )
-     // 22.2.1.2 %TypedArray% ( typedArray )
-     // 22.2.1.3 %TypedArray% ( object )
-     // 22.2.1.4 %TypedArray% ( buffer [ , byteOffset [ , length ] ] )
-     // 22.2.1.5 %TypedArray% ( all other argument combinations )
-     // 22.2.2 Properties of the %TypedArray% Intrinsic Object
+    // 22.2.1 The %TypedArray% Intrinsic Object
+    // 22.2.1.1 %TypedArray% ( length )
+    // 22.2.1.2 %TypedArray% ( typedArray )
+    // 22.2.1.3 %TypedArray% ( object )
+    // 22.2.1.4 %TypedArray% ( buffer [ , byteOffset [ , length ] ] )
+    // 22.2.1.5 %TypedArray% ( all other argument combinations )
+    // 22.2.2 Properties of the %TypedArray% Intrinsic Object
 
-     // 22.2.2.1 %TypedArray%.from ( source [ , mapfn [ , thisArg ] ] )
-     define(
-       $TypedArray$, 'from',
-       function from(source) {
-         var mapfn = arguments[1];
-         var thisArg = arguments[2];
+    // 22.2.2.1 %TypedArray%.from ( source [ , mapfn [ , thisArg ] ] )
+    define(
+      $TypedArray$, 'from',
+      function from(source) {
+        var mapfn = arguments[1];
+        var thisArg = arguments[2];
 
-         var c = strict(this);
-         if (!IsConstructor(c)) throw TypeError();
-         if (mapfn === undefined) {
-           var mapping = false;
-         } else {
-           if (IsCallable(mapfn)) throw TypeError();
-           var t = thisArg;
-           mapping = true;
-         }
-         var usingIterator = GetMethod(source, $$iterator);
-         if (usingIterator !== undefined) {
-           var iterator = GetIterator(source, usingIterator);
-           var values = [];
-           var next = true;
-           while (next !== false) {
-             next = IteratorStep(iterator);
-             if (next !== false) {
-               var nextValue = IteratorValue(next);
-               values.push(nextValue);
-             }
-           }
-           var len = values.length;
-           var newObj = new c(len);
-           var k = 0;
-           while (k < len) {
-             var kValue = values.shift();
-             if (mapping) {
-               var mappedValue = mapfn.call(t, kValue);
-             } else {
-               mappedValue = kValue;
-             }
-             newObj[k] = mappedValue;
-             ++k;
-           }
-           //console.assert(values.length === 0);
-           return newObj;
-         }
-         var arrayLike = ToObject(source);
-         var lenValue = arrayLike.length;
-         len = ToLength(lenValue);
-         newObj = new c(len);
-         k = 0;
-         while (k < len) {
-           kValue = arrayLike[k];
-           if (mapping) {
-             mappedValue = mapfn.call(t, kValue, k);
-           } else {
-             mappedValue = kValue;
-           }
-           newObj[k] = mappedValue;
-           ++k;
-         }
-         return newObj;
-       });
+        var c = strict(this);
+        if (!IsConstructor(c)) throw TypeError();
+        if (mapfn === undefined) {
+          var mapping = false;
+        } else {
+          if (IsCallable(mapfn)) throw TypeError();
+          var t = thisArg;
+          mapping = true;
+        }
+        var usingIterator = GetMethod(source, $$iterator);
+        if (usingIterator !== undefined) {
+          var iterator = GetIterator(source, usingIterator);
+          var values = [];
+          var next = true;
+          while (next !== false) {
+            next = IteratorStep(iterator);
+            if (next !== false) {
+              var nextValue = IteratorValue(next);
+              values.push(nextValue);
+            }
+          }
+          var len = values.length;
+          var newObj = new c(len);
+          var k = 0;
+          while (k < len) {
+            var kValue = values.shift();
+            if (mapping) {
+              var mappedValue = mapfn.call(t, kValue);
+            } else {
+              mappedValue = kValue;
+            }
+            newObj[k] = mappedValue;
+            ++k;
+          }
+          //console.assert(values.length === 0);
+          return newObj;
+        }
+        var arrayLike = ToObject(source);
+        var lenValue = arrayLike.length;
+        len = ToLength(lenValue);
+        newObj = new c(len);
+        k = 0;
+        while (k < len) {
+          kValue = arrayLike[k];
+          if (mapping) {
+            mappedValue = mapfn.call(t, kValue, k);
+          } else {
+            mappedValue = kValue;
+          }
+          newObj[k] = mappedValue;
+          ++k;
+        }
+        return newObj;
+      });
 
-     // 22.2.2.2 %TypedArray%.of ( ...items )
-     define(
-       $TypedArray$, 'of',
-       function of() {
-         var items = arguments;
+    // 22.2.2.2 %TypedArray%.of ( ...items )
+    define(
+      $TypedArray$, 'of',
+      function of () {
+        var items = arguments;
 
-         var len = items.length;
-         var c = strict(this);
-         var newObj = new c(len);
-         var k = 0;
-         while (k < len) {
-           newObj[k] = items[k];
-           ++k;
-         }
-         return newObj;
-       });
+        var len = items.length;
+        var c = strict(this);
+        var newObj = new c(len);
+        var k = 0;
+        while (k < len) {
+          newObj[k] = items[k];
+          ++k;
+        }
+        return newObj;
+      });
 
-     // 22.2.2.3 %TypedArray%.prototype
-     // 22.2.2.4 get %TypedArray% [ @@species ]
-     // 22.2.3 Properties of the %TypedArrayPrototype% Object
-     // 22.2.3.1 get %TypedArray%.prototype.buffer
-     // 22.2.3.2 get %TypedArray%.prototype.byteLength
-     // 22.2.3.3 get %TypedArray%.prototype.byteOffset
-     // 22.2.3.4 %TypedArray%.prototype.constructor
+    // 22.2.2.3 %TypedArray%.prototype
+    // 22.2.2.4 get %TypedArray% [ @@species ]
+    // 22.2.3 Properties of the %TypedArrayPrototype% Object
+    // 22.2.3.1 get %TypedArray%.prototype.buffer
+    // 22.2.3.2 get %TypedArray%.prototype.byteLength
+    // 22.2.3.3 get %TypedArray%.prototype.byteOffset
+    // 22.2.3.4 %TypedArray%.prototype.constructor
 
-     // 22.2.3.5 %TypedArray%.prototype.copyWithin (target, start [, end ] )
-     define($TypedArray$.prototype, 'copyWithin', Array.prototype.copyWithin);
+    // 22.2.3.5 %TypedArray%.prototype.copyWithin (target, start [, end ] )
+    define($TypedArray$.prototype, 'copyWithin', Array.prototype.copyWithin);
 
-     // 22.2.3.6 %TypedArray%.prototype.entries ( )
-     define($TypedArray$.prototype, 'entries', Array.prototype.entries);
+    // 22.2.3.6 %TypedArray%.prototype.entries ( )
+    define($TypedArray$.prototype, 'entries', Array.prototype.entries);
 
-     // 22.2.3.7 %TypedArray%.prototype.every ( callbackfn [ , thisArg ] )
-     define($TypedArray$.prototype, 'every', Array.prototype.every);
+    // 22.2.3.7 %TypedArray%.prototype.every ( callbackfn [ , thisArg ] )
+    define($TypedArray$.prototype, 'every', Array.prototype.every);
 
-     // 22.2.3.8 %TypedArray%.prototype.fill (value [ , start [ , end ] ] )
-     define(
-       $TypedArray$.prototype, 'fill',
-       //Array.prototype.fill // Doesn't work in Safari 7
-       function fill(value/*, start, end*/) {
-         var start = arguments[1],
-             end = arguments[2];
+    // 22.2.3.8 %TypedArray%.prototype.fill (value [ , start [ , end ] ] )
+    define(
+      $TypedArray$.prototype, 'fill',
+      //Array.prototype.fill // Doesn't work in Safari 7
+      function fill(value /*, start, end*/ ) {
+        var start = arguments[1],
+          end = arguments[2];
 
-         var o = ToObject(this);
-         var lenVal = o.length;
-         var len = ToLength(lenVal);
-         len = max(len, 0);
-         var relativeStart = ToInteger(start);
-         var k;
-         if (relativeStart < 0) k = max((len + relativeStart), 0);
-         else k = min(relativeStart, len);
-         var relativeEnd;
-         if (end === undefined) relativeEnd = len;
-         else relativeEnd = ToInteger(end);
-         var final_;
-         if (relativeEnd < 0) final_ = max((len + relativeEnd), 0);
-         else final_ = min(relativeEnd, len);
-         while (k < final_) {
-           var pk = String(k);
-           o[pk] = value;
-           k += 1;
-         }
-         return o;
-       });
+        var o = ToObject(this);
+        var lenVal = o.length;
+        var len = ToLength(lenVal);
+        len = max(len, 0);
+        var relativeStart = ToInteger(start);
+        var k;
+        if (relativeStart < 0) k = max((len + relativeStart), 0);
+        else k = min(relativeStart, len);
+        var relativeEnd;
+        if (end === undefined) relativeEnd = len;
+        else relativeEnd = ToInteger(end);
+        var final_;
+        if (relativeEnd < 0) final_ = max((len + relativeEnd), 0);
+        else final_ = min(relativeEnd, len);
+        while (k < final_) {
+          var pk = String(k);
+          o[pk] = value;
+          k += 1;
+        }
+        return o;
+      });
 
-     // 22.2.3.9 %TypedArray%.prototype.filter ( callbackfn [ , thisArg ] )
-     define(
-       $TypedArray$.prototype, 'filter',
-       function filter(callbackfn) {
-         var thisArg = arguments[1];
+    // 22.2.3.9 %TypedArray%.prototype.filter ( callbackfn [ , thisArg ] )
+    define(
+      $TypedArray$.prototype, 'filter',
+      function filter(callbackfn) {
+        var thisArg = arguments[1];
 
-         var o = ToObject(this);
-         var lenVal = o.length;
-         var len = ToLength(lenVal);
-         if (!IsCallable(callbackfn)) throw TypeError();
-         var t = thisArg;
-         var c = o.constructor;
-         var kept = [];
-         var k = 0;
-         var captured = 0;
-         while (k < len) {
-           var kValue = o[k];
-           var selected = callbackfn.call(t, kValue, k, o);
-           if (selected) {
-             kept.push(kValue);
-             ++captured;
-           }
-           ++k;
-         }
-         var a = new c(captured);
-         var n = 0;
-         for (var i = 0; i < kept.length; ++i) {
-           var e = kept[i];
-           a[n] = e;
-           ++n;
-         }
-         return a;
-       });
+        var o = ToObject(this);
+        var lenVal = o.length;
+        var len = ToLength(lenVal);
+        if (!IsCallable(callbackfn)) throw TypeError();
+        var t = thisArg;
+        var c = o.constructor;
+        var kept = [];
+        var k = 0;
+        var captured = 0;
+        while (k < len) {
+          var kValue = o[k];
+          var selected = callbackfn.call(t, kValue, k, o);
+          if (selected) {
+            kept.push(kValue);
+            ++captured;
+          }
+          ++k;
+        }
+        var a = new c(captured);
+        var n = 0;
+        for (var i = 0; i < kept.length; ++i) {
+          var e = kept[i];
+          a[n] = e;
+          ++n;
+        }
+        return a;
+      });
 
-     // 22.2.3.10 %TypedArray%.prototype.find (predicate [ , thisArg ] )
-     define($TypedArray$.prototype, 'find', Array.prototype.find);
+    // 22.2.3.10 %TypedArray%.prototype.find (predicate [ , thisArg ] )
+    define($TypedArray$.prototype, 'find', Array.prototype.find);
 
-     // 22.2.3.11 %TypedArray%.prototype.findIndex ( predicate [ , thisArg ] )
-     define($TypedArray$.prototype, 'findIndex', Array.prototype.findIndex);
+    // 22.2.3.11 %TypedArray%.prototype.findIndex ( predicate [ , thisArg ] )
+    define($TypedArray$.prototype, 'findIndex', Array.prototype.findIndex);
 
-     // 22.2.3.12 %TypedArray%.prototype.forEach ( callbackfn [ , thisArg ] )
-     define($TypedArray$.prototype, 'forEach', Array.prototype.forEach);
+    // 22.2.3.12 %TypedArray%.prototype.forEach ( callbackfn [ , thisArg ] )
+    define($TypedArray$.prototype, 'forEach', Array.prototype.forEach);
 
-     // 22.2.3.13 %TypedArray%.prototype.indexOf (searchElement [ , fromIndex ] )
-     define($TypedArray$.prototype, 'indexOf', Array.prototype.indexOf);
+    // 22.2.3.13 %TypedArray%.prototype.indexOf (searchElement [ , fromIndex ] )
+    define($TypedArray$.prototype, 'indexOf', Array.prototype.indexOf);
 
-     // 22.2.3.14 %TypedArray%.prototype.join ( separator )
-     define($TypedArray$.prototype, 'join', Array.prototype.join);
+    // 22.2.3.14 %TypedArray%.prototype.join ( separator )
+    define($TypedArray$.prototype, 'join', Array.prototype.join);
 
-     // 22.2.3.15 %TypedArray%.prototype.keys ( )
-     define($TypedArray$.prototype, 'keys', Array.prototype.keys);
+    // 22.2.3.15 %TypedArray%.prototype.keys ( )
+    define($TypedArray$.prototype, 'keys', Array.prototype.keys);
 
-     // 22.2.3.16 %TypedArray%.prototype.lastIndexOf ( searchElement [ , fromIndex ] )
-     define($TypedArray$.prototype, 'lastIndexOf', Array.prototype.lastIndexOf);
+    // 22.2.3.16 %TypedArray%.prototype.lastIndexOf ( searchElement [ , fromIndex ] )
+    define($TypedArray$.prototype, 'lastIndexOf', Array.prototype.lastIndexOf);
 
-     // 22.2.3.17 get %TypedArray%.prototype.length
+    // 22.2.3.17 get %TypedArray%.prototype.length
 
-     // 22.2.3.18 %TypedArray%.prototype.map ( callbackfn [ , thisArg ] )
-     define(
-       $TypedArray$.prototype, 'map',
-       function map(callbackfn) {
-         var thisArg = arguments[1];
+    // 22.2.3.18 %TypedArray%.prototype.map ( callbackfn [ , thisArg ] )
+    define(
+      $TypedArray$.prototype, 'map',
+      function map(callbackfn) {
+        var thisArg = arguments[1];
 
-         var o = ToObject(this);
-         var lenValue = o.length;
-         var len = ToLength(lenValue);
-         if (!IsCallable(callbackfn)) throw TypeError();
-         var t = thisArg;
-         var a = undefined;
-         var c = o.constructor;
-         if (IsConstructor(c))
-           a = new c(len);
-         if (a === undefined)
-           a = new Array(len);
-         var k = 0;
-         while (k < len) {
-           var kPresent = HasProperty(o, k);
-           if (kPresent) {
-             var kValue = o[k];
-             var mappedValue = callbackfn.call(t, kValue, k, o);
-             a[k] = mappedValue;
-           }
-           ++k;
-         }
-         return a;
-       });
+        var o = ToObject(this);
+        var lenValue = o.length;
+        var len = ToLength(lenValue);
+        if (!IsCallable(callbackfn)) throw TypeError();
+        var t = thisArg;
+        var a = undefined;
+        var c = o.constructor;
+        if (IsConstructor(c))
+          a = new c(len);
+        if (a === undefined)
+          a = new Array(len);
+        var k = 0;
+        while (k < len) {
+          var kPresent = HasProperty(o, k);
+          if (kPresent) {
+            var kValue = o[k];
+            var mappedValue = callbackfn.call(t, kValue, k, o);
+            a[k] = mappedValue;
+          }
+          ++k;
+        }
+        return a;
+      });
 
-     // 22.2.3.19 %TypedArray%.prototype.reduce ( callbackfn [, initialValue] )
-     define($TypedArray$.prototype, 'reduce', Array.prototype.reduce);
+    // 22.2.3.19 %TypedArray%.prototype.reduce ( callbackfn [, initialValue] )
+    define($TypedArray$.prototype, 'reduce', Array.prototype.reduce);
 
-     // 22.2.3.20 %TypedArray%.prototype.reduceRight ( callbackfn [, initialValue] )
-     define($TypedArray$.prototype, 'reduceRight', Array.prototype.reduceRight);
+    // 22.2.3.20 %TypedArray%.prototype.reduceRight ( callbackfn [, initialValue] )
+    define($TypedArray$.prototype, 'reduceRight', Array.prototype.reduceRight);
 
-     // 22.2.3.21 %TypedArray%.prototype.reverse ( )
-     define($TypedArray$.prototype, 'reverse', Array.prototype.reverse);
+    // 22.2.3.21 %TypedArray%.prototype.reverse ( )
+    define($TypedArray$.prototype, 'reverse', Array.prototype.reverse);
 
-     // 22.2.3.22 %TypedArray%.prototype.set ( overloaded [ , offset ])
-     // 22.2.3.22.1 %TypedArray%.prototype.set (array [ , offset ] )
-     // 22.2.3.22.2 %TypedArray%.prototype.set(typedArray [, offset ] )
+    // 22.2.3.22 %TypedArray%.prototype.set ( overloaded [ , offset ])
+    // 22.2.3.22.1 %TypedArray%.prototype.set (array [ , offset ] )
+    // 22.2.3.22.2 %TypedArray%.prototype.set(typedArray [, offset ] )
 
-     // 22.2.3.23 %TypedArray%.prototype.slice ( start, end )
-     define(
-       $TypedArray$.prototype, 'slice',
-       function slice(start, end) {
-         var o = ToObject(this);
-         var lenVal = o.length;
-         var len = ToLength(lenVal);
-         var relativeStart = ToInteger(start);
-         var k = (relativeStart < 0) ? max(len + relativeStart, 0) : min(relativeStart, len);
-         var relativeEnd = (end === undefined) ? len : ToInteger(end);
-         var final_ = (relativeEnd < 0) ? max(len + relativeEnd, 0) : min(relativeEnd, len);
-         var count = final_ - k;
-         var c = o.constructor;
-         if (IsConstructor(c)) {
-           var a = new c(count);
-         } else {
-           throw TypeError();
-         }
-         var n = 0;
-         while (k < final_) {
-           var kValue = o[k];
-           a[n] = kValue;
-           ++k;
-           ++n;
-         }
-         return a;
-       });
+    // 22.2.3.23 %TypedArray%.prototype.slice ( start, end )
+    define(
+      $TypedArray$.prototype, 'slice',
+      function slice(start, end) {
+        var o = ToObject(this);
+        var lenVal = o.length;
+        var len = ToLength(lenVal);
+        var relativeStart = ToInteger(start);
+        var k = (relativeStart < 0) ? max(len + relativeStart, 0) : min(relativeStart, len);
+        var relativeEnd = (end === undefined) ? len : ToInteger(end);
+        var final_ = (relativeEnd < 0) ? max(len + relativeEnd, 0) : min(relativeEnd, len);
+        var count = final_ - k;
+        var c = o.constructor;
+        if (IsConstructor(c)) {
+          var a = new c(count);
+        } else {
+          throw TypeError();
+        }
+        var n = 0;
+        while (k < final_) {
+          var kValue = o[k];
+          a[n] = kValue;
+          ++k;
+          ++n;
+        }
+        return a;
+      });
 
-     // 22.2.3.24 %TypedArray%.prototype.some ( callbackfn [ , thisArg ] )
-     define($TypedArray$.prototype, 'some', Array.prototype.some);
+    // 22.2.3.24 %TypedArray%.prototype.some ( callbackfn [ , thisArg ] )
+    define($TypedArray$.prototype, 'some', Array.prototype.some);
 
-     // 22.2.3.25 %TypedArray%.prototype.sort ( comparefn )
-     define(
-       $TypedArray$.prototype, 'sort',
-       function sort() {
-         var comparefn = arguments[0];
+    // 22.2.3.25 %TypedArray%.prototype.sort ( comparefn )
+    define(
+      $TypedArray$.prototype, 'sort',
+      function sort() {
+        var comparefn = arguments[0];
 
-         function sortCompare(x, y) {
-           //console.assert(Type(x) === 'number' && Type(y) === 'number');
-           if (x !== x && y !== y) return +0;
-           if (x !== x) return 1;
-           if (y !== y) return -1;
-           if (comparefn !== undefined) {
-             return comparefn(x, y);
-           }
-           if (x < y) return -1;
-           if (x > y) return 1;
-           return +0;
-         }
-         return Array.prototype.sort.call(this, sortCompare);
-       });
+        function sortCompare(x, y) {
+          //console.assert(Type(x) === 'number' && Type(y) === 'number');
+          if (x !== x && y !== y) return +0;
+          if (x !== x) return 1;
+          if (y !== y) return -1;
+          if (comparefn !== undefined) {
+            return comparefn(x, y);
+          }
+          if (x < y) return -1;
+          if (x > y) return 1;
+          return +0;
+        }
+        return Array.prototype.sort.call(this, sortCompare);
+      });
 
-     // 22.2.3.26 %TypedArray%.prototype.subarray( [ begin [ , end ] ] )
-     // 22.2.3.27 %TypedArray%.prototype.toLocaleString ([ reserved1 [ , reserved2 ] ])
-     // 22.2.3.28 %TypedArray%.prototype.toString ( )
+    // 22.2.3.26 %TypedArray%.prototype.subarray( [ begin [ , end ] ] )
+    // 22.2.3.27 %TypedArray%.prototype.toLocaleString ([ reserved1 [ , reserved2 ] ])
+    // 22.2.3.28 %TypedArray%.prototype.toString ( )
 
-     // 22.2.3.29 %TypedArray%.prototype.values ( )
-     define($TypedArray$.prototype, 'values', Array.prototype.values);
+    // 22.2.3.29 %TypedArray%.prototype.values ( )
+    define($TypedArray$.prototype, 'values', Array.prototype.values);
 
-     // 22.2.3.30 %TypedArray%.prototype [ @@iterator ] ( )
-     define(
-       $TypedArray$.prototype, $$iterator,
-       $TypedArray$.prototype.values
-     );
+    // 22.2.3.30 %TypedArray%.prototype [ @@iterator ] ( )
+    define(
+      $TypedArray$.prototype, $$iterator,
+      $TypedArray$.prototype.values
+    );
 
-     // 22.2.3.31 get %TypedArray%.prototype [ @@toStringTag ]
-     define($TypedArray$.prototype, $$toStringTag, $TypedArrayName$);
+    // 22.2.3.31 get %TypedArray%.prototype [ @@toStringTag ]
+    define($TypedArray$.prototype, $$toStringTag, $TypedArrayName$);
 
-     // 22.2.4 The TypedArray Constructors
-     // 22.2.4.1TypedArray( ... argumentsList)
-     // 22.2.5 Properties of the TypedArray Constructors
-     // 22.2.5.1 TypedArray.BYTES_PER_ELEMENT
-     // 22.2.5.2 TypedArray.prototype
-     // 22.2.6 Properties of TypedArray Prototype Objects
-     // 22.2.6.1 TypedArray.prototype.BYTES_PER_ELEMENT
-     // 22.2.6.2 TypedArray.prototype.constructor
-     // 22.2.7 Properties of TypedArray Instances
-   });
+    // 22.2.4 The TypedArray Constructors
+    // 22.2.4.1TypedArray( ... argumentsList)
+    // 22.2.5 Properties of the TypedArray Constructors
+    // 22.2.5.1 TypedArray.BYTES_PER_ELEMENT
+    // 22.2.5.2 TypedArray.prototype
+    // 22.2.6 Properties of TypedArray Prototype Objects
+    // 22.2.6.1 TypedArray.prototype.BYTES_PER_ELEMENT
+    // 22.2.6.2 TypedArray.prototype.constructor
+    // 22.2.7 Properties of TypedArray Instances
+  });
 
   // ---------------------------------------
   // 23 Keyed Collection
@@ -2347,12 +2394,12 @@
   // 23.1 Map Objects
   // ---------------------------------------
 
-  (function() {
+  (function () {
     // 23.1.1 The Map Constructor
 
     // 23.1.1.1 Map ( [ iterable ] )
     /** @constructor */
-    function Map(/*iterable*/) {
+    function Map( /*iterable*/ ) {
       var map = strict(this);
       var iterable = arguments[0];
 
@@ -2364,7 +2411,10 @@
         if (!IsCallable(adder)) throw TypeError();
         var iter = GetIterator(ToObject(iterable));
       }
-      set_internal(map, '[[MapData]]', { keys: [], values: [] });
+      set_internal(map, '[[MapData]]', {
+        keys: [],
+        values: []
+      });
       if (iter === undefined) return map;
       while (true) {
         var next = IteratorStep(iter);
@@ -2381,9 +2431,24 @@
     }
 
     if (!('Map' in global) || OVERRIDE_NATIVE_FOR_TESTING ||
-        (function() { try { new global.Map([]); return false; } catch (_) { return true; } }()) ||
-        (function() { try { return !new global.Map().entries().next; } catch (_) { return true; } }()) ||
-        (new global.Map([['a', 1]]).size !== 1))
+      (function () {
+        try {
+          new global.Map([]);
+          return false;
+        } catch (_) {
+          return true;
+        }
+      }()) ||
+      (function () {
+        try {
+          return !new global.Map().entries().next;
+        } catch (_) {
+          return true;
+        }
+      }()) ||
+      (new global.Map([
+        ['a', 1]
+      ]).size !== 1))
       global.Map = Map;
 
 
@@ -2449,7 +2514,7 @@
     // 23.1.3.5 Map.prototype.forEach ( callbackfn [ , thisArg ] )
     define(
       Map.prototype, 'forEach',
-      function forEach(callbackfn /*, thisArg*/) {
+      function forEach(callbackfn /*, thisArg*/ ) {
         var thisArg = arguments[1];
 
         var m = strict(this);
@@ -2525,7 +2590,7 @@
     // 23.1.3.10 get Map.prototype.size
     Object.defineProperty(
       Map.prototype, 'size', {
-        get: function() {
+        get: function () {
           var m = strict(this);
           if (Type(m) !== 'object') throw TypeError();
           if (!('[[MapData]]' in m)) throw TypeError();
@@ -2552,7 +2617,7 @@
     // 23.1.3.12 Map.prototype [ @@iterator ]( )
     define(
       Map.prototype, $$iterator,
-      function() {
+      function () {
         var m = strict(this);
         if (Type(m) !== 'object') throw TypeError();
         return CreateMapIterator(m, 'key+value');
@@ -2590,11 +2655,14 @@
         var o = strict(this);
         if (Type(o) !== 'object') throw TypeError();
         var m = o['[[Map]]'],
-            index = o['[[MapNextIndex]]'],
-            itemKind = o['[[MapIterationKind]]'],
-            entries = m['[[MapData]]'];
+          index = o['[[MapNextIndex]]'],
+          itemKind = o['[[MapIterationKind]]'],
+          entries = m['[[MapData]]'];
         while (index < entries.keys.length) {
-          var e = {key: entries.keys[index], value: entries.values[index]};
+          var e = {
+            key: entries.keys[index],
+            value: entries.values[index]
+          };
           index = index += 1;
           set_internal(o, '[[MapNextIndex]]', index);
           if (e.key !== empty) {
@@ -2620,12 +2688,12 @@
   // 23.2 Set Objects
   // ---------------------------------------
 
-  (function() {
+  (function () {
     // 23.2.1 The Set Constructor
     // 23.2.1.1 Set ( [ iterable ] )
 
     /** @constructor */
-    function Set(/*iterable*/) {
+    function Set( /*iterable*/ ) {
       var set = strict(this);
       var iterable = arguments[0];
 
@@ -2651,8 +2719,14 @@
     }
 
     if (!('Set' in global) || OVERRIDE_NATIVE_FOR_TESTING ||
-        (function() { try { return !new global.Set().entries().next; } catch (_) { return true; } }()) ||
-        (new global.Set([1]).size !== 1))
+      (function () {
+        try {
+          return !new global.Set().entries().next;
+        } catch (_) {
+          return true;
+        }
+      }()) ||
+      (new global.Set([1]).size !== 1))
       global.Set = Set;
 
     function SetDataIndexOf(setData, key) {
@@ -2669,7 +2743,7 @@
     // 23.2.2 Properties of the Set Constructor
 
     // 23.2.2.1 Set.prototype
-    var $SetPrototype$ =  {};
+    var $SetPrototype$ = {};
     Set.prototype = $SetPrototype$;
 
     // 23.2.2.2 get Set [ @@species ]
@@ -2733,7 +2807,7 @@
     // 23.2.3.6 Set.prototype.forEach ( callbackfn [ , thisArg ] )
     define(
       Set.prototype, 'forEach',
-      function forEach(callbackfn/*, thisArg*/) {
+      function forEach(callbackfn /*, thisArg*/ ) {
         var thisArg = arguments[1];
 
         var s = strict(this);
@@ -2770,7 +2844,7 @@
     // 23.2.3.9 get Set.prototype.size
     Object.defineProperty(
       Set.prototype, 'size', {
-        get: function() {
+        get: function () {
           var s = strict(this);
           if (Type(s) !== 'object') throw TypeError();
           if (!('[[SetData]]' in s)) throw TypeError();
@@ -2799,7 +2873,7 @@
     // 23.2.3.11 Set.prototype [@@iterator ] ( )
     define(
       Set.prototype, $$iterator,
-      function() {
+      function () {
         var s = strict(this);
         if (Type(s) !== 'object') throw TypeError();
         return CreateSetIterator(s);
@@ -2836,9 +2910,9 @@
         var o = strict(this);
         if (Type(o) !== 'object') throw TypeError();
         var s = o['[[IteratedSet]]'],
-            index = o['[[SetNextIndex]]'],
-            itemKind = o['[[SetIterationKind]]'],
-            entries = s['[[SetData]]'];
+          index = o['[[SetNextIndex]]'],
+          itemKind = o['[[SetIterationKind]]'],
+          entries = s['[[SetData]]'];
         while (index < entries.length) {
           var e = entries[index];
           index = index += 1;
@@ -2863,11 +2937,11 @@
   // 23.3 WeakMap Objects
   // ---------------------------------------
 
-  (function() {
+  (function () {
     // 23.3.1 The WeakMap Constructor
     // 23.3.1.1 WeakMap ( [ iterable ] )
     /** @constructor */
-    function WeakMap(/*iterable*/) {
+    function WeakMap( /*iterable*/ ) {
       var map = strict(this);
       var iterable = arguments[0];
 
@@ -2905,7 +2979,7 @@
 
 
 
-   // 23.3.2.2 WeakMap[ @@create ] ( )
+    // 23.3.2.2 WeakMap[ @@create ] ( )
     // 23.3.3 Properties of the WeakMap Prototype Object
 
     // 23.3.3.1 WeakMap.prototype.constructor
@@ -2961,7 +3035,7 @@
     // 23.3.4 Properties of WeakMap Instances
 
     // Polyfills for incomplete native implementations:
-    (function() {
+    (function () {
       var wm = new global.WeakMap();
       var orig = global.WeakMap.prototype.set;
       define(global.WeakMap.prototype, 'set', function set() {
@@ -2975,11 +3049,11 @@
   // 23.4 WeakSet Objects
   // ---------------------------------------
 
-  (function() {
+  (function () {
     // 23.4.1 The WeakSet Constructor
     // 23.4.1.1 WeakSet ( [ iterable ] )
     /** @constructor */
-    function WeakSet(/*iterable*/) {
+    function WeakSet( /*iterable*/ ) {
       var set = strict(this);
       var iterable = arguments[0];
 
@@ -3054,7 +3128,7 @@
     // 23.4.4 Properties of WeakSet Instances
 
     // Polyfills for incomplete native implementations:
-    (function() {
+    (function () {
       var ws = new global.WeakSet();
       var orig = global.WeakSet.prototype.add;
       define(global.WeakSet.prototype, 'add', function add() {
@@ -3074,7 +3148,7 @@
 
   // See typedarray.js for TypedArray polyfill
 
-  (function() {
+  (function () {
     if (!('ArrayBuffer' in global))
       return;
 
@@ -3117,7 +3191,7 @@
 
   // See typedarray.js for TypedArray polyfill
 
-  (function() {
+  (function () {
     if (!('DataView' in global))
       return;
 
@@ -3177,7 +3251,7 @@
   // 25.1.2 The %IteratorPrototype% Object
   // Defined earlier, so other prototypes can reference it.
   // 25.1.2.1 %IteratorPrototype% [ @@iterator ] ( )
-  define($IteratorPrototype$, $$iterator, function() {
+  define($IteratorPrototype$, $$iterator, function () {
     return this;
   });
 
@@ -3186,7 +3260,7 @@
   // 25.4 Promise Objects
   // ---------------------------------------
 
-  (function() {
+  (function () {
     // 25.4 Promise Objects
 
     // 25.4.1 Promise Abstract Operations
@@ -3204,20 +3278,25 @@
     // 25.4.1.3 CreateResolvingFunctions ( promise )
 
     function CreateResolvingFunctions(promise) {
-      var alreadyResolved = {'[[value]]': false};
+      var alreadyResolved = {
+        '[[value]]': false
+      };
       var resolve = PromiseResolveFunction();
-      set_internal(resolve, '[[Promise]]',  promise);
+      set_internal(resolve, '[[Promise]]', promise);
       set_internal(resolve, '[[AlreadyResolved]]', alreadyResolved);
       var reject = PromiseRejectFunction();
       set_internal(reject, '[[Promise]]', promise);
       set_internal(reject, '[[AlreadyResolved]]', alreadyResolved);
-      return { '[[Resolve]]': resolve, '[[Reject]]': reject};
+      return {
+        '[[Resolve]]': resolve,
+        '[[Reject]]': reject
+      };
     }
 
     // 25.4.1.3.1 Promise Reject Functions
 
     function PromiseRejectFunction() {
-      var F = function(reason) {
+      var F = function (reason) {
         //console.assert(Type(F['[[Promise]]']) === 'object');
         var promise = F['[[Promise]]'];
         var alreadyResolved = F['[[AlreadyResolved]]'];
@@ -3231,14 +3310,14 @@
     // 25.4.1.3.2 Promise Resolve Functions
 
     function PromiseResolveFunction() {
-      var F = function(resolution) {
+      var F = function (resolution) {
         //console.assert(Type(F['[[Promise]]']) === 'object');
         var promise = F['[[Promise]]'];
         var alreadyResolved = F['[[AlreadyResolved]]'];
         if (alreadyResolved['[[value]]']) return undefined;
         set_internal(alreadyResolved, '[[value]]', true);
 
-        if (SameValue(resolution, promise))  {
+        if (SameValue(resolution, promise)) {
           var selfResolutionError = TypeError();
           return RejectPromise(promise, selfResolutionError);
         }
@@ -3246,7 +3325,7 @@
           return FulfillPromise(promise, resolution);
         try {
           var then = resolution['then'];
-        } catch(then) {
+        } catch (then) {
           return RejectPromise(promise, then);
         }
         if (!IsCallable(then))
@@ -3301,7 +3380,7 @@
     // 25.4.1.5.2 GetCapabilitiesExecutor Functions
 
     function GetCapabilitiesExecutor() {
-      var F = function(resolve, reject) {
+      var F = function (resolve, reject) {
         //console.assert(F['[[Capability]]']);
         var promiseCapability = F['[[Capability]]'];
         if (promiseCapability['[[Resolve]]'] !== undefined) throw TypeError();
@@ -3356,7 +3435,8 @@
         else handlerResult = handler.call(undefined, argument);
       } catch (handlerResult) {
         status = promiseCapability['[[Reject]]'].call(undefined, handlerResult);
-        NextJob(status); return;
+        NextJob(status);
+        return;
       }
       status = promiseCapability['[[Resolve]]'].call(undefined, handlerResult);
       NextJob(status);
@@ -3369,10 +3449,11 @@
       var resolvingFunctions = CreateResolvingFunctions(promiseToResolve);
       try {
         var thenCallResult = then.call(thenable, resolvingFunctions['[[Resolve]]'],
-                                       resolvingFunctions['[[Reject]]']);
+          resolvingFunctions['[[Reject]]']);
       } catch (thenCallResult) {
         var status = resolvingFunctions['[[Reject]]'].call(undefined, thenCallResult);
-        NextJob(status); return;
+        NextJob(status);
+        return;
       }
       NextJob(thenCallResult);
     }
@@ -3382,7 +3463,12 @@
     // 25.4.3.1 Promise ( executor )
 
     function Promise(executor) {
-      var config = { configurable: false, enumerable: false, writable: true, value: undefined };
+      var config = {
+        configurable: false,
+        enumerable: false,
+        writable: true,
+        value: undefined
+      };
       Object.defineProperty(this, '[[PromiseState]]', config);
       Object.defineProperty(this, '[[PromiseConstructor]]', config);
       Object.defineProperty(this, '[[PromiseResult]]', config);
@@ -3411,7 +3497,7 @@
       var resolvingFunctions = CreateResolvingFunctions(promise);
       try {
         var completion = executor.call(undefined, resolvingFunctions['[[Resolve]]'],
-                                       resolvingFunctions['[[Reject]]']);
+          resolvingFunctions['[[Reject]]']);
       } catch (completion) {
         var status = resolvingFunctions['[[Reject]]'].call(undefined, completion);
       }
@@ -3431,7 +3517,9 @@
         return promiseCapability['[[Promise]]'];
       }
       var values = [];
-      var remainingElementsCount = { value: 1 };
+      var remainingElementsCount = {
+        value: 1
+      };
       var index = 0;
       while (true) {
         try {
@@ -3462,7 +3550,9 @@
           return promiseCapability['[[Promise]]'];
         }
         var resolveElement = PromiseAllResolveElementFunction();
-        set_internal(resolveElement, '[[AlreadyCalled]]', { value: false });
+        set_internal(resolveElement, '[[AlreadyCalled]]', {
+          value: false
+        });
         set_internal(resolveElement, '[[Index]]', index);
         set_internal(resolveElement, '[[Values]]', values);
         set_internal(resolveElement, '[[Capabilities]]', promiseCapability);
@@ -3481,7 +3571,7 @@
     // 25.4.4.1.1 Promise.all Resolve Element Functions
 
     function PromiseAllResolveElementFunction() {
-      var F = function(x) {
+      var F = function (x) {
         var alreadyCalled = F['[[AlreadyCalled]]'];
         if (alreadyCalled.value) return undefined;
         alreadyCalled.value = true;
@@ -3592,10 +3682,14 @@
       if (!IsCallable(onRejected)) onRejected = 'Thrower';
       var c = promise.constructor;
       var promiseCapability = NewPromiseCapability(c);
-      var fulfillReaction = { '[[Capabilities]]': promiseCapability,
-                              '[[Handler]]': onFulfilled };
-      var rejectReaction = { '[[Capabilities]]': promiseCapability,
-                             '[[Handler]]': onRejected };
+      var fulfillReaction = {
+        '[[Capabilities]]': promiseCapability,
+        '[[Handler]]': onFulfilled
+      };
+      var rejectReaction = {
+        '[[Capabilities]]': promiseCapability,
+        '[[Handler]]': onRejected
+      };
       if (promise['[[PromiseState]]'] === 'pending') {
         promise['[[PromiseFulfillReactions]]'].push(fulfillReaction);
         promise['[[PromiseRejectReactions]]'].push(rejectReaction);
@@ -3625,7 +3719,7 @@
   // 26 Reflection
   // ---------------------------------------
 
-  (function() {
+  (function () {
     // 26.1 The Reflect Object
     if (!('Reflect' in global) || OVERRIDE_NATIVE_FOR_TESTING)
       global.Reflect = {};
@@ -3660,7 +3754,7 @@
     // 26.1.4 Reflect.deleteProperty ( target, propertyKey )
     define(
       Reflect, 'deleteProperty',
-      function deleteProperty(target,name) {
+      function deleteProperty(target, name) {
         try {
           delete target[name];
           return !HasOwnProperty(target, name);
@@ -3704,7 +3798,7 @@
     // 26.1.9 Reflect.has ( target, propertyKey )
     define(
       Reflect, 'has',
-      function has(target,name) {
+      function has(target, name) {
         return String(name) in ToObject(target);
       });
 
@@ -3725,7 +3819,12 @@
     define(
       Reflect, 'preventExtensions',
       function preventExtensions(target) {
-        try { Object.preventExtensions(target); return true; } catch (_) { return false; }
+        try {
+          Object.preventExtensions(target);
+          return true;
+        } catch (_) {
+          return false;
+        }
       });
 
     // 26.1.13 Reflect.set ( target, propertyKey, V [ , receiver ] )
@@ -3754,7 +3853,7 @@
         try {
           target.__proto__ = proto;
           return Reflect.getPrototypeOf(target) === proto;
-        } catch(_) {
+        } catch (_) {
           return false;
         }
       });
@@ -3772,5 +3871,7 @@
 // This helper is defined outside the main scope so that the use of
 // 'eval' does not taint the scope for minifiers.
 function __cons(t, a) {
-  return eval('new t(' + a.map(function(_, i) { return 'a[' + i + ']'; }).join(',') + ')');
+  return eval('new t(' + a.map(function (_, i) {
+    return 'a[' + i + ']';
+  }).join(',') + ')');
 }

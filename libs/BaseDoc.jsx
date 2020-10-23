@@ -132,6 +132,7 @@ BaseDoc.prototype.place_on_film = function (sepFile, pos) {
         }
 
         var myArgs = eval(serializedmyArgs);
+        if(app.documents.length < 1) throw new Error('keine Filmvorlage geöffnet, Separation kann nicht platziert werden');
         var iDoc = app.activeDocument;
         var myPage = iDoc.pages[0];
         var sepLayer = iDoc.layers.item('motivEbene');

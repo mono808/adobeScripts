@@ -204,11 +204,8 @@ MonoMockup.prototype.fill_job_infos = function (nfo)
 {
     var jobFrameBounds = this.masterPages.fixed.pageItems.item('mJobFrame').geometricBounds;
 
-
-    try{
-        var tf = this.masterPages.fixed.textFrames.item('jobFrame');
-        var check = tf.name;
-    } catch (e) {
+    var tf = this.masterPages.fixed.textFrames.item('jobFrame');
+    if(!tf.isValid) {
         var tf = this.masterPages.fixed.textFrames.add({
             itemLayer: this.layers.infos,
             geometricBounds:jobFrameBounds,

@@ -19,60 +19,68 @@ exports.show_dialog = function (inputElements, propertyToList, multiselect, dial
         names = inputElements;
     }
 
-    var selected = [];
+
     var temp;
     var keyCount = 0;
-    var dialogTitle = dialogTitle || 'Quick select';
-    var w = new Window ('dialog {text: dialogTitle, alignChildren: "fill"}');
+
+    var w = new Window ('dialog {alignChildren: "fill"}');
+    w.text = dialogTitle || 'Quick select';
+
     var entry = w.add ('edittext {active: true}');
     var dummy = w.add ('panel {alignChildren: "fill"}');
     var list = dummy.add ('listbox', [0,0,250,250], names, {multiselect: multiselect});
+    w.add ('button {text: "Ok"}');
+
     entry.onChanging = function ()
     {
         keyCount++;
-        if(keyCount < 3) return;
+        if(keyCount < 4 || entry.text.length < 4) return;
         var temp = entry.text;
         var tempArray = [];
         for (var i = 0; i < names.length; i++) {
-            if (names[i].toLowerCase().indexOf(temp) == 0) {
+            if (names[i].toLowerCase().indexOf(temp) > -1) {
                 tempArray.push (names[i]);
-            }
+                }
             if (tempArray.length > 0) {
                 // Create the new list with the same bounds as the one it will replace
-                tempList = dummy.add ("listbox", list.bounds, tempArray, {scrolling: true});
+                tempList = dummy.add ("listbox", list.bounds, tempArray, {scrolling: true, multiselect: multiselect});
                 dummy.remove(list);
                 list = tempList;
                 list.selection = 0;
             }
         }
-    } // entry.onChanging
-    w.add ('button {text: "Ok"}');
-
-    if (w.show () != 2){
-        if(list.selection) {
-            if(list.selection instanceof Array) {
-                for (var i = 0; i < list.selection.length; i++) {
-                    selected.push(list.selection[i].text);
-                }
-            } else {
-                selected.push(list.selection.text);
-            }
-        }
-        if(!propertyToList) return selected;
-
-        // if not simply returning the selected text, get the corresponding object
-        var returnArray = [];
-        var isSelected = function(elem) {
-            return elem[propertyToList] = selected[i];
-        }
-        returnArray = selected.map(function(elem){
-            return inputElements.find(function (item){
-                return (item[propertyToList] === elem);
-            })
-        })
-
-        return returnArray;
     }
+
+    if (w.show () == 2){ 
+        w.close();
+        return null;
+    }
+
+    if(!list.selection) {
+        w.close();
+        return [];
+    }
+
+    if(list.selection instanceof Array) {
+        var selectedStrings = list.selection.map(function(elem) {
+            return elem.text;
+        });
+
+    } else {
+        var selectedStrings = [list.selection.text];
+    }
+
+    if(!propertyToList) return selectedStrings;
+
+    // if not simply returning the selected strings, get the corresponding inputElements with a matching value in the specified key
+    var selectedObjects = selectedStrings.map(function(str) {
+        return inputElements.find(function (elem) {
+            return (elem[propertyToList] === str);
+        });
+    });
+
+    return selectedObjects;
+
     w.close();
 }
 

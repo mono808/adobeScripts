@@ -1,6 +1,7 @@
 ﻿//@target indesign
 //@include 'require.jsx'
-function main () {
+
+(function () {
 
     var f_all = require('f_all');
     
@@ -29,12 +30,4 @@ function main () {
     for(var i = 0; i < monoGraphics.length; i++) {
         monoTable.add_row(monoGraphics[i]);
     }
-
-    //monoTable.update_columnWidths();
-
-    //indesign.executeScriptFile(File('/c/repos/adobeScripts1/indesign/ansicht_4_stand_automatik.jsx'));
-    //monoTable.update_stand(monoGraphics[0]);
-    //monoTable.update_row(monoGraphics[1], false);
-}
-
-main();
+})();

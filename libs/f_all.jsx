@@ -348,9 +348,9 @@ exports.copy_file_via_bridgeTalk = function (sourceFile, destFolder, deleteSourc
         }
     }
 
-    var myArgs = { delsource : deleteSource || false }
-        tempFile,
-        tempFolder;
+    var myArgs = { delsource : deleteSource || false };
+    var tempFile;
+    var tempFolder;
 
     if(sourceFile instanceof File) {
         myArgs.src = sourceFile;

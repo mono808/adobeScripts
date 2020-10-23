@@ -1,6 +1,4 @@
-﻿//$.level = 1;
-
-var f_all = require('f_all');
+﻿var f_all = require('f_all');
 var rE = require('rE');
 var recentFolders = require('recentFolders');
 var names = require('names');

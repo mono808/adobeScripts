@@ -1,6 +1,4 @@
-﻿$.level = 1;
-
-var AiSiebdruck = require('AiSiebdruck');
+﻿var AiSiebdruck = require('AiSiebdruck');
 var pantoneList = require('pantoneList');
 var MonoSpot = require('MonoSpot');
 var saveOptions = require('saveOptions');
