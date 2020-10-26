@@ -16,17 +16,14 @@
     var job = require('job');
     var paths = require('paths');
     var MonoFilm = require('MonoFilm');
+    var MonoGraphic = require('MonoGraphic');
 
-    job.set_nfo(null, false);
-    paths.set_nfo(job.nfo);
-
-    var monoFilm = new MonoFilm(myDoc);
-    var mockUpDoc = app.activeDocument;
-    
-    for (var i = 0; i < mockUpDoc.selection.length; i++) {
-        var monoGraphic = new MonoGraphic(mockUpDoc.selection[i].graphics[0]);
-        var job = new Job (monoGraphic.get_file('print'), true, false);
-        var pm = new Pathmaker(job.nfo);
+    var myDoc = app.activeDocument;
+        
+    for (var i = 0; i < myDoc.selection.length; i++) {
+        var monoGraphic = new MonoGraphic(myDoc.selection[i].graphics[0]);
+        job.set_nfo(monoGraphic.get_file('print'), true, false);
+        paths.set_nfo(job.nfo);
 
         var monoFilm = new MonoFilm();
         monoFilm.create_template();
