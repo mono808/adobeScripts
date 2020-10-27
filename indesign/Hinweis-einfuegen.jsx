@@ -1,20 +1,13 @@
-﻿#target indesign
-function main () {
+﻿//@target indesign
+//@include 'require.jsx'
+
+(function() {
     
-     
-    #include 'augment_objects.jsx'
-    #include 'f_all.jsx'
-    #include 'f_id.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
+    var MonoMockup = require('MonoMockup');
 
     //var job = new Job(null,false);
     //var pm = new Pathmaker(job.nfo);
     //var typeahead = new Typeahead();
     var mockup = new MonoMockup(app.activeDocument);
     mockup.add_hinweis();
-};
-
-main();
+})();
