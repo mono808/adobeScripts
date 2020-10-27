@@ -2,6 +2,7 @@
 /pantones.txt
 samplescripts/**
 launch.json
-.vscode
-runscript.txt
 dev/**
+runscript.txt
+*~
+

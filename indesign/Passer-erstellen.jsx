@@ -112,43 +112,35 @@ function addPasser() {
         return coordinatesArray;
     }
 
-    function createPasser(xyPoint) {
-        var x = xyPoint[0],
-            y = xyPoint[1];
-            
-        var bounds1 = [y-pS.pSize/2*pS.aspectRatio, x-pS.lineWeight/2, y+pS.pSize/2*pS.aspectRatio, x+pS.lineWeight/2],
-            bounds2 = [y-pS.lineWeight/2, x-pS.pSize/2, y+pS.lineWeight/2, x+pS.pSize/2];
+    function create_centerMark  (xy, name) {
+        var pS = {
+            stroke1 : 0.25,
+            stroke2 : 0.6,
+            circle : 4.5,
+            dia1 : 10,
+            dia2 : 10,
+            dia3 : 16.5,
+            distance : 8,
+        };
+        var myLayer = app.activeDocument.activeLayer;
+        var pGroup = [], 
+            centerMark, 
+            x = xy[0],
+            y = xy[1];
+          
+        // create Kreuz
 
-        var rec1 = myPage.rectangles.add({geometricBounds:bounds1, fillColor: myDoc.colors.item('Registration'),itemLayer:pLayer}),
-            rec2 = myPage.rectangles.add({geometricBounds:bounds2, fillColor: myDoc.colors.item('Registration'),itemLayer:pLayer});
+        var circle =    myPage.ovals.add       (myLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noColor, strokeColor:regColor, geometricBounds: [y-pS.circle/2, x-pS.circle/2, y+pS.circle/2, x+pS.circle/2]});
+        var gLH =       myPage.graphicLines.add(myLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noColor, strokeColor:regColor, geometricBounds: [y, x-pS.dia2/2, y, x+pS.dia2/2] });
+        var gLV =       myPage.graphicLines.add(myLayer, undefined, undefined, {strokeWeight:pS.stroke2, fillColor:noColor, strokeColor:regColor, geometricBounds: [y-pS.circle/2, x, y+pS.circle/2, x] });
+        var gLHhair =   myPage.graphicLines.add(myLayer, undefined, undefined, {strokeWeight:pS.stroke1, fillColor:noColor, strokeColor:regColor, geometricBounds: [y, x-pS.dia3/2, y, x+pS.dia3/2] });
+        var gLVhair =   myPage.graphicLines.add(myLayer, undefined, undefined, {strokeWeight:pS.stroke1, fillColor:noColor, strokeColor:regColor, geometricBounds: [y-pS.circle, x, y+pS.circle, x] });
         
-        var passer = rec1.excludeOverlapPath(rec2);
-
-        return passer;
-    }
-    
-    function createObenPasser(xyPoint) {
-        var passer = createPasser(xyPoint),
-            x = xyPoint[0],
-            y = xyPoint[1];
-
-        var tfBounds = [];
-        var myPointSize = pS.pSize/2*pS.aspectRatio*2.83464567;
-        tfBounds[0] = y - pS.pSize/2*pS.aspectRatio;
-        tfBounds[1] = x;
-        tfBounds[2] = y - pS.lineWeight/2;
-        tfBounds[3] = x + pS.pSize/2;
-        var myTF = myPage.textFrames.add({geometricBounds:tfBounds, contents: 'Oben', itemLayer:pLayer});
-        var myText = myTF.paragraphs[0];
-        myText.pointSize = myPointSize;
-        myText.fillColor = myDoc.colors.item('Registration');
-        //myText.strokeColor = myDoc.colors.item('Ohne');
-
-        var mySelection = [];
-        mySelection.push(passer);
-        mySelection.push(myTF);
-        var groupedPasser = myPage.groups.add(mySelection);
-        return groupedPasser;
+        pGroup.push(circle,gLH,gLHhair,gLV,gLVhair);
+        centerMark = myPage.groups.add(pGroup);
+        centerMark.name = name;
+       
+        return centerMark;
     }
 
     function createRasterPasser(xyPoint) {
@@ -177,33 +169,46 @@ function addPasser() {
             passer = center.addPath(circle);
     }
 
+    ///////////////////////////////////////////
+    //     Start Script
+    ///////////////////////////////////////////
+
     var settings = getSettings();
     if(!settings) {
         alert('Script cancelled!');
         return
     };
 
+    var myDoc = app.activeDocument;
+    var myPage = myDoc.pages.item(0);
+    var regColor = myDoc.colors.item('Registration');
+    var noColor = myDoc.swatches.item('None');
+
     try {
-        var mLayer = app.activeDocument.layers.item('motivEbene');
+        var mLayer = myDoc.layers.item('motivEbene');
         var check = mLayer.name;
         mLayer.visible = false;
     } catch (e) {}
-
-    var myDoc = app.activeDocument,
-        myPage = myDoc.pages.item(0);
-
-    viewPrefSwitch.set('fast');
+    
+    try {
+        myDoc.layers.item('infoEbene').name;
+        var pLayer = myDoc.layers.item('infoEbene');
+    } catch (e) {
+        var pLayer = myDoc.layers.add({name:'infoEbene'});
+    } finally {
+        myDoc.activeLayer = pLayer;
+    }  
     
     // Settings for RasterPasser
     var rPS = {
         pDist : 3,
-        lineWeight : 0.25,
-        pSize : 8
+        lineWeight : 0.1,
+        pSize : 4
     };
 
     // Settings for Passer
     var pS = {
-        pDist : 3,
+        pDist : 8,
         lineWeight : 0.5,
         pSize : 15,
         aspectRatio : 0.33
@@ -213,21 +218,15 @@ function addPasser() {
         sepWidth = sepRef.geometricBounds[3] - sepRef.geometricBounds[1],
         sepHeight = sepRef.geometricBounds[2] - sepRef.geometricBounds[0];
 
-    measureUnitSwitch.set(MeasurementUnits.millimeters);
+    // store measurementUnits, set to millimeters
+    var oldXUnits = app.activeDocument.viewPreferences.horizontalMeasurementUnits;
+    var oldYUnits = app.activeDocument.viewPreferences.verticalMeasurementUnits;
+    app.activeDocument.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.millimeters;
+    app.activeDocument.viewPreferences.verticalMeasurementUnits = MeasurementUnits.millimeters;
 
-    var myPage = myDoc.pages[0],
-        pageWidth = myPage.bounds[3] - myPage.bounds[1],
-        pageHeight = myPage.bounds[2] - myPage.bounds[0],
-        pageAspect = pageHeight / pageWidth;
-
-    try {
-        myDoc.layers.item('passerEbene').name;
-        var pLayer = myDoc.layers.item('passerEbene');
-    } catch (e) {
-        var pLayer = myDoc.layers.add({name:'passerEbene'});
-    }
-
-    myDoc.activeLayer = pLayer;
+    var pageWidth = myPage.bounds[3] - myPage.bounds[1];
+    var pageHeight = myPage.bounds[2] - myPage.bounds[0];
+    var pageAspect = pageHeight / pageWidth;
 
     var i, maxI, xyPoint;
 
@@ -236,12 +235,12 @@ function addPasser() {
             var topPoints = getCoordinatesTopCenter();
             for(i = 0, maxI = topPoints.length; i < maxI; i += 1) {
                 xyPoint = topPoints[i];
-                createObenPasser(xyPoint);
+                create_centerMark(xyPoint, 'topMark');
             }
             var bottomPoints = getCoordinatesBottomCenter();
             for(i = 0, maxI = bottomPoints.length; i < maxI; i += 1) {
                 xyPoint = bottomPoints[i];
-                createPasser(xyPoint);
+                create_centerMark(xyPoint,'bottomMark');
             }
             break;
         case 'RasterHochformat' : 
@@ -266,9 +265,10 @@ function addPasser() {
         mLayer.visible = true;
     } catch(e) {}
 
-    myMeasureSwitch.reset_units();
-
-    viewPrefSwitch.reset();
+    // myMeasureSwitch.reset_units();
+    app.activeDocument.viewPreferences.horizontalMeasurementUnits = oldXUnits;
+    app.activeDocument.viewPreferences.verticalMeasurementUnits = oldYUnits;
+    // viewPrefSwitch.reset();
 
 };
 
