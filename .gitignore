@@ -2,5 +2,7 @@
 /pantones.txt
 samplescripts/**
 launch.json
+dev/**
 runscript.txt
 *~
+
