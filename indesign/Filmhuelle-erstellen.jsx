@@ -1,14 +1,11 @@
 ﻿//@target indesign
-
 //@include 'require.jsx'
+
 var names = require('names');
 var MonoFilm = require('MonoFilm');
 var MonoPrint = require('MonoPrint');
 var MonoSep = require('MonoSep');
-// #include 'MonoFilm.jsx'
-// #include 'MonoNamer.jsx'
-// #include 'MonoPrint.jsx'
-// #include 'MonoSep.jsx'
+
 
 function createTextFrame (doc)
 {

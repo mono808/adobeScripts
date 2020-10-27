@@ -1,32 +1,24 @@
-﻿#target indesign
+﻿//@target indesign
+//@include 'require.jsx'
 
-#include 'MonoFilm.jsx'
-#include 'MonoSep.jsx'
-#include 'statics.jsx'
-#include 'variables.jsx'
-#include 'Job.jsx'
+(function () {
 
-function update_film () {
+    if(!app.activeDocument) {
+        alert('Bitte zuerst Filmdatei öffnen');
+        return;
+    }
 
-    var job = new Job(null, false);
+    var job = require('job');
+    var paths = require('paths');
+    var MonoFilm = require('MonoFilm');
 
-    var myFilm = new MonoFilm(app.activeDocument);
-        
-    job.get_nfo (myFilm.sep.file, true, false);
+    job.set_nfo(null, false);
+    paths.set_nfo(job.nfo);
+
+    var myDoc = app.activeDocument;
+
+    var monoFilm = new MonoFilm(myDoc);
     
     myFilm.save(job, true, false);
 
-}
-
-function check() {
-    if(!app.activeDocument) {
-        alert('Bitte Ansicht öffnen und Separation anwählen');
-        return false;
-    }
-    
-    return true;
-}
-
-if(check()){
-    update_film();
-}
+})();
