@@ -1,9 +1,12 @@
 ﻿var ioFile = require('ioFile');
 var rE = require('rE');
 
-var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
-var userName = $.getenv('USERNAME').replace('.', '').toLowerCase();
-var recentFoldersFile = new File(scriptDir + '/recentFolders_' + userName + '.txt');
+// var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
+// var userName = $.getenv('USERNAME').replace('.', '').toLowerCase();
+// var recentFoldersFile = new File(scriptDir + '/recentFolders_' + userName + '.txt');
+var recentFoldersFile = new File ('~/documents/adobeScripts/recentFolders.txt');
+
+if(!recentFoldersFile.exists) {ioFile.write_file(recentFoldersFile, [].toSource())};
 
 var lastFolders = import_recentFolders(recentFoldersFile);
 lastFolders = lastFolders.filter(function(fld) {return fld.exists});

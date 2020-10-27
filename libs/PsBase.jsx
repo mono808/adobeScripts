@@ -241,6 +241,64 @@ PsBase.prototype.get_guide_location = function () {
     }
 };
 
+PsBase.prototype.checkBitsPerChannel = function(requiredValues) {
+
+        var savedState = this.doc.activeHistoryState;
+        var oldValue = this.doc.bitsPerChannel;
+        var shortNames = {
+            'BitsPerChannelType.ONE' : '1-bit',
+            'BitsPerChannelType.EIGHT' : '8-bit',
+            'BitsPerChannelType.SIXTEEN' : '16-bit',
+            'BitsPerChannelType.THIRTYTWO' : '32-bit'
+        };
+        
+        if(!requiredValues.includes(oldValue)){
+            var msg = 'Aktuelle Bittiefe ist ' + shortNames[oldValue.toString()];
+            msg += '\r\rBenötigt wird ' + requiredValues.join(' oder ');
+            msg += '\r\rMotiv wird zu ' + shortNames[requiredValues[0].toString()] + ' umgewandelt';
+            alert(msg);
+            this.doc.bitsPerChannel = requiredValues[0];
+            app.refresh();
+            if(!Window.confirm('Grafik nock ok?')) {
+                this.doc.activeHistoryState = savedState;
+                return false;
+            }
+        }
+    
+        return true;
+    }
+
+
+PsBase.prototype.checkDocumentMode = function (requiredValues) {
+        
+        var savedState = this.doc.activeHistoryState;
+        var oldValue = this.doc.mode;
+        var shortNames = {
+            'DocumentMode.GRAYSCALE' : 'Graustufen',
+            'DocumentMode.RGB' : 'RGB',
+            'DocumentMode.CMYK' : 'CMYK',
+            'DocumentMode.LAB' : 'LAB',
+            'DocumentMode.BITMAP' : 'Bitmap',
+            'DocumentMode.INDEXEDCOLOR' : 'IndizierteFarben',
+            'DocumentMode.MULTICHANNEL' : 'Mehrkanal',
+            'DocumentMode.DUOTONE' : 'Duotone'
+        };        
+
+        if(!requiredValues.includes(oldValue)){
+            var msg = 'Aktueller Farbmodus ist ' + shortNames[oldValue.toString()];
+            msg += '\r\rBenötigt wird ' + requiredValues.join(' oder ');
+            msg += '\r\rMotiv wird zu RGB umgewandelt';
+            alert(msg);
+            this.doc.changeMode(ChangeMode.RGB);
+            app.refresh();
+            if(!Window.confirm('Grafik nock ok?')) {
+                this.doc.activeHistoryState = savedState;
+                return false;
+            }
+        }
+        return true;
+    }
+
 //var psBaseDoc = new PsBase(app.activeDocument);
 //psBaseDoc.get_guide_location ();
 

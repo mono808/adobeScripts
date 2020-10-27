@@ -7,48 +7,12 @@ function PsDtg (initDoc) {
 PsDtg.prototype = Object.create(PsBase.prototype);
 PsDtg.prototype.constructor = PsDtg;
 
+
 PsDtg.prototype.check = function () {
 
-    var savedState = this.doc.activeHistoryState;
-    var modeChanged = false;
-    var shortie;
-
-    if(this.doc.bitsPerChannel != BitsPerChannelType.EIGHT) {
-        shortie = {
-            'BitsPerChannelType.ONE' : '1-bit',
-            'BitsPerChannelType.EIGHT' : '8-bit',
-            'BitsPerChannelType.SIXTEEN' : '16-bit',
-            'BitsPerChannelType.THIRTYTWO' : '32-bit',
-        }
-        modeChanged = true;
-        alert('Bittiefe ist ' + shortie[this.doc.bitsPerChannel.toString()] + '. Motiv wird zu 8-bit umgewandelt');
-        this.doc.bitsPerChannel = BitsPerChannelType.EIGHT;
-    }
-
-    if(this.doc.mode != DocumentMode.CMYK && this.doc.mode != DocumentMode.RGB) {
-        shortie = {
-            'DocumentMode.GRAYSCALE' : 'Graustufen',
-            'DocumentMode.RGB' : 'RGB',
-            'DocumentMode.CMYK' : 'CMYK',
-            'DocumentMode.LAB' : 'LAB',
-            'DocumentMode.BITMAP' : 'Bitmap',
-            'DocumentMode.INDEXEDCOLOR' : 'IndizierteFarben',
-            'DocumentMode.MULTICHANNEL' : 'Mehrkanal',
-            'DocumentMode.DUOTONE' : 'Duotone',
-        }
-        modeChanged = true;
-        alert('Farbmodus ist '+ shortie[this.doc.mode.toString()] + '. Motiv wird in RGB umgewandelt');
-        this.doc.changeMode(ChangeMode.RGB);
-    }
-
-    if(modeChanged) {
-        if(Window.confirm('Grafik noch ok?')) {
-            return true;
-        } else {
-            this.doc.activeHistoryState = savedState;
-            return false;
-        }
-    }
+    if(!this.checkBitsPerChannel ([BitsPerChannelType.EIGHT])) return false;
+    
+    if(!this.checkDocumentMode ([DocumentMode.RGB, DocumentMode.CMYK])) return false;
 
     var spotChans = this.get_spot_channels();
     if(spotChans.length > 0) {
@@ -57,9 +21,9 @@ PsDtg.prototype.check = function () {
         confirmStr += 'Vollton-Kanäle verwenden? (Ich weiß was ich tue ;)';
 
         if(Window.confirm(confirmStr)) {
-            this.tiffOptions.spotColors = true;
+            this.saveSpotChannels = true;
         } else {
-            this.tiffOptions.spotColors = false;
+            this.saveSpotChannels = false;
         }
     }
 
@@ -73,29 +37,33 @@ PsDtg.prototype.make = function (saveFile, saveOpts) {
 
     this.sourceDoc = this.doc;
     this.doc = this.sourceDoc.duplicate();
+    
+    if(!this.check()) return;
 
-    try{
-        var check = this.sourceDoc.fullName;
-        var saveFolder = new Folder(this.sourceDoc.fullName.parent.parent + '/Druckdaten-DTG');
-        try {
-            var searchFor = ['Working'];
-            var saveName = this.get_saveName(this.sourceDoc.fullName, searchFor, 'Print', 'tif');
+    if(this.saveSpotChannels) saveOpts.spotColors = true;
+
+    if(!saveFile) {
+        try{
+            var check = this.sourceDoc.fullName;
+            var saveFolder = new Folder(this.sourceDoc.fullName.parent.parent + '/Druckdaten-DTG');
+            try {
+                var searchFor = ['Working'];
+                var saveName = this.get_saveName(this.sourceDoc.fullName, searchFor, 'Print', 'tif');
+            } catch (e) {
+                alert(e);
+            }
+            var saveFile = new File(saveFolder + '/' + saveName);        
+            
         } catch (e) {
-            alert(e);
+            var recentFolders = new recentFolders();
+            recentFolders.import_txt();
+            var saveFolder = recentFolders.show_dialog();
+            var saveFile = new File(saveFolder + '/Druckdaten-DTG/' + this.sourceDoc.name).saveDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');            
         }
-        var saveFile = new File(saveFolder + '/' + saveName);        
-        
-    } catch (e) {
-        var recentFolders = new recentFolders();
-        recentFolders.import_txt();
-        var saveFolder = recentFolders.show_dialog();
-        var saveFile = new File(saveFolder + '/Druckdaten-DTG/' + this.sourceDoc.name).saveDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');
-        //saveFile = saveFile.saveDlg('Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen');        
     }
 
-    //this.doc = this.sourceDoc.duplicate() || app.activeDocument.duplicate();
-
-    this.save_doc(saveFile, saveOpts, false, true);
+    var close = true, showDialog = false;
+    this.save_doc(saveFile, saveOpts, close, showDialog);
 
     app.preferences.rulerUnits = originalRulerUnits;
 }

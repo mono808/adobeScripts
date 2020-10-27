@@ -20,12 +20,13 @@
     p.backupAi          = p.working  + p.printTag + '_Backup.ai';
     p.previewAi         = p.previews + p.printTag + '_Preview.ai';
     p.previewPs         = p.previews + p.printTag + '_Preview.psd';
-    p.previewEps         = p.previews + p.printTag + '_Preview.eps';
+    p.previewEps        = p.previews + p.printTag + '_Preview.eps';
 
     // druckdaten
     p.sdPrintAi         = p.ddSD  + p.printTag + '_Print.ai';
     p.sdPrintEps        = p.ddSD  + p.printTag + '_Print.eps';
     p.sdPrintPsd        = p.ddSD  + p.printTag + '_Print.psd';
+    p.dtgPrintTif       = p.ddDTG + p.printTag + '_Print.tif';
     p.dtaPrintPdf       = p.ddDTA + p.printTag + '_Print.pdf';
     p.dtaxPrintPdf      = p.ddDTA + p.printTag + '_Print.pdf';
     p.dtaoPrintPdf      = p.ddDTA + p.printTag + '_Print.pdf';

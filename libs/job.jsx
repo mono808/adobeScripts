@@ -13,32 +13,21 @@ function set_nfo (ref, fullExtract, nachdruckMoeglich) {
 
     if (ref == null) return null;
 
-    //extract additional nfos from filename and folderstructure
-    // var tempNfo = null;
-
     if (ref.constructor.name === 'Document') {
         try {
             ref = ref.fullName;
         } catch (e) {
             ref = get_ref();
-            // var startFile = Folder($.getenv('csroot') + '/Kundendaten');
-            // var saveFile = startFile.saveDlg ('Speicherort wählen');
-            // //ref.saveAs(saveFile);
-            // ref = saveFile;
         }
     }
 
     if (ref.constructor.name === 'File') {
-        //this.nfo.file = ref;
         get_nfo_from_filename(ref);
-
         ref = ref.parent;
     }
 
     if (ref.constructor.name === 'Folder') {
-        //this.nfo.folder = ref;
         get_nfo_from_filepath(ref);
-
     }
 
 
@@ -120,7 +109,7 @@ function get_ref_from_indd_doc(doc) {
         var motivLayer = doc.layers.item('motivEbene');
         if(motivLayer.isValid) {
             var myGraphic = motivLayer.allGraphics[0];
-            if(myGraphic.isValid)
+            if(myGraphic && myGraphic.isValid)
                 return new File(myGraphic.properties.itemLink.filePath);
         } else {
             return doc;

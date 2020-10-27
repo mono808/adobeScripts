@@ -1,7 +1,7 @@
 ﻿var ioFile = require('ioFile');
 
 var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
-var pantoneFile = new File(scriptDir + '/pantoneList.txt');
+var pantoneFile = new File('~/documents/adobeScripts/pantoneList.txt');
 var pantoneFileLegacy = new File($.getenv('pcroot') + '/adobescripts/pantones.txt');
 
 var pantoneList = import_pantoneList();
@@ -26,12 +26,15 @@ function import_pantoneList_legacy () {
 }
 
 function import_pantoneList (aFile) {
-    if (!pantoneFile.exists) return {};
+    if (!pantoneFile.exists) {
+        $.writeln('pantoneFile does not exist');
+        return {};
+    }
     
     var fileContent = ioFile.read_file(pantoneFile);
     var imported = eval(fileContent);//$.evalFile(pantoneFile);
     if(typeof(imported) !== 'object') return {};
-    
+    $.writeln('pantoneList loaded');
     return imported;
 }
 

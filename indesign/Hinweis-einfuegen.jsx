@@ -17,6 +17,4 @@
 
     var mockup = new MonoMockup(app.activeDocument);
     mockup.add_hinweis();
-};
-
-main();
+})();
