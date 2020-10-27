@@ -1,9 +1,8 @@
 ﻿//@target illustrator
-$.level = 1;
+//@include 'require.jsx'
+
 
 function main() {
-
-    //@include 'require.jsx'
 
     var f_all = require('f_all');
     var paths = require('paths');

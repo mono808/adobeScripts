@@ -1,9 +1,7 @@
 ﻿//@target illustrator
+//@include 'require.jsx'
 
-function main (report) 
-{
-
-    //@include 'require.jsx'
+function main (report) {
     
     var job = require('job');
     var paths = require('paths');

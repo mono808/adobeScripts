@@ -1,8 +1,8 @@
 ﻿//@target illustrator
+//@include 'require.jsx'
 
 function main (report) {
 
-    //@include 'require.jsx'
     var aiSiebdruck = require('AiSiebdruck');
     var areaDialog = require('AreaDialog');
 

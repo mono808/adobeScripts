@@ -1,9 +1,7 @@
 ﻿//@target illustrator
-$.level=1
+//@include 'require.jsx'
 
-function main (report) 
-{
-    //@include 'require.jsx'
+function main (report) {
 
     var f_all = require('f_all');
     var AiBase = require('AiBase');

@@ -1,4 +1,8 @@
-﻿//@target illustrator
+﻿// this scripts helps with estimating the time needed to weed a plotted heat transfer
+// it counts the number of cutouts, which have to be manually pealed off
+// it also counts very small details, which have to remain in the design, and can therefore be timeconsuming to weed around
+
+//@target illustrator
 
 function calc () {
 

@@ -14,7 +14,7 @@ function main () {
     }
     var i = sel.length-1;
     do{
-    	var pI = sel[i];
+        var pI = sel[i];
         if(pI.filled && !check_swatches(doc, pI.fillColor)) create_swatch(doc, pI.fillColor);
         if(pI.stroked && !check_swatches(doc, pI.strokeColor)) create_swatch(doc, pI.strokeColor);    	
     }while(i--);

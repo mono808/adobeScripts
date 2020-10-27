@@ -1,9 +1,7 @@
 ﻿//@target illustrator
-$.level = 1;
+//@include 'require.jsx'
 
-function main ()
-{
-    //@include 'require.jsx'
+function main () {
 
     var typeahead = require('typeahead');
     var paths = require('paths');
