@@ -1,5 +1,5 @@
 *.swp
-/pantones.txt
+pantones.txt
 samplescripts/**
 launch.json
 dev/**
