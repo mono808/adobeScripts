@@ -44,14 +44,14 @@
         return ops;
     },
             
-    dtgPrintPS : function () {
+    dtgPrintPsTif : function () {
         var options = new TiffSaveOptions();
         with(options){
             alphaChannels = false;
             embedColorProfile = true;
             imageCompression = TIFFEncoding.TIFFLZW;
             layers = false;
-            spotColors = true;
+            spotColors = false;
             transparency = true;
         }            
         return options;
