@@ -6,6 +6,8 @@ function MonoGraphic (myGraphic)
 {
     var check_folder = function (fldr) {
         var jobFolder;
+        if(!fldr) return null;
+        if(!fldr instanceof Folder) return null;
         if (fldr.displayName.match(reJobNr)) {
             jobFolder = fldr;
         } else {
