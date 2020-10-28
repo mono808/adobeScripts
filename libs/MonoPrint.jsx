@@ -5,8 +5,8 @@
         if(!match) return aFile.displayName.substring(0, aFile.displayName.lastIndexOf ('.'));
         var tag = this.id = match[1];
         if(match[3]){
-                tag += match[2]; //= the separator _ or -
-                tag += match[3]; // 23x344 stuff
+                tag += match[2];
+                tag += match[3];
             } 
         if(match[4]) {
             tag += match[2];
