@@ -257,26 +257,43 @@
             return File (runscript.script_dir + '/' + script);
     } // dialog
 
+    function read_file(aFile) {     
+        if(aFile && aFile instanceof File && aFile.exists) {
+            aFile.open('r', undefined, undefined);
+            aFile.encoding = "UTF-8";      
+            aFile.lineFeed = "Windows";
+            var success = aFile.read();
+            aFile.close();
+            return success;
+        }
+        else {
+            alert(aFile + 'could not be read');
+        }
+    }
 
     try {
         var script = get_a_script();
 				if(!script) return;
         switch (app.name) {
             case 'Adobe Illustrator' :
-                $.evalFile (script);
+                var scriptString = read_file(script);
+                if(!scriptString) return
+                illustrator.executeScript(scriptString);
             break;
             
-            case 'Adobe InDesign' :                
-                app.doScript (script);;
+            case 'Adobe InDesign' :
+                indesign.executeScript(script);
+                app.doScript (script);
+                app.activate();
             break;
 
             case 'Adobe Photoshop' :
                 app.doScript (script);
             break;
         }
-        app.activate();
+        
     } catch (e) {
-        alert (e.message + "\r(line " + e.line + ")");
+		alert (e.message  + "\rin file " + e.fileName + "\rin line " + e.line);
     }
 
 }());
