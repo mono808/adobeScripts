@@ -1,6 +1,6 @@
 *.swp
-pantones.txt
+*~
+samplescripts/**
 launch.json
 runscript.txt
-*~
-
+tests/output/**

@@ -1,27 +1,17 @@
-﻿#target indesign
+﻿//@target indesign
+//@include 'require.jsx'
 
+(function () {
+    if(!app.activeDocument) {
+        alert('Bitte Ansicht öffnen und Separation anwählen');
+        return;
+    }
 
-#include 'augment_objects.jsx'
-#include 'MonoFilm.jsx'
-#include 'MonoSep.jsx'
-
-function main () {
+    var MonoFilm = require('MonoFilm');
 
     var myFilm = new MonoFilm(app.activeDocument);
 
     myFilm.resize_page();
 
-}
+})();
 
-function check() {
-    if(!app.activeDocument) {
-        alert('Bitte Ansicht öffnen und Separation anwählen');
-        return false;
-    }
-    
-    return true;
-}
-
-if(check()){
-    main();
-}

@@ -1,24 +1,22 @@
-﻿//#target indesign
-function main () {
+﻿//@target indesign
+//@include 'require.jsx'
+
+(function () {
     
-     
-    #include 'f_all.jsx'    
-    #include 'save_Options.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'MonoPrint.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'MonoFilm.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
+    var f_all = require('f_all');
     
-    var job = new Job(null,false);
+    var job = require('job');
+    var jobFolder = require('jobFolder');
+    var paths = require('paths');
+    var names = require('names');
+    
+    var MonoMockup = require('MonoMockup');
+    var MonoPrint = require('MonoPrint');
+    var saveOptions = require('saveOptions');
+
+    job.set_nfo(null,false);
     if(!job.nfo) return;
-    var pm = new Pathmaker(job.nfo);
-    //var typeahead = new Typeahead();
+    paths.set_nfo(job.nfo);
     
     try{
         app.applyWorkspace('Ansichten');
@@ -32,20 +30,16 @@ function main () {
     mockup.init();
     mockup.import_pages();
 
-    mockup.save();
+    mockup.save_doc(paths.file('mockUpIndd'));
 
     mockup.show_shop_logo(job.nfo.shop);
     mockup.fill_job_infos(job.nfo);
 
-//  var mockup = new MonoMockup(app.activeDocument);
-    var jobFolder = new JobFolder(job.nfo.folder);
+    jobFolder.set_folder(job.nfo.folder);
     var monoPrints = jobFolder.get_prints();
 
     mockup.place_prints_on_page (monoPrints);
 
     mockup.add_preview_page();
     
-    //mockup.save();
-};
-
-main();
+})();

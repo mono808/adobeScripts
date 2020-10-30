@@ -1,5 +1,6 @@
-﻿#targetengine session
-#target indesign
+﻿//@target indesign
+//@targetengine session
+//@include 'require.jsx'
 
 function show_dialog(){
 
@@ -14,8 +15,8 @@ function show_dialog(){
 function toggle_standListener (compensate) 
 {   
     
-    #include 'MonoGraphic.jsx'
-    #include 'MonoTable.jsx'
+    var MonoGraphic = require('MonoGraphic');
+    var MonoTable = require('MonoTable');
     
     var compensate = false;
 

@@ -1,17 +1,14 @@
-﻿#target indesign
-
+﻿//@target indesign
+//@include 'require.jsx'
 function main() {
 
-     
-    #include 'augment_objects.jsx'
-    #include 'f_all.jsx'
-    #include 'f_id.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'rE.jsx'
+    var paths = require('paths');
+    var f_all = require('f_all');
+    var f_id = require('f_id');
+    var rE = require('rE');
 
     var myDoc = app.activeDocument;
     var myWin = myDoc.layoutWindows.item(0);
-    var pm = new Pathmaker();
 
     //collect of fileNames of placed PDFs for nameing the output file accordingly
     function collect_placed_pdfs () {
@@ -86,10 +83,10 @@ function main() {
 
 	var saveName = namesArray.join('_');
 
-    var psFolder = pm.folder('rolleIn');
+    var psFolder = paths.folder('rolleIn');
     var psFile =   new File(psFolder.fullName  + '/' + saveName + '.ps');
     
-    var saveFolder = pm.folder('rolleSaved');
+    var saveFolder = paths.folder('rolleSaved');
     var saveFile = new File(saveFolder.fullName + '/' + saveName + '.indd');
     
     f_all.saveFile(saveFile, undefined, false);

@@ -1,13 +1,17 @@
-﻿function main () {
+﻿//@target indesign
+//@include 'require.jsx'
 
-    #include 'f_all.jsx'
-    #include 'f_id.jsx'
-    #include 'Job.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'save_Options.jsx'
+function main () {
 
-    var job = new Job(null,false);
-    var pm = new Pathmaker();
+
+    var job = require('job');
+    var paths = require('paths');
+    var saveOptions = require('saveOptions');
+    var f_id = require('f_id');
+
+    job.set_nfo(null, false);
+    paths.set_nfo(job.nfo);
+
     var myDoc = app.activeDocument;
     var myFolder = myDoc.fullName.parent;
     var saveName = myDoc.name.substring(0, myDoc.name.lastIndexOf('.'));
@@ -35,13 +39,11 @@
             clipComplexRegions= true;
         }
 
-        try{
-            var check = app.pdfExportPresets.itemByName('monosPDFExportPreset').name;
-            app.pdfExportPresets.itemByName('monosPDFExportPreset').remove();
-        } catch (e) {}
-        finally {
-            var myExportPreset = app.pdfExportPresets.add();
-        } 
+        
+        var preset = app.pdfExportPresets.itemByName('monosPDFExportPreset');
+        if(preset.isValid) app.pdfExportPresets.itemByName('monosPDFExportPreset').remove();
+        var myExportPreset = app.pdfExportPresets.add();
+
 
         with(app.pdfExportPreferences) {
             name = 'monosPDFExportPreset';

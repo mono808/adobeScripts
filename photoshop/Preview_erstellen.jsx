@@ -1,27 +1,23 @@
-﻿#target photoshop
+﻿//@target photoshop
+
 function main () {
 
-     
-    #include 'PreviewDocPS.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'InteractSwitch.jsx'
-    #include 'ButtonList.jsx'
+    //@include 'require.jsx'
 
-    //FIXME: does not work when not in a standard job folder
-    var job = new Job(app.activeDocument, true);
-    var pm = new Pathmaker(job.nfo);
+    var job = require('job');
+    var paths = require('paths');
+    var iaSwitch = require('interactionSwitch');
+    var PsSiebdruckPreview = require('PsSiebdruckPreview');
 
-    var iaSwitch = new InteractSwitch();
+    job.set_nfo(app.activeDocument, true);
+    paths.set_nfo(job.nfo);
+
     iaSwitch.set('none');
 
-    var saveFile = pm.file('previewPs');
+    var saveFile = paths.file('previewPs');
 
-    var previewObj = Object.create(previewDocPS);
-    previewObj.startDoc = app.activeDocument;
-    previewObj.make(saveFile);
+    var previewDoc = new PsSiebdruckPreview(app.activeDocument);   
+    previewDoc.make(saveFile);
 
     app.refresh();
 

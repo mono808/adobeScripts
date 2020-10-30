@@ -1,17 +1,20 @@
-﻿#target illustrator
+﻿//@target illustrator
+//@include 'require.jsx'
+
 
 function main() {
 
-    #include "f_all.jsx"
-    #include 'Job.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'save_Options.jsx'
+    var f_all = require('f_all');
+    var paths = require('paths');
+    var saveOptions = require('saveOptions');
+    var job = require('job');
+    var BaseDoc = require('BaseDoc');
+
+    job.set_nfo(null, true, false);
+    paths.set_nfo(job.nfo);
     
-    var job = new Job(null, true, false);
-    var pathmaker = new Pathmaker(job.nfo);
-  
-    f_all.saveFile (pathmaker.file('workingAi', job.nfo), save_ops.ai_sep(), false);
+    var baseDoc = new BaseDoc(app.activeDocument);
+    baseDoc.save_doc(paths.file('workingAi'), saveOptions.sdPrintAi(), false);
 };
 
 if (app.documents.length > 0) {

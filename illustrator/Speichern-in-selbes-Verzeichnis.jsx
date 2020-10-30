@@ -1,4 +1,4 @@
-﻿#target illustrator
+﻿//@target illustrator
 
 try {
 
@@ -13,10 +13,10 @@ try {
             throw new Error('Please select a linked graphic to get the filepath from');
 
         for (var i=0, len=sel.length; i < len ; i++) {
-          if(sel[i].constructor.name == 'PlacedItem') {
-            ref = sel[i];
-            break;
-          }
+            if(sel[i].constructor.name == 'PlacedItem') {
+                ref = sel[i];
+                break;
+            }
         };
         
 
