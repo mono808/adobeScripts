@@ -148,8 +148,6 @@ function show_dialog () {
     // bounds = [left, top, right, bottom]
     var win = new Window("dialog", "Extracted Infos",undefined);
     this.windowRef = win;
-
-    var manualGrp = win[manualGrp] = win.add("group", undefined);
     
     var p = win.add("panel" , undefined);
     p.size = [750,800];
@@ -158,6 +156,9 @@ function show_dialog () {
     fdG.orientation = "column";
     fdG.alignment = "left";
     fdG.maximumSize.height = lastFolders.length*50;
+
+    
+    var manualGrp = win[manualGrp] = win.add("group", undefined);
 
     var b2bBtn = manualGrp.add("button", undefined, 'B2B');
     b2bBtn.preferredSize.width = 50;                
