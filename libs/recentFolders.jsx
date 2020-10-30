@@ -133,9 +133,19 @@ function show_dialog () {
         }
     }
 
-    function browse_Helper (path) {
+    function browse_Helper_folder (path) {
         return function () {
             var result = Folder(path).selectDlg('Select Job-Folder:');
+            if(result) {
+                retval = result;
+                win.close();
+            }
+        }
+    }
+
+        function browse_Helper_file (path) {
+        return function () {
+            var result = File(path).openDlg('Datei wählen');
             if(result) {
                 retval = result;
                 win.close();
@@ -150,7 +160,7 @@ function show_dialog () {
     this.windowRef = win;
     
     var p = win.add("panel" , undefined);
-    p.size = [750,800];
+    //p.size = [750,800];
 
     var fdG = p.add("group");
     fdG.orientation = "column";
@@ -162,15 +172,15 @@ function show_dialog () {
 
     var b2bBtn = manualGrp.add("button", undefined, 'B2B');
     b2bBtn.preferredSize.width = 50;                
-    b2bBtn.onClick = browse_Helper(csroot + '/kundendaten/b2b');
+    b2bBtn.onClick = browse_Helper_folder(csroot + '/kundendaten/b2b');
     
     var b2cBtn = manualGrp.add("button", undefined, 'B2C');
     b2cBtn.preferredSize.width = 50;
-    b2cBtn.onClick = browse_Helper(csroot + '/kundendaten/b2c');
+    b2cBtn.onClick = browse_Helper_folder(csroot + '/kundendaten/b2c');
     
     var angBtn = manualGrp.add("button", undefined, 'ANG');
     angBtn.preferredSize.width = 50;
-    angBtn.onClick = browse_Helper(csroot + '/angebotedaten');
+    angBtn.onClick = browse_Helper_folder(csroot + '/angebotedaten');
     
     var cancelBtn = manualGrp.add("button", undefined, 'Cancel');
 
@@ -190,8 +200,11 @@ function show_dialog () {
         btn.justify ='left';
         btn.onClick = select_helper (i);
         
-        var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Dateibrowser hier');
-        browseBtn.onClick = browse_Helper (fd.fullName);
+        var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Verzeichnis suchen');
+        browseBtn.onClick = browse_Helper_folder (fd.fullName);
+
+        var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Datei suchen');
+        browseBtn.onClick = browse_Helper_file (fd.fullName);
     }
 
     var scrollBar = p.add("scrollbar");
@@ -209,10 +222,15 @@ function show_dialog () {
         scrollBar.maxvalue = fdG.size.height-p.size.height+20;
     };        
         
-    if(win.show() != 2 && retval && retval instanceof Folder) {
-        add_to_recentFolders(retval);
-        return retval;
-        
+    if(win.show() != 2 && retval) {
+        if(retval instanceof File) {
+            add_to_recentFolders(retval.parent);
+            return retval;
+        }
+        if(retval instanceof Folder) {
+            add_to_recentFolders(retval);
+            return retval;
+        }
     } else {
         return null;
     }
