@@ -27,10 +27,12 @@
 
 //@include "json2.jsxinc"
 //@include "es5.jsxinc"
-//@include "es6.jsxinc"
+//@include "es6_mono808.jsxinc"
+/* 
+ * //@include "es6.jsxinc"
+ */
 
-
-$.level = 1;
+$.level = 0;
 
 (function (root) {
     var require = root.require = function require(id) {
