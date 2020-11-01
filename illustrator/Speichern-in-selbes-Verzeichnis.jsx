@@ -1,49 +1,49 @@
 ﻿//@target illustrator
+//@include 'require.jsx'
 
-try {
+(function () {
 
-    function main(doc) {
-        if(doc.placedItems.length == 0)
-            throw new Error('no linked graphic to get a filepath from. please place & select a graphic first!');
-
-        var sel = doc.selection;
-        var ref = null;
-
-        if(sel.length < 1)
-            throw new Error('Please select a linked graphic to get the filepath from');
-
-        for (var i=0, len=sel.length; i < len ; i++) {
-            if(sel[i].constructor.name == 'PlacedItem') {
-                ref = sel[i];
-                break;
-            }
-        };
-        
-
-        if(ref == undefined)
-            throw new Error('no linked graphic in selection. Please select a linked graphic!');
-
-        var saveFile = ref.file.parent.saveDlg();
-
-        if(saveFile == null)
-            throw new Error('Script cancelled');
-        
-        doc.saveAs(saveFile);
-
+    if(app.documents.length < 1) {
+        alert('No document open, please open a document first');
+        return;
+    }
+    
+    var doc = app.activeDocument;
+    if(doc.placedItems.length == 0) {
+        alert('no linked graphic to get a filepath from. please place & select a graphic first!');
+        return;
     }
 
-    if(app.documents.length < 1)
-        throw new Error ('No document open, please open a document first');
-        
-    main(app.activeDocument);
+    var sel = doc.selection;
+    var ref = null;
 
+    if(sel.length < 1) {
+        alert('Please select a linked graphic to get the filepath from');
+        return;
+    }
 
-} catch(e) {
-    alert("Fehler:\n\n" + e.message);
+    for (var i=0, len=sel.length; i < len ; i++) {
+        if(sel[i].constructor.name == 'PlacedItem') {
+            ref = sel[i];
+            break;
+        }
+    }
+    
 
-    $.writeln("Error: " + e.message);
-    $.writeln("Line: " + e.line);
-    $.writeln("Script: " + e.fileName);
-}
+    if(ref == undefined) {
+        alert('no linked graphic in selection. Please select a linked graphic!');
+        return;
+    }
+
+    var saveFile = ref.file.parent.saveDlg();
+
+    if(saveFile == null) {
+        alert('Script cancelled');
+        return;
+    }
+    
+    doc.saveAs(saveFile);
+
+})();
 
 
