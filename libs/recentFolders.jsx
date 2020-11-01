@@ -1,9 +1,6 @@
 ﻿var ioFile = require('ioFile');
 var rE = require('rE');
 
-// var scriptDir = $.fileName.substring(0, $.fileName.lastIndexOf('/'));
-// var userName = $.getenv('USERNAME').replace('.', '').toLowerCase();
-// var recentFoldersFile = new File(scriptDir + '/recentFolders_' + userName + '.txt');
 var recentFoldersFile = new File ('~/documents/adobeScripts/recentFolders.txt');
 
 if(!recentFoldersFile.exists) {ioFile.write_file(recentFoldersFile, [].toSource())};
@@ -119,7 +116,7 @@ function add_to_recentFolders(ref) {
 
 
 
-function show_dialog () {
+function show_dialog (get_folder, get_file) {
     
     function get_subfolders (fd) {
         var subs = fd.getFiles(function (fd) {return fd.constructor.name == 'Folder';});
@@ -143,7 +140,7 @@ function show_dialog () {
         }
     }
 
-        function browse_Helper_file (path) {
+    function browse_Helper_file (path) {
         return function () {
             var result = File(path).openDlg('Datei wählen');
             if(result) {
@@ -198,13 +195,21 @@ function show_dialog () {
         btn.preferredSize.width = 400;
         btn.text = fd.displayName;
         btn.justify ='left';
-        btn.onClick = select_helper (i);
         
-        var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Verzeichnis suchen');
-        browseBtn.onClick = browse_Helper_folder (fd.fullName);
+        if(get_file) {
+            btn.onClick = browse_Helper_file(fd.fullName);
+        } else {
+            btn.onClick = select_helper (i);
+        }
 
-        var browseBtn = fdGrp['browseBtn'] = fdGrp.add("button", undefined,'Datei suchen');
-        browseBtn.onClick = browse_Helper_file (fd.fullName);
+        if(!get_file) {
+            var browseFolderBtn = fdGrp['browseFolderBtn'] = fdGrp.add("button", undefined,'Verzeichnis suchen');
+            browseFolderBtn.onClick = browse_Helper_folder (fd.fullName);
+        }
+        if(get_file) {
+            var browseFileBtn = fdGrp['browseFileBtn'] = fdGrp.add("button", undefined,'Datei suchen');
+            browseFileBtn.onClick = browse_Helper_file (fd.fullName);
+        }
     }
 
     var scrollBar = p.add("scrollbar");
@@ -236,7 +241,17 @@ function show_dialog () {
     }
 };
 
+function get_file () {
+    return show_dialog(false, true);
+}
+
+function get_folder() {
+    return show_dialog(true,false);
+}
+
 //~ show_dialog();
 
 exports.show_dialog = show_dialog;
+exports.get_file = get_file;
+exports.get_folder = get_folder;
 exports.add_to_recentFolders = add_to_recentFolders;
