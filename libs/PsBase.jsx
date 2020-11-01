@@ -1,6 +1,7 @@
 ﻿////@include 'require.jsx'
 
 var BaseDoc = require('BaseDoc');
+var buttonList = require('buttonList');
 
 function PsBase (initDoc) {
     BaseDoc.call(this, initDoc);
@@ -170,7 +171,8 @@ PsBase.prototype.get_spot_channels = function (visibleOnly) {
 
 PsBase.prototype.trim_doc = function () {
     var trims = ['TOPLEFT', 'BOTTOMRIGHT', 'NOE'];
-    var trim = f_all.choose_from_array(trims, undefined, 'Bild zuschneiden?');
+    var trim = buttonList.show_dialog(trims, undefined, 'Bild zuschneiden?');
+    
     if(trim != 'NOE') {
         this.doc.trim(TrimType[trim]);
     }

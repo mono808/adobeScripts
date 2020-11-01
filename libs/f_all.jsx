@@ -10,7 +10,7 @@ function reflect_props (obj) {
     props.sort(function(a,b) {return a.name < b.name});
     props.forEach(function(p) {
         $.writeln(p.name)
-        });
+    });
 }
 
 function saveBAT (saveThis) {
@@ -24,6 +24,14 @@ function saveBAT (saveThis) {
         myDataLog.close();
         return myDataLog;
     } catch (err) { return null }
+}
+
+exports.alert_error = function(e) {
+    var msg = 'Fehler:\r'
+    msg += e.message;
+    msg += '\r\rScript: ' + e.fileName;
+    msg += '\rZeile: ' + e.line;
+    alert (msg);
 }
 
 exports.BT_send_script = function (targetApp, script, scriptArgs, waitSec, callBack) {
@@ -99,16 +107,6 @@ exports.copyToClipboard = function (myString) {
     }
 }
 
-exports.read_file = function (aFile)
-{
-    if(aFile && aFile instanceof File) {
-        aFile.open('r', undefined, undefined);
-        aFile.encoding = "UTF-8";
-        aFile.lineFeed = "Windows";
-        return aFile.read();
-    }
-}
-
 exports.typeOf = function (v)
 {
     var ret=typeof(v);
@@ -171,13 +169,6 @@ exports.saveFile = function (dest, saveOps, close, showDialog)
         alert(e);
         return false;
     }
-}
-
-exports.openFile = function (source)
-{
-    var sourceFile = new File (source);
-    var fileRef = app.open (sourceFile);
-    return fileRef;
 }
 
 exports.startDistiller = function ()
@@ -385,13 +376,6 @@ exports.copy_file_via_bridgeTalk = function (sourceFile, destFolder, deleteSourc
     }
 
     return;
-}
-
-exports.choose_from_array = function (myArray, propToList, dialogTitle)
-{
-    var btnList = new ButtonList();
-    var retval = btnList.show_dialog(myArray, propToList, dialogTitle);
-    return retval ? retval : null;
 }
 
 exports.escapeRegExp = function (str) {
