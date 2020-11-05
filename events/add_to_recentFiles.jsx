@@ -1,4 +1,4 @@
-﻿//@include '/c/monodev/adobescripts/includes/require.jsx'
+﻿//@include 'require.jsx'
 
 (function () {
     var recentFiles = require('recentFiles');
@@ -9,11 +9,11 @@
     try {
         var aFullName = doc.fullName;
     } catch(e) {
-        $.writeln(doc.displayName + ' wurde noch nicht gespeichert');
+        $.writeln(doc.name + ' wurde noch nicht gespeichert');
         return;
     }   
     
     recentFiles.add_file(aFullName);
     
-})()
+})();
 
