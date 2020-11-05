@@ -1,7 +1,14 @@
 ﻿var ioFile = require('ioFile');
 var rE = require('rE');
 
-var historyFile = new File ('~/documents/adobeScripts/recentFiles.txt');
+switch (BridgeTalk.appName) {
+    case 'photoshop' : historyFileName = 'recentFiles-PS.txt';
+    break;
+    case 'indesign' : historyFileName = 'recentFiles-ID.txt';
+    break;
+    case 'illustrator' : historyFileName = 'recentFiles-AI.txt';
+}
+var historyFile = new File ('~/documents/adobeScripts/' + historyFileName);
 
 if(!historyFile.exists) {ioFile.write_file(historyFile, [].toSource())};
 
@@ -22,41 +29,6 @@ function get_primary_screen () {
     }
 }
 
-function select_dialog (path) {
-    var myFile = new File(path).selectDlg();
-    if(myFile.constructor.name == 'Folder') {
-        add_file(myFile);
-    }
-    return myFile;
-}
-
-function get_jobFolder (fld) {
-    if(fld.displayName.match(rE.jobNr)) {
-        return fld;
-    } else if (fld.parent) {
-        return get_jobFolder(fld.parent);
-    } else {
-        return null;
-    }
-}
-
-function get_folder_from_ref (ref) {
-    var fd;
-    switch(ref.constructor.name) {
-        case 'File' : fd = ref.parent;
-        break;
-        case 'Document' : 
-            if(ref.saved) {
-                fd = ref.fullName.parent;
-            } else {
-                return null;
-            }
-        break;
-        case 'Folder' : fd = ref;
-    }
-    return fd;            
-}
-
 function move_to_top (idx) {
     if(idx >= 0 && idx < lastFiles.length) {
         var tmp = lastFiles.splice(idx,1);
@@ -65,9 +37,6 @@ function move_to_top (idx) {
 }
 
 function export_history () {
-//~     var paths = lastFiles.map(function(fd) {
-//~         return fd.fullName;
-//~     })
     var str = lastFiles.toSource();
     var success = ioFile.write_file(historyFile, str);
     return success;
@@ -77,9 +46,6 @@ function import_history () {
     var str = ioFile.read_file(historyFile);
     var ev = eval(str);
     if(ev instanceof Array && ev.length > 0) {
-        // ev = ev.map(function(path) {
-        //     return new Folder(path)
-        // });
         return ev;
     } else {
         return [];
@@ -92,6 +58,8 @@ function remove_file(aFile) {
     }
     
     var result = lastFiles.filter(function(elem) {return elem !== aFile});
+    
+    $.writeln('removed "' + aFile + '" from recentFiles');
     lastFiles = result;
     
     export_history();
@@ -115,7 +83,7 @@ function add_file(aFile) {
     }
     
     if(lastFiles.length > maxRecentFolders) {
-        lastFiles.pop();
+        $.writeln('dropped "' + lastFiles.pop() + '" from recentFiles');
     }
 
     export_history();
@@ -214,7 +182,8 @@ function show_dialog () {
         var browseFileBtn = fileRow.add("button", undefined,'Datei suchen');
         browseFileBtn.onClick = browse_Helper_file (aFilePath);
         
-        var removeBtn = fileRow.add("button", undefined, 'DEL');
+        var removeBtn = fileRow.add("button", undefined, '-');
+        removeBtn.preferredSize.width = 25;
         removeBtn.onClick = remove_helper(aFullName,fileRow);
     }
 
