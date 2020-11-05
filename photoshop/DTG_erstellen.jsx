@@ -1,29 +1,25 @@
-﻿#target photoshop
-function main () {
+﻿//@target photoshop
+//@include 'require.jsx'
 
-     
-    #include 'DTGDocPS.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'LastFolders.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'InteractSwitch.jsx'
-    #include 'ButtonList.jsx'
+(function () {
+    
+    var PsDtg = require('PsDtg');
+    var saveOptions = require('saveOptions');
+    var job = require('job');
+    var paths = require('paths');
+    var iaSwitch = require('interactionSwitch');
+    
+    job.set_nfo(null, true);
+    paths.set_nfo(job.nfo);
 
-    //var job = new Job(app.activeDocument, true);
-    var pm = new Pathmaker();
-
-    var iaSwitch = new InteractSwitch();
     iaSwitch.set('none');
 
-    var dtgObj = Object.create(dtgDocPS);
-    dtgObj.startDoc = app.activeDocument;
-   
-    if(dtgObj.check()) {
-        dtgObj.make();
-    }
+    var psDtg = new PsDtg(app.activeDocument);
+
+    var saveFile = paths.file('dtgPrintTif');
+    var saveOpts = saveOptions.dtgPrintPsTif();
+    psDtg.make(saveFile, saveOpts);
 
     iaSwitch.reset();
-}
-main();
+    
+})();

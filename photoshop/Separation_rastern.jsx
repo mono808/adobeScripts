@@ -1,7 +1,8 @@
-﻿#target photoshop
+﻿//@target photoshop
+//@include 'require.jsx'
 
-#include 'augment_objects.jsx'
-#include 'BaseDocPS.jsx'
+var PsBase = require('PsBase');
+var f_all = require('f_all');
 
 var remove_component_channels = function () 
 {
@@ -34,9 +35,6 @@ var activate_all_channels = function ()
 };
 
 function rastern() {
-   
-      
-    #include 'f_all.jsx'
 
     var settings = get_raster_settings();
     if(!settings) {
@@ -62,7 +60,7 @@ function rastern() {
 
     // remove component channels not needed for halftoning
     remove_component_channels(tempDoc);
-                 
+
     // activate first channel only
     var targetDoc = tempDoc.duplicate('targetDoc');
     //targetDoc.name = 'targetDoc';
@@ -77,7 +75,7 @@ function rastern() {
         color : chan.color,
         opacity : chan.opacity
     };
-                   
+
     //bitmap the activeChannel with user defined settings
     convert_to_bitmap(targetDoc, settings);
 
@@ -349,8 +347,7 @@ function rastern() {
 
 function check () {
 
-    var baseDoc = Object.create(baseDocPS);
-    baseDoc.doc = app.activeDocument;
+    var baseDoc = new PsBase(app.activeDocument);
     var pantoneChannels = baseDoc.check_for_pantone();
     if( pantoneChannels.length > 0) {
         var alertStr = '';

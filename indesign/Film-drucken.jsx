@@ -1,28 +1,26 @@
-﻿#target indesign
-function main () {
+﻿//@target indesign
+//@include 'require.jsx'
 
-     
-    #include 'augment_objects.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'MonoFilm.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'MonoGraphic.jsx'
-    #include 'MonoTextil.jsx'
-    #include 'MonoPrint.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
+(function () {
 
-    var job = new Job(null, false);
-    var pm = new Pathmaker();    
+    if(!app.activeDocument) {
+        alert('Bitte Filmdatei zuerst öffnen');
+        return;
+    }
+
+    var job = require('job');
+    var paths = require('paths');
+    var MonoFilm = require('MonoFilm');
+
+    job.set_nfo(null, false);
+    paths.set_nfo(job.nfo);
+
+    var myDoc = app.activeDocument;
+
+    var monoFilm = new MonoFilm(myDoc);
     
-    var monoFilm = new MonoFilm(app.activeDocument);
-    monoFilm.print(job, true, false);
+    monoFilm.print(paths.path('filmIn'), paths.path('filmOut'));
 
     app.activeDocument.save();
 
-}
-main();
+})();

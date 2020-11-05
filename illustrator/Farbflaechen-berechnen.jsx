@@ -1,17 +1,12 @@
-﻿#target illustrator
-function main (report) 
-{
-   
-    #include 'Job.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'SepAI.jsx'
-    #include 'AreaDialog.jsx'
+﻿//@target illustrator
+//@include 'require.jsx'
 
-    //var job = new Job(null, true, false);
-    
-    //var pm = new Pathmaker();
-    
-    var sep = new SepAI(app.activeDocument);
+function main (report) {
+
+    var aiSiebdruck = require('AiSiebdruck');
+    var areaDialog = require('AreaDialog');
+
+    var sep = new aiSiebdruck(app.activeDocument);
     
     if(!sep.check()) return;
     
@@ -20,7 +15,7 @@ function main (report)
 
     sep.get_totalArea();
     
-    var inkDialog = new AreaDialog(sep.spots, sep.totalArea).create_win().show();
+    var inkDialog = new areaDialog(sep.spots, sep.totalArea).create_win().show();
 
 }
 

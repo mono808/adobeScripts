@@ -1,31 +1,29 @@
-﻿#target indesign
+﻿//@target indesign
+//@include 'require.jsx'
 
-
-
-function main () {
+(function () {
     
-     
-    #include 'augment_objects.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'MonoFilm.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'MonoGraphic.jsx'
-    #include 'MonoTextil.jsx'
-    #include 'MonoPrint.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'PasserFab.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
-
-    var mockUpDoc = app.activeDocument;
+    if(!app.activeDocument) {
+        alert('Bitte Ansicht öffnen und Separation anwählen');
+        return;
+    }
     
-    for (var i = 0; i < mockUpDoc.selection.length; i++) {
-        var monoGraphic = new MonoGraphic(mockUpDoc.selection[i].graphics[0]);
-        var job = new Job (monoGraphic.get_file('print'), true, false);
-        var pm = new Pathmaker(job.nfo);
+    if(app.activeDocument.selection.length < 1) {
+        alert('Bitte erst eine Grafik auswählen');
+        return;
+    }
+
+    var job = require('job');
+    var paths = require('paths');
+    var MonoFilm = require('MonoFilm');
+    var MonoGraphic = require('MonoGraphic');
+
+    var myDoc = app.activeDocument;
+        
+    for (var i = 0; i < myDoc.selection.length; i++) {
+        var monoGraphic = new MonoGraphic(myDoc.selection[i].graphics[0]);
+        job.set_nfo(monoGraphic.get_file('print'), true, false);
+        paths.set_nfo(job.nfo);
 
         var monoFilm = new MonoFilm();
         monoFilm.create_template();
@@ -40,22 +38,4 @@ function main () {
         monoFilm.save(job);
         monoFilm.print(job, true, false);
     }
-}
-
-function check() {
-    if(!app.activeDocument) {
-        alert('Bitte Ansicht öffnen und Separation anwählen');
-        return false;
-    }
-    
-    if(app.activeDocument.selection.length < 1) {
-        alert('Bitte erst eine Grafik auswählen');
-        return false;
-    }
-
-    return true;
-}
-
-if(check()){
-    main();
-}
+})();

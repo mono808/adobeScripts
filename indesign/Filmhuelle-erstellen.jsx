@@ -1,13 +1,11 @@
-﻿#target indesign
+﻿//@target indesign
+//@include 'require.jsx'
 
-#include 'Job.jsx'
-#include 'JobFolder.jsx'
-#include 'MonoFilm.jsx'
-#include 'MonoNamer.jsx'
-#include 'MonoPrint.jsx'
-#include 'MonoSep.jsx'
-#include 'Pathmaker.jsx'
-#include 'universal_functions.jsx'
+var names = require('names');
+var MonoFilm = require('MonoFilm');
+var MonoPrint = require('MonoPrint');
+var MonoSep = require('MonoSep');
+
 
 function createTextFrame (doc)
 {
@@ -66,15 +64,14 @@ function checkCreateStyle (type, name)
         break;
     }
     
-    if(!newStyle) {
-        try{
-            newStyle = existingStyles.item(name);
-            var check = newStyle.name;
-        } catch (myError){  
-            newStyle = existingStyles.add({name:name});
+    if(!newStyle) {       
+        newStyle = existingStyles.item(name);
+        if(newStyle.isValid) {
+            return newStyle;
+        } else{  
+            return existingStyles.add({name:name});
         }
     }
-    return newStyle;
 }
 
 function createStyles (doc) 
@@ -264,7 +261,7 @@ function import_graphic_to_cell (graphic, cell)
     }
 }
 
-function fill_table_with_printNfo (monoPrints, myTable, monoNamer) 
+function fill_table_with_printNfo (monoPrints, myTable, names) 
 {
     var jobRow = myTable.rows.item(0);          
     jobRow.cells.everyItem().appliedCellStyle = 'jobCStyle';
@@ -282,7 +279,7 @@ function fill_table_with_printNfo (monoPrints, myTable, monoNamer)
         monoFilm.close(SaveOptions.YES);
         
         var posCell = posRow.cells.item(i);
-        posCell.contents = monoNamer.name('printId', monoPrints[i].id);
+        posCell.contents = names.name('printId', monoPrints[i].id);
 
         var colorCell = colorsRow.cells.item(i);    
         colorCell.contents = spotNames.join(', ');
@@ -359,12 +356,22 @@ function create_aufkleber ()
 
 function main () 
 {
-    var job = new Job(null, false, false);
-    var pm = new Pathmaker(job.nfo);
-    var jobFolder = new JobFolder(job.nfo.folder);
-    var monoNamer = new MonoNamer();
+
+    //@include 'require.jsx'
+
+    var job = require('job');
+    var paths = require('paths');
+    var f_all = require('f_all');
+    var jobFolder = require('jobFolder');
+    var names = require('names');
+    var BaseDoc = require('BaseDoc');
+
+    job.set_nfo(null, false, false);
+    paths.set_nfo(job.nfo);
+    jobFolder.set_folder(job.nfo.folder);
 
     var doc = create_aufkleber();
+
     var myPage = doc.pages.item(0);
     var myTable = myPage.textFrames.item(0).tables.item(0);
     
@@ -386,8 +393,8 @@ function main ()
     }
          
     sdPrints.sort(function(a,b) {
-        var sideA = monoNamer.name('side', a.id);
-        var sideB = monoNamer.name('side', b.id);
+        var sideA = names.name('side', a.id);
+        var sideB = names.name('side', b.id);
         return sideA < sideB;
     });
     
@@ -403,11 +410,11 @@ function main ()
         var fourtett = sdPrints.splice(0,4);  
         var myPage = doc.pages[i];
         var myTable = myPage.textFrames.item(0).tables.item(0);
-        fill_table_with_printNfo(fourtett, myTable, monoNamer);
+        fill_table_with_printNfo(fourtett, myTable, names);
     }
     
     if(app.activeDocument.saved == false){
-        save_file(pm.file('filmhuelle'), undefined, false);
+        BaseDoc.prototype.save_doc(paths.file('filmhuelle'), undefined, false);
     }
 }
 

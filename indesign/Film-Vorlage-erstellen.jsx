@@ -1,9 +1,10 @@
-﻿#target indesign
-function main () {
+﻿//@target indesign
+//@include 'require.jsx'
 
-     
-    #include 'MonoFilm.jsx'
-   
+(function () {
+
+    var MonoFilm = require('MonoFilm');
+
     var monoFilm = new MonoFilm();
     
     try {
@@ -14,5 +15,5 @@ function main () {
 
     monoFilm.create_template (false);
 
-}
-main();
+})();
+

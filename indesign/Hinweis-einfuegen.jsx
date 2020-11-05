@@ -1,20 +1,20 @@
-﻿#target indesign
-function main () {
-    
-     
-    #include 'augment_objects.jsx'
-    #include 'f_all.jsx'
-    #include 'f_id.jsx'
-    #include 'MonoMockup.jsx'
-    #include 'MonoSep.jsx'
-    #include 'Typeahead.jsx'
-    #include 'TexAdder.jsx'
+﻿//@target indesign
+//@include 'require.jsx'
 
-    //var job = new Job(null,false);
-    //var pm = new Pathmaker(job.nfo);
-    //var typeahead = new Typeahead();
+(function () {
+
+    if(!app.activeDocument) {
+        alert('Bitte zuerst Filmdatei öffnen');
+        return;
+    }
+
+    var job = require('job');
+    var paths = require('paths');
+    var MonoFilm = require('MonoFilm');
+
+    job.set_nfo(null, false);
+    paths.set_nfo(job.nfo);
+
     var mockup = new MonoMockup(app.activeDocument);
     mockup.add_hinweis();
-};
-
-main();
+})();

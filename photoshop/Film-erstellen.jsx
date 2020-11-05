@@ -1,67 +1,22 @@
-﻿//#target photoshop-60.064
+﻿//@target photoshop
 
 function main() {
 
-     
-    #include 'augment_objects.jsx'
-    #include 'SepDocPS.jsx'
-    #include 'PreviewDocPS.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'InteractSwitch.jsx'
-    #include 'ButtonList.jsx'
-    #include 'save_Options.jsx'
+    //@include 'require.jsx'
 
-	var monoNamer = new MonoNamer();
-    var job = new Job(app.activeDocument, true);
-    var pm = new Pathmaker(job.nfo);
-
-    //---------------------------------------------------------------------
-    // create the separation file
-
-    var originalRulerUnits = app.preferences.rulerUnits;
-    app.preferences.rulerUnits = Units.MM;
-
-    var iaSwitch = new InteractSwitch();
-    iaSwitch.set('none');
-
-    var sepObj = Object.create(sepDocPS)
-    sepObj.startDoc = app.activeDocument;
-    var sepFormat = sepObj.get_sep_fileformat_dialog();
-    var saveFile = pm.file(sepFormat.fileName, job.nfo);
-    sepObj.make(saveFile, sepFormat.isSpot);
-
-    sepObj.pos = sepObj.get_guide_location();
-    sepObj.place_on_film(saveFile, sepObj.pos);
-
-    app.activeDocument = sepObj.startDoc;
-    //sepObj.doc.close();
-
-
-    //---------------------------------------------------------------------
-    // create the preview file
-
-    var saveFile = pm.file('previewPs');
-    var previewObj = Object.create(previewDocPS);
-    previewObj.startDoc = app.activeDocument;
-    previewObj.make(saveFile);
-
-    app.preferences.rulerUnits = originalRulerUnits;
-}
-
-
-
-function check () {
-
+    var job = require('job');
+    var paths = require('paths');
+    var saveOptions = require('saveOptions');
+    var iaSwitch = require('interactionSwitch');
+    var PsSiebdruckPrint = require('PsSiebdruckPrint');
+    var PsSiebdruckPreview = require('PsSiebdruckPreview');
+    
     if(!app.activeDocument) return false;
 
-    #include 'BaseDocPS.jsx'
+    //make some checks to verify that the script can run
+    var printDoc = new PsSiebdruckPrint(app.activeDocument);
 
-    var baseDoc = Object.create(baseDocPS);
-    baseDoc.doc = app.activeDocument;
-    var pantoneChannels = baseDoc.check_for_pantone();
+    var pantoneChannels = printDoc.check_for_pantone();
     if( pantoneChannels.length > 0) {
         var alertStr = '';
         alertStr += 'Dokument enthält Pantone-Farben in folgenden Kanälen:\n\n';
@@ -71,14 +26,50 @@ function check () {
         return false;
     }
 
-    if(baseDoc.get_spot_channels().length < 1) {
+    if(printDoc.get_spot_channels().length < 1) {
         alert('Document contains no SpotColor Channels, script cancelled');
         return false;
     }
 
-    return true;
+    job.set_nfo(app.activeDocument, true);
+    paths.set_nfo(job.nfo);
+
+    //---------------------------------------------------------------------
+    // create the separation file
+
+    var originalRulerUnits = app.preferences.rulerUnits;
+    app.preferences.rulerUnits = Units.MM;
+
+    iaSwitch.set('none');
+
+    var sepFormat = printDoc.get_sep_format();
+    switch(sepFormat) {
+        case 'PSD': var saveFile = paths.file('sdPrintPsd');
+                    var saveOpts = saveOptions.sdPrintPsPsd();
+                    break;
+        case 'EPS': var saveFile = paths.file('sdPrintEps');
+                    var saveOpts = saveOptions.sdPrintPsEps();
+                    break;
+    }
+    
+    printDoc.make(saveFile, saveOpts);
+
+    var guidesLocation = printDoc.get_guide_location();
+    printDoc.place_on_film(saveFile, guidesLocation);
+
+    app.activeDocument = printDoc.sourceDoc;
+
+    //---------------------------------------------------------------------
+    // create the preview file
+
+    var saveFile = paths.file('previewPs');
+
+    var previewDoc = new PsSiebdruckPreview(app.activeDocument);
+    var previewSaveOpts = saveOptions.previewPs();
+    previewDoc.make(saveFile, previewSaveOpts);
+
+    app.preferences.rulerUnits = originalRulerUnits;
+    iaSwitch.reset();
 }
 
-if (check()) {
-    main();
-}
+main();
