@@ -303,7 +303,8 @@ PsSiebdruckPrint.prototype.make = function (saveFile, saveOptions) {
         }
     }
 
-    this.remove_alpha_channels(true);
+    var keepTeeChan = /^(t|tee|shirt|tasche|beutel)$/i;
+    this.remove_alpha_channels(keepTeeChan);
 
     var teeChan = this.find_tee_channel();
     if(teeChan) teeChan.remove();

@@ -41,25 +41,6 @@ PsSiebdruck.prototype.check_histogram = function (chan) {
     };
 };
 
-PsSiebdruck.prototype.remove_alpha_channels = function (containTeeChannel) {
-    var teeNames = /^(t|tee|shirt|tasche|beutel)$/i;
-    var i = this.doc.channels.length-1;
-    do{
-        var chan = this.doc.channels[i];
-        if(chan.kind === ChannelType.MASKEDAREA || chan.kind === ChannelType.SELECTEDAREA) {
-            if(chan.name.match(teeNames)) {
-                var teeColor = chan.color;
-                if(containTeeChannel) {
-                    continue;
-                }
-            }
-            chan.remove();
-        };
-    }while(i--);
-
-    return teeColor;
-};
-
 PsSiebdruck.prototype.find_tee_channel = function () {
 	var teeNames = /^(t|tee|shirt|tasche|beutel)$/i;
 

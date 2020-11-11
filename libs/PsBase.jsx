@@ -32,23 +32,16 @@ PsBase.prototype.choose_saveFile = function (myDoc)
     }
 }
 
-PsBase.prototype.remove_alpha_channels = function (containTeeChannel) {
-    var teeNames = /^(t|tee|shirt|tasche|beutel)$/i;
+PsBase.prototype.remove_alpha_channels = function (keepThoseChannels) {
     var i = this.doc.channels.length-1;
+    var chan;
     do{
-        var chan = this.doc.channels[i];
+        chan = this.doc.channels[i];
+        if(keepThoseChannels && chan.name.match(keepThoseChannels)) continue;
         if(chan.kind === ChannelType.MASKEDAREA || chan.kind === ChannelType.SELECTEDAREA) {
-            if(chan.name.match(teeNames)) {
-                var teeColor = chan.color;
-                if(containTeeChannel) {
-                    continue;
-                }
-            }
             chan.remove();
         };
     }while(i--);
-
-    return teeColor;
 };
 
 PsBase.prototype.reset_colors = function () {

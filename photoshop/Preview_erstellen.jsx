@@ -1,8 +1,7 @@
 ﻿//@target photoshop
-
-function main () {
-
-    //@include 'require.jsx'
+//@include 'require.jsx'
+$.level = 0;
+(function () {
 
     var job = require('job');
     var paths = require('paths');
@@ -22,6 +21,4 @@ function main () {
     app.refresh();
 
     iaSwitch.reset();
-}
-
-main();
+})()

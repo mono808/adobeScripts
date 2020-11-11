@@ -36,37 +36,11 @@ PsSiebdruckPreview.prototype.create_layers_from_channels = function (chans) {
     this.doc.activeChannels = this.doc.componentChannels;
 };
 
-// creates a combined selection from all spotchannels
-// then merge all spotchannels including t-shirt channel into rgb
-// and use the created selection to make a layermask for the merged rgb image
-PsSiebdruckPreview.prototype.create_merged_doc = function () {
-
-    var activeChannels = this.get_active_channels();
+PsSiebdruckPreview.prototype.make_selection_from_channels = function (chanArray) {
     this.doc.selection.deselect;
-
-    //this.delete_hidden_channels();
-
-    var spotChans = this.get_spot_channels();
-    if(spotChans.length < 1) {
-        this.doc.close();
-        alert("No spotchannels found, can't create Preview Doc");
-        return;
-    }
-
-    var teeChan = this.find_tee_channel();
-    /*convert tee chan to alpha, so its not misinterpreted as regular spotchannel*/
-    /*
-    if(teeChan && teeChan.kind == ChannelType.SPOTCOLOR) {
-        teeChan.kind = ChannelType.SELECTEDAREA;
-    }
-    */
-
-    var spotChans = this.get_spot_channels();
-
-    /*create a combined selection from all spotChannels*/
     var selection = this.doc.selection;
-    for (var i = 0; i < spotChans.length; i++) {
-        var chan = spotChans[i];
+    for (var i = 0; i < chanArray.length; i++) {
+        var chan = chanArray[i];
         /*extending a selection works only with an existing selection*/
         try {
             var test = selection.bounds;
@@ -77,18 +51,31 @@ PsSiebdruckPreview.prototype.create_merged_doc = function () {
             selection.load(chan,SelectionType.REPLACE, false);
         }
     }
+    return selection;
+}
 
-    if(!teeChan) {
-        var teeChan = this.create_tee_channel();
-        activeChannels = this.get_active_channels();
+// creates a combined selection from all spotchannels
+// then merge all spotchannels including t-shirt channel into rgb
+// and use the created selection to make a layermask for the merged rgb image
+PsSiebdruckPreview.prototype.create_merged_doc = function () {
+
+    var activeChannels = this.get_active_channels();
+    this.doc.selection.deselect;
+
+    var spotChans = this.get_spot_channels();
+    if(spotChans.length < 1) {
+        this.doc.close();
+        alert("No spotchannels found, can't create Preview Doc");
+        return;
     }
 
-    /*convert teeChan to spotcolor, so its included the final merge to rgb*/
-    teeChan.kind = ChannelType.SPOTCOLOR;
-    spotChans.unshift(teeChan);
+    var teeChan = this.find_tee_channel();
 
-    this.remove_alpha_channels();
+    var spotChans = this.get_spot_channels();
 
+    /*create a combined selection from all spotChannels*/
+    var selection = this.make_selection_from_channels (spotChans);
+    
     /*save the selection in an alpha channel*/
     var maskChan = this.doc.channels.add();
     maskChan.kind = ChannelType.MASKEDAREA;
@@ -97,8 +84,23 @@ PsSiebdruckPreview.prototype.create_merged_doc = function () {
     selection.store(maskChan,SelectionType.REPLACE);
     selection.deselect();
 
+    if(!teeChan) {
+        var teeChan = this.create_tee_channel();
+        activeChannels = this.get_active_channels();
+    }
+
+    /*convert teeChan to spotcolor, so its included the final merge to rgb*/
+    if(teeChan.kind !== ChannelType.SPOTCOLOR) {
+        teeChan.kind = ChannelType.SPOTCOLOR;
+        spotChans.unshift(teeChan);
+    }
+
+    var keepMask = /myMask/;
+    this.remove_alpha_channels(keepMask);
+
+
 	/*add rgb channels if none are present*/
-    if (this.doc.mode != DocumentMode.RGB) {
+    if (this.doc.mode !== DocumentMode.RGB) {
         if (this.doc.componentChannels.length >= 1) {
             this.doc.changeMode(ChangeMode.RGB);
         } else {
@@ -107,10 +109,14 @@ PsSiebdruckPreview.prototype.create_merged_doc = function () {
     }
 
 	/*merge all spotchans into the rgb chans*/
+    var teeChanName = teeChan.name;
     for (var i = 0; i < spotChans.length; i++) {
         var spotChan = spotChans[i];
-        if(activeChannels.includes(spotChan.name))
+        var isActive = activeChannels.includes(spotChan.name);
+        var isTeeChan = teeChanName === spotChan.name;
+        if(isActive || isTeeChan) {
             spotChan.merge();
+        }
     }
 
     /*use the stored selection to create a mask for the artlayer*/
@@ -158,6 +164,7 @@ PsSiebdruckPreview.prototype.get_preview_format = function () {
     var infoText = 'in Ebenen -> Kanale werden in Ebenen kopiert, geeignet für Vollton-Motive\r\r';
     infoText += 'verrechnet -> Kanäle werden zu RGB verrechnet, simuliert Überdrucken, geeignet für Rastermotive';
     var previewStyle = buttonList.show_dialog(styles,undefined, dialogTitle, infoText);
+    return previewStyle;
 }
 
 PsSiebdruckPreview.prototype.make = function (saveFile, saveOptions) {
@@ -168,9 +175,9 @@ PsSiebdruckPreview.prototype.make = function (saveFile, saveOptions) {
     var previewStyle = this.get_preview_format ();
 
 	switch(previewStyle) {
-		case 'Kanäle in Ebenen' : this.create_merged_doc ();
+		case 'Kanäle in Ebenen' : this.create_layered_doc();
 		break;
-		case 'Kanäle verrechnet': this.create_layered_doc();
+		case 'Kanäle verrechnet': this.create_merged_doc ();
 		break;
 		default : this.create_layered_doc();
 	}
