@@ -173,7 +173,7 @@ function show_dialog () {
         parentTxt.alignment = 'center';
 
         var btn = fileRow['btn'] = fileRow.add('button {justify:"right"}');
-        btn.preferredSize.width = 250;
+        btn.preferredSize.width = 350;
         btn.text = aFileName;
         btn.justify ='left';
         
