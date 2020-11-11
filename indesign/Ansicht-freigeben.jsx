@@ -239,7 +239,7 @@
     if (result.opts.printFilme) {
         for (var i=0, len=filme.length; i < len ; i++) {
             var monoFilm = new MonoFilm(app.open(filme[i]));
-            monoFilm.print();
+            monoFilm.print(paths.path('filmIn'), paths.path('filmOut'));
         }
     }
 
