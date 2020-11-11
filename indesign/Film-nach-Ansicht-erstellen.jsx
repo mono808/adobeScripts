@@ -2,12 +2,12 @@
 //@include 'require.jsx'
 
 (function () {
-    
+
     if(!app.activeDocument) {
         alert('Bitte Ansicht öffnen und Separation anwählen');
         return;
     }
-    
+
     if(app.activeDocument.selection.length < 1) {
         alert('Bitte erst eine Grafik auswählen');
         return;
@@ -19,7 +19,7 @@
     var MonoGraphic = require('MonoGraphic');
 
     var myDoc = app.activeDocument;
-        
+
     for (var i = 0; i < myDoc.selection.length; i++) {
         var monoGraphic = new MonoGraphic(myDoc.selection[i].graphics[0]);
         job.set_nfo(monoGraphic.get_file('print'), true, false);
@@ -36,6 +36,6 @@
         monoFilm.position_textFrames();
         monoFilm.resize_page();
         monoFilm.save(job);
-        monoFilm.print(job, true, false);
+        monoFilm.print(paths.path('filmIn'), paths.path('filmOut'));
     }
 })();

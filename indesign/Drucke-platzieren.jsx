@@ -1,5 +1,6 @@
 ﻿//@target indesign
 //@include 'require.jsx'
+$.level = 1;
 
 function main () {
 
@@ -15,7 +16,7 @@ function main () {
 
     var MonoMockup = require('MonoMockup');
 
-    job.set_nfo(null,false);
+    job.set_nfo(app.activeDocument,false);
     paths.set_nfo(job.nfo);
     jobFolder.set_folder(job.nfo.folder);
     

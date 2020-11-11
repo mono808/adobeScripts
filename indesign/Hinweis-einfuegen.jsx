@@ -10,7 +10,7 @@
 
     var job = require('job');
     var paths = require('paths');
-    var MonoFilm = require('MonoFilm');
+    var MonoMockup = require('MonoMockup');
 
     job.set_nfo(null, false);
     paths.set_nfo(job.nfo);
