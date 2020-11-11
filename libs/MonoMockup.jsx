@@ -1,10 +1,12 @@
-﻿var typeahead = require('typeahead');
-var texTool = require('textilTool');
-var rE = require('rE');
-var IdBase = require('IdBase');
+﻿var csroot = Folder($.getenv("csroot"));
+var pcroot = Folder($.getenv("pcroot"));
 var names = require('names');
-var csroot = Folder($.getenv("csroot"));
+var rE = require('rE');
+var typeahead = require('typeahead');
+var texTool = require('textilTool');
+
 var MonoGraphic = require('MonoGraphic');
+var IdBase = require('IdBase');
 var MonoFilm = require('MonoFilm');
 
 function MonoMockup (initDoc) 
@@ -13,18 +15,17 @@ function MonoMockup (initDoc)
     this.templates = [
         {
             type: 'bags',
-            file: File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/taschen/Ansicht_Taschen_Master.indd'),
+            file: File(pcroot.fullName + '/adobeScripts/templates/Ansicht_Taschen_Master.indd'),
             scale : 4.5
         },
         {
-            type: 'shirts',            
-            file : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master.indd'),
-            fileCC18 : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master_cc2018.indd'),
+            type: 'shirts',
+            file : File(pcroot.fullName + '/adobeScripts/templates/Ansicht_Shirt_Master.indd'),
             scale : 6.5
         },
         {
             type: 'accessoires',
-            file : File(csroot.fullName + '/produktion/druckvorstufe/scriptVorlagen/ansicht/taschen/Ansicht_Accessoires_Master.indd'),
+            file : File(pcroot.fullName + '/adobeScripts/templates/Ansicht_Accessoires_Master.indd'),
             scale : 3
         }
     ];
@@ -48,12 +49,23 @@ MonoMockup.prototype.import_pages = function ()
     this.templateDoc = app.open(this.template.file, false);
     
     this.label_pages(this.templateDoc);
-    
-    //var typeahead = new Typeahead();
-    var selectedPages = typeahead.show_dialog(this.templateDoc.pages, 'label', true);
+    var pagesToImport = typeahead.show_dialog(this.templateDoc.pages, 'label', true);
 
     //var selectedPages = this.select_textile_pages(this.templateDoc);
-    this.copy_spreads(this.templateDoc, this.doc, selectedPages);
+    this.copy_pages(this.templateDoc, this.doc, pagesToImport);
+    this.templateDoc.close();
+
+    return this;
+};
+
+MonoMockup.prototype.import_empty_template = function () 
+{
+
+    //var templateFile = this.get_scale() > 5 ? this.templates.shirts.file : this.templates.bags.file;        
+    this.templateDoc = app.open(this.template.file, false);
+
+    var emptyTemplatePage = [this.templateDoc.pages.lastItem()];
+    this.copy_pages(this.templateDoc, this.doc, emptyTemplatePage);
     this.templateDoc.close();
 
     return this;
@@ -358,7 +370,7 @@ MonoMockup.prototype.select_textile_pages = function (templateDoc)
     return this.get_pageRefs(templateDoc, pageNames);
 };
 
-MonoMockup.prototype.copy_spreads = function (sourceDoc,destDoc, pages2copy) 
+MonoMockup.prototype.copy_pages = function (sourceDoc,destDoc, pages2copy) 
 {
     var dupedSpreads = [];
 
