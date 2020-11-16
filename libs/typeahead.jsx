@@ -35,12 +35,12 @@ exports.show_dialog = function (inputElements, propertyToList, multiselect, dial
     {
         keyCount++;
         if(keyCount < 4 || entry.text.length < 4) return;
-        var temp = entry.text;
+        var tempRegExp = new RegExp(entry.text,'gi');
         var tempArray = [];
         for (var i = 0; i < names.length; i++) {
-            if (names[i].toLowerCase().indexOf(temp) > -1) {
+            if (names[i].match(tempRegExp)) {
                 tempArray.push (names[i]);
-                }
+            }
             if (tempArray.length > 0) {
                 // Create the new list with the same bounds as the one it will replace
                 tempList = dummy.add ("listbox", list.bounds, tempArray, {scrolling: true, multiselect: multiselect});
