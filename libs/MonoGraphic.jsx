@@ -210,7 +210,7 @@ function MonoGraphic (myGraphic)
                     if(monoPrint.film) {
                         var monoFilm = new MonoFilm(monoPrint.film);
                         var spotNames = monoFilm.get_spotNames(longNames);
-                        monoFilm.filmDoc.close(SaveOptions.ASK);
+                        monoFilm.filmDoc.close(SaveOptions.NO);
                         return spotNames;
                     }
                 break;

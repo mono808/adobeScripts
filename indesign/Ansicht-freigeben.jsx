@@ -238,8 +238,10 @@
 
     if (result.opts.printFilme) {
         for (var i=0, len=filme.length; i < len ; i++) {
-            var monoFilm = new MonoFilm(app.open(filme[i]));
+            var showWindow = false;
+            var monoFilm = new MonoFilm(app.open(filme[i]),showWindow);
             monoFilm.print(paths.path('filmIn'), paths.path('filmOut'));
+            monoFilm.filmDoc.close(SaveOptions.NO);
         }
     }
 

@@ -407,7 +407,7 @@ MonoMockup.prototype.place_prints_on_page = function (monoPrints)
         if(mP.film) {
             var monoFilm = new MonoFilm(mP.film);
             var sepPos = monoFilm.get_sepPos();
-            monoFilm.filmDoc.close(SaveOptions.ASK);
+            monoFilm.filmDoc.close(SaveOptions.NO);
         }
 
         var side = names.name_side(mP.id);
@@ -537,20 +537,23 @@ MonoMockup.prototype.create_ui = function (rowObjs, job)
 
 MonoMockup.prototype.show_hinweisDialog = function () {
     //<fragment>
+    var numberOfEditTexts = 3;
+    var textLines = [];
 	var myDialog = app.dialogs.add({name:"Hinweis erstellen", canCancel:true});
 	with(myDialog){
 		//Add a dialog column.
 		with(dialogColumns.add()){
 			//Create a border panel.
 			with(borderPanels.add()){
-				with(dialogColumns.add()){
-					//The following line shows how to set a property as you create an object.
-					staticTexts.add({staticLabel:"Hinweis:"});
-				}
-				with(dialogColumns.add()){
-					//The following line shows how to set multiple properties as you create an object.
-					var myTextEditField = textEditboxes.add({editContents:"Das ist ein Hinweis!", minWidth:180});
-				}
+                with(dialogColumns.add()) {
+                    for (var i=0; i < numberOfEditTexts ; i++) {
+                        with(dialogRows.add()){
+                            staticTexts.add({staticLabel:"Zeile "+i+" :"});
+                            var myTextEditField = textEditboxes.add({editContents:"", minWidth:180});
+                            textLines.push(myTextEditField);
+                        }
+                    }
+                }
 			}
 
 			//Create another border panel.
@@ -565,12 +568,13 @@ MonoMockup.prototype.show_hinweisDialog = function () {
 		}
 	}
 	//Display the dialog box.
-	if(myDialog.show() == true){
+	if(myDialog.show() == true) {
 		var myString, mytarget;
-		//If the user didn’t click the Cancel button,
-		//then get the values back from the dialog box.	
-		//Get the example text from the text edit field.
-		myString = myTextEditField.editContents
+        var hinweise = [];
+        for (var i=0, len=textLines.length; i < len ; i++) {
+            hinweise.push(textLines[i].editContents);
+        };
+		myString = hinweise.join('\r');
 
 		//Get the paragraph alignment setting from the radiobutton group.
 		if(myRadioButtonGroup.selectedButton == 0){
@@ -641,7 +645,7 @@ MonoMockup.prototype.add_hinweis = function ()
         justification = Justification.LEFT_ALIGN;
     }
 
-    myTF.paragraphs.item(0).applyParagraphStyle(pStyle);
+    myTF.paragraphs.everyItem().applyParagraphStyle(pStyle);
 
     doc.activeLayer = lastLayer;
     return myTF;
