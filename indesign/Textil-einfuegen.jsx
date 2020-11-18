@@ -12,6 +12,12 @@
     
     texTool.add_textiles();
     texTool.choose_object_layers(app.selection);
-    //texTool.flatten_textiles(app.selection);
+    
+    var msg = 'Texti als JPG einbetten?';
+    var flatten = Window.confirm (msg, true, 'Einbetten?');
+    
+    if(flatten) {
+        texTool.flatten_textiles(app.selection);
+    }
     
 })();

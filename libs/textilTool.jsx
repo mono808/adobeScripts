@@ -2,8 +2,9 @@
 var paths = require('paths');
 
 var csroot = Folder($.getenv("csroot")).fullName;
-var ignoreThoseFiles = /\.bridge/i;
+var ignoreBridge = /^(?!.*(\.bridge)).*$/i;
 var fixedLayerNames = ["Shirt","Naht","Tasche","Beutel","Hintergrund"];
+var listAlways = 'front|back|left|right';
 var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
 
 function find_files (dir, filter) {
@@ -17,7 +18,7 @@ function find_files_sub (dir, array, filter) {
         if (f[i] instanceof Folder)
             find_files_sub (f[i], array, filter);
         else
-            if (f[i] instanceof File && f[i].displayName.search(filter) == -1)
+            if (f[i] instanceof File && f[i].displayName.search(filter) > -1)
                 array.push (f[i]);
         }
     return array;
@@ -54,7 +55,7 @@ function add_textiles(staySelected) {
     var placedItems = [];
     var placedItem;
     // if something is selected,  place image into selected rectangles
-    var texFiles = get_tex_files(texRoot, ignoreThoseFiles);
+    var texFiles = get_tex_files(texRoot, ignoreBridge);
     var selectedTex = typeahead.show_dialog(texFiles, 'displayName', true, 'Textilien wählen');
 
     if(!selectedTex || selectedTex.length < 1) {
@@ -113,58 +114,60 @@ function get_graphicLayerNames (myImage, skipHiddenLayers, skipFixedLayers) {
     return layerNames;
 }
 
-function changeImage(image, aFile) {
-    var rec = image.parent;
-    //image.remove();
+function replace_graphic(myRect, aFile) {
 
     if(aFile.constructor.name !== 'File') {
         aFile = new File(decodeURI(aFile));
     }
-    rec.place(aFile);
-    //rec.fit(FitOptions.CONTENT_TO_FRAME);
-    rec.allGraphics[0].itemLink.unlink();
+    myRect.place(aFile);
+    //myRect.fit(FitOptions.CONTENT_TO_FRAME);
+    return myRect;
 }
 
-function flatten_textiles (mySelection) {
-    if(!mySelection || mySelection.length == 0) return;
-    var selItem;
-    for (var i=0, lenI=mySelection.length; i < lenI ; i++) {
-        selItem = mySelection[i];
-        if(selItem.constructor.name === 'Rectangle') {
-            var graphic = selItem.graphics[0];
-        } else {
-            var graphic = selItem;
-        }
+function isImage (item) {
+    return item.constructor.name === 'Image';
+}
 
-        if(graphic.imageTypeName !== 'Photoshop' && graphic.imageTypeName !== 'PDF') return;
+function isGraphic(item) {
+    return item.constructor.name === 'Graphic';
+}
 
-        var skipHiddenLayers = true;
-        var skipFixedLayers = true;
-        var visibleOjectLayers = get_graphicLayerNames(graphic, skipHiddenLayers, skipFixedLayers);
-        var sourcePath = graphic.itemLink.filePath;
+function isPDF (item) {
+    return item.constructor.name === 'PDF';
+}
 
-        /* create filename containing the visible object layers */
-        
-        var filename = sourcePath.substring(0, sourcePath.lastIndexOf('.'));
-        var sourceExtension = sourcePath.substring(sourcePath.lastIndexOf('.'), sourcePath.length-1);
-        var destExtension = '.jpg';
-        for (var j=0, lenJ=visibleOjectLayers.length; j < lenJ ; j++) {
-            filename += '_-_';
-            filename += (encodeURI(visibleOjectLayers[j]));
-        };
+function isJPG (item) {
+    return isGraphic(item) && item.imageTypeName === 'JPEG';
+}
 
-        var destPath = filename + destExtension;
+function isPSD (item) {
+    return isGraphic(item) && item.imageTypeName === 'Photoshop';
+}
 
-        var jpgFile = new File(decodeURI(destPath));
-        graphic.exportFile(ExportFormat.JPG, jpgFile, false);
+function containsGraphic (item) {
+    return (item.constructor.name === 'Rectangle' && item.graphics.length > 0);
+}
 
-        changeImage(graphic, jpgFile);
-        jpgFile.remove();
+function get_sourcePath(selItem) {
+    if(selItem.constructor.name == 'Rectangle') {
+        return get_sourcePath (selItem.graphics[0]);
     }
+    
+    var sourcePath;
+    switch(selItem.constructor.name) {
+        case "Image": sourcePath = selItem.itemLink.filePath; break;
+        case "PDF": sourcePath = selItem.itemLink.filePath; break;
+        case "Graphic": sourcePath = selItem.properties.itemLink.filePath; break;
+    }
+    return sourcePath;
 }
 
-function toggle_graphicLayers (myImage, visibleLayerNames) {
-    var rect = myImage.parent;
+function get_filename_from_path (path) {
+    return path.substring(path.lastIndexOf('\\')+1, path.lastIndexOf('.'));
+}
+
+function toggle_graphicLayers (myGraphic, visibleLayerNames) {
+    var rect = myGraphic.parent;
     var gLO = rect.graphics.item(0).graphicLayerOptions;
     var gL;
     
@@ -182,40 +185,96 @@ function toggle_graphicLayers (myImage, visibleLayerNames) {
             if(!gLO.isValid) gLO = rect.graphics.item(0).graphicLayerOptions;
         }
     }
+    return rect.graphics.item(0);
 }
 
-function choose_object_layers (selection) {
-
-    if(selection.length < 1) return;
-
-    var isOrContainsImage = function(item) {
-        return item.constructor.name === 'Image' || (item.constructor.name === 'Rectangle' && item.graphics.length > 0);
+function flatten_textiles (myRect,myGraphic) {
+    
+    if(myGraphic.imageTypeName === 'JPEG') {
+        alert('Image is already a JPG, no need to flatten again');
+        return;
     }
 
-    var filtered = selection.filter(isOrContainsImage);
-    var images = filtered.map(function(item){
-        if(item.constructor.name == 'Image') return item;
-        return item.graphics[0];
-    });
+    var sourcePath = get_sourcePath(myGraphic);
+    var jpgFilename = get_filename_from_path(sourcePath);
+    jpgFilename += '.jpg';
+    var jpgFile = new File('~/documents/adobeScripts/'+ jpgFilename);
 
-    var myImage;
-    for (var i = 0; i < images.length; i++) {
-        myImage = images[i];
+    myGraphic.exportFile(ExportFormat.JPG, jpgFile, false);
+    replace_graphic(myRect, jpgFile);
+    myRect.allGraphics[0].itemLink.unlink();
+    jpgFile.remove();
 
-        if (myImage.imageTypeName !== "Photoshop" && myImage.imageTypeName !== "Adobe PDF") continue;
-        
-        var graphicLayerNames = get_graphicLayerNames(myImage,false, true);
-        
-        var selectedLayerNames = typeahead.show_dialog(graphicLayerNames, undefined, true);
+}
 
-        var visibleLayerNames = selectedLayerNames ? selectedLayerNames.concat(fixedLayerNames) : fixedLayerNames;
-        
-        if(visibleLayerNames && visibleLayerNames.length > 0) {
-            toggle_graphicLayers(myImage, visibleLayerNames);
+function reactivate_jpg (myRect,myGraphic) {
+
+    var sourcePath = get_sourcePath(myGraphic);
+    var sourceFilename = get_filename_from_path(sourcePath);
+    var searchPattern = new RegExp(sourceFilename);
+    var foundTex = get_tex_files(texRoot, searchPattern);
+    var multiselect = false;
+    var selectedTex = typeahead.show_dialog(foundTex, 'displayName', multiselect, 'Textilien wählen');
+    replace_graphic(myRect, selectedTex);
+    return myRect;
+}
+
+
+function handleSelection (mySelection, func) {
+    if(!mySelection || mySelection.length == 0) return;
+
+    var resultSelection = [];
+    for (var i=0, lenI=mySelection.length; i < lenI ; i++) {
+        var selectionItem = mySelection[i];
+        var myRect, myGraphic;
+        if(selectionItem.constructor.name === 'Rectangle') {
+            myRect = selectionItem;
+            myGraphic = myRect.graphics[0];
+        } else {
+            myGraphic = selectionItem;
+            myRect = myGraphic.parent;
         }
+        func(myRect,myGraphic);
+    }
+}
+
+function choose_object_layers (myRect,myGraphic) {
+
+    var imageTypes = ['Adobe PDF', 'Photoshop'];
+    var constructors = ['Graphic', 'Image', 'PDF'];
+
+    $.writeln("choosing object layers on " + myGraphic.constructor.name);
+
+    if(myGraphic.imageTypeName === 'JPEG') {
+        $.writeln('switching embedded jpg with layered linked graphic')
+        reactivate_jpg (myRect, myGraphic);
+        myGraphic = myRect.graphics[0];
+    }
+    
+    if(!imageTypes.includes(myGraphic.imageTypeName)) {
+        $.writeln('cant choose object layers on '+ myGraphic.constructor.name);
+        return null;
+    }
+    
+    var graphicLayerNames = get_graphicLayerNames(myGraphic,false, true);
+    
+    //inputElements, propertyToList, multiselect, dialogTitle, listAlways
+    var selectedLayerNames = typeahead.show_dialog(graphicLayerNames, undefined, true, undefined, listAlways);
+
+    var visibleLayerNames = selectedLayerNames ? selectedLayerNames.concat(fixedLayerNames) : fixedLayerNames;
+    
+    if(visibleLayerNames && visibleLayerNames.length > 0) {
+        myGraphic = toggle_graphicLayers(myGraphic, visibleLayerNames);
     }
 }
 
 exports.add_textiles = add_textiles;
-exports.choose_object_layers = choose_object_layers;
-exports.flatten_textiles = flatten_textiles;
+exports.choose_object_layers = function (selection) {
+    handleSelection(selection, choose_object_layers);
+};
+exports.flatten_textiles = function(selection) {
+    handleSelection(selection, flatten_textiles)
+};
+exports.reactivate_jpg = function(selection) {
+    handleSelection(selection, reactivate_jpg)
+};
