@@ -1,0 +1,26 @@
+{
+    "name": "adobescripts",
+    "version": "1.0.0",
+    "description": "prepress tools",
+    "main": "index.js",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "format": "prettier --write '*.jsx'"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mono808/adobeScripts.git"
+    },
+    "author": "mono808",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/mono808/adobeScripts/issues"
+    },
+    "homepage": "https://github.com/mono808/adobeScripts#readme",
+    "devDependencies": {
+        "prettier": "2.1.2"
+    }
+}
