@@ -6,7 +6,7 @@
     return arr;
 }
 
-exports.show_dialog = function (inputElements, propertyToList, multiselect, dialogTitle) {
+exports.show_dialog = function (inputElements, propertyToList, multiselect, dialogTitle, listAlways) {
     
     var names;
     if(propertyToList) {
@@ -35,7 +35,9 @@ exports.show_dialog = function (inputElements, propertyToList, multiselect, dial
     {
         keyCount++;
         if(keyCount < 4 || entry.text.length < 4) return;
-        var tempRegExp = new RegExp(entry.text,'gi');
+        var regString = listAlways ? entry.text + '|' + listAlways : entry.text;
+        w.text = regString;
+        var tempRegExp = new RegExp(regString,'i');
         var tempArray = [];
         for (var i = 0; i < names.length; i++) {
             if (names[i].match(tempRegExp)) {
