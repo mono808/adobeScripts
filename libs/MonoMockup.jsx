@@ -77,7 +77,7 @@ MonoMockup.prototype.create_mockupDoc = function ()
     var retArray = typeahead.show_dialog(this.templates, 'type', false);
     this.template = retArray[0] ? retArray[0] : null;
     
-    if(!this.template) return;
+    if(!this.template) return null;
     this.templateDoc = app.open(this.template.file);
 
     //create doc preset based on the chosen template document
