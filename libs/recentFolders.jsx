@@ -29,14 +29,6 @@ function get_primary_screen() {
     }
 }
 
-function select_dialog(path) {
-    var fd = new Folder(path).selectDlg();
-    if (fd.constructor.name == "Folder") {
-        add_to_recentFolders(fd);
-    }
-    return fd;
-}
-
 function get_jobFolder(fld) {
     if (fld.displayName.match(rE.jobNr)) {
         return fld;
@@ -127,7 +119,7 @@ function add_to_recentFolders(ref) {
 
 function remove_from_recentFolder(aFullName) {
     if (aFullName instanceof Folder) {
-        var aFullName = aFullName.fullName;
+        aFullName = aFullName.fullName;
     }
 
     var result = lastFolders.filter(function (elem) {
@@ -141,13 +133,6 @@ function remove_from_recentFolder(aFullName) {
 }
 
 function show_dialog(get_folder, get_file) {
-    function get_subfolders(fd) {
-        var subs = fd.getFiles(function (fd) {
-            return fd.constructor.name == "Folder";
-        });
-        return subs;
-    }
-
     function select_helper(aFullName) {
         return function () {
             retval = new Folder(aFullName);
@@ -268,7 +253,7 @@ function show_dialog(get_folder, get_file) {
     angBtn.preferredSize.width = 50;
     angBtn.onClick = browse_Helper_folder(csroot + "/angebotedaten");
 
-    var cancelBtn = manualGrp.add("button", undefined, "Cancel");
+    manualGrp.add("button", undefined, "Cancel");
 
     win.onShow = function () {
         scrollBar.size = [20, p.size.height];

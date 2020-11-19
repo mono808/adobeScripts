@@ -1,6 +1,6 @@
-var Base = require('BaseDoc');
+var Base = require("BaseDoc");
 
-function AiBase (initDoc) {
+function AiBase(initDoc) {
     Base.call(this, initDoc);
 }
 
@@ -29,23 +29,23 @@ AiBase.prototype.recursive_delete_layer = function (ly) {
         } while (j--);
     }
     ly.remove();
-}
+};
 
 AiBase.prototype.delete_layer = function (layer_name) {
     try {
         var l = this.doc.layers.getByName(layer_name);
         this.recursive_delete_layer(l);
     } catch (e) {
-        $.writeln('no layer named ' + layer_name + ' found!');
+        $.writeln("no layer named " + layer_name + " found!");
         return;
     }
-}
+};
 
 AiBase.prototype.fit_artboard_to_art = function (artlayer_name) {
     try {
-        var artLayer = this.doc.layers.getByName(artlayer_name)
+        var artLayer = this.doc.layers.getByName(artlayer_name);
     } catch (e) {
-        artLayer = this.doc.activeLayer
+        artLayer = this.doc.activeLayer;
     }
 
     var selection = [];
@@ -63,39 +63,44 @@ AiBase.prototype.fit_artboard_to_art = function (artlayer_name) {
 
     this.doc.selection = selection;
     this.doc.fitArtboardToSelectedArt(0);
-}
+};
 
-AiBase.fit_artboard_to_selection = function (myDoc, arrayOfPageItems, padding) 
-    {
-        var i = arrayOfPageItems.length-1;
-        var vB;
-        var selBounds = arrayOfPageItems[i].visibleBounds; //use first pageItem to init the Bounds
-        
-        do {
-            vB = arrayOfPageItems[i].visibleBounds; /*bounds = [left,top,right,bottom]*/
-            selBounds[0] = vB[0] < selBounds[0] ? vB[0] : selBounds[0];
-            selBounds[1] = vB[1] > selBounds[1] ? vB[1] : selBounds[1];
-            selBounds[2] = vB[2] > selBounds[2] ? vB[2] : selBounds[2];
-            selBounds[3] = vB[3] < selBounds[3] ? vB[3] : selBounds[3];
-        } while (i--);
+AiBase.fit_artboard_to_selection = function (myDoc, arrayOfPageItems, padding) {
+    var i = arrayOfPageItems.length - 1;
+    var vB;
+    var selBounds = arrayOfPageItems[i].visibleBounds; //use first pageItem to init the Bounds
 
-        var myBorder = padding;
-        var myBorderInput = -1;
-        while (myBorder < 0 || myBorder > 100 || isNaN(myBorder) ) {
-            myBorderInput = prompt("Size of padding around image, in points (0-100)","20","Padding Size");
-            myBorder = parseInt(myBorderInput);
-        }
+    do {
+        vB =
+            arrayOfPageItems[i]
+                .visibleBounds; /*bounds = [left,top,right,bottom]*/
+        selBounds[0] = vB[0] < selBounds[0] ? vB[0] : selBounds[0];
+        selBounds[1] = vB[1] > selBounds[1] ? vB[1] : selBounds[1];
+        selBounds[2] = vB[2] > selBounds[2] ? vB[2] : selBounds[2];
+        selBounds[3] = vB[3] < selBounds[3] ? vB[3] : selBounds[3];
+    } while (i--);
 
-        selBounds[0] -= myBorder;
-        selBounds[1] += myBorder;
-        selBounds[2] += myBorder;
-        selBounds[3] -= myBorder;
-
-        var ab = myDoc.artboards.getActiveArtboardIndex();  
-        myDoc.artboards[ab].artboardRect = selBounds;
-
-        return myDoc;
+    var myBorder = padding;
+    var myBorderInput = -1;
+    while (myBorder < 0 || myBorder > 100 || isNaN(myBorder)) {
+        myBorderInput = prompt(
+            "Size of padding around image, in points (0-100)",
+            "20",
+            "Padding Size"
+        );
+        myBorder = parseInt(myBorderInput);
     }
+
+    selBounds[0] -= myBorder;
+    selBounds[1] += myBorder;
+    selBounds[2] += myBorder;
+    selBounds[3] -= myBorder;
+
+    var ab = myDoc.artboards.getActiveArtboardIndex();
+    myDoc.artboards[ab].artboardRect = selBounds;
+
+    return myDoc;
+};
 
 AiBase.prototype.get_items_on_layer = function (items, layer_name) {
     var itemsOnLayer = [];
@@ -110,12 +115,12 @@ AiBase.prototype.get_items_on_layer = function (items, layer_name) {
     while (i >= 0) {
         item = items[i];
         if (item.layer == l) {
-            itemsOnLayer.push(item)
-        };
+            itemsOnLayer.push(item);
+        }
         i--;
     }
 
     return itemsOnLayer;
-}
+};
 
 module.exports = AiBase;
