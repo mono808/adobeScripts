@@ -8,7 +8,7 @@
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "format": "prettier --write '*.jsx'"
+        "format": "prettier --write 'illustrator/*.jsx'"
     },
     "repository": {
         "type": "git",
@@ -21,6 +21,8 @@
     },
     "homepage": "https://github.com/mono808/adobeScripts#readme",
     "devDependencies": {
+        "eslint": "^7.13.0",
+        "eslint-plugin-extendscript": "^1.0.1",
         "prettier": "2.1.2"
     }
 }
