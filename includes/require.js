@@ -184,7 +184,7 @@ $.level = 0;
     require._cache = {};
 
     // Extension type to use
-    require._ext = ".jsx"; // '.js'
+    require._ext = ".js"; // '.js'
 })($.global);
 
 // Tests
