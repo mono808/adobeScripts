@@ -9,7 +9,7 @@
         "extendscript/photoshop": true, // Photoshop globals
         "extendscript/illustrator": true // Illustrator globals
     },
-    "extends": "eslint:recommended",
+    "extends": ["eslint:recommended", "prettier"],
     "plugins": ["extendscript"],
     "parserOptions": {
         "ecmaVersion": 3
