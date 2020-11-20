@@ -43,7 +43,6 @@ function main() {
         exportPreset = app.pdfExportPresets.add();
 
         var pEP = app.pdfExportPreferences;
-        pEP.name = "monosPDFExportPreset";
         pEP.acrobatCompatibility = AcrobatCompatibility.ACROBAT_4;
         pEP.appliedFlattenerPreset = flattenerPreset;
         pEP.cropImagesToFrames = true;
