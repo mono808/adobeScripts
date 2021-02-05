@@ -9,7 +9,7 @@
 
     var texTool = require("textilTool");
 
-    //texTool.add_textiles();
+    //texTool.add_textile();
     //texTool.choose_object_layers(app.selection);
-    texTool.flatten_textiles(app.selection);
+    texTool.flatten_textile(app.selection);
 })();
