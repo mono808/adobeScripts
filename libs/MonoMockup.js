@@ -392,7 +392,7 @@ MonoMockup.prototype.copy_pages = function (sourceDoc, destDoc, pages2copy) {
             LocationOptions.AFTER,
             destDoc.pages.lastItem()
         );
-        texTool.choose_object_layers(this.layers.textils.allGraphics);
+        //texTool.choose_object_layers(this.layers.textils.allGraphics);
         dupedSpreads.push(dupedSpread);
     }
 
@@ -592,7 +592,7 @@ MonoMockup.prototype.show_hinweisDialog = function () {
         win.close();
     };
     btnPanel.kundeBtn.onClick = function () {
-        returnValue.layername = "Intern";
+        returnValue.layername = "Infos";
         returnValue.hinweis = collect_hinweise();
         win.close();
     };
@@ -764,7 +764,7 @@ MonoMockup.prototype.split_frame = function (myFrame) {
 
         var rowGroup = editPanel.add("group");
         rowGroup.add("statictext", undefined, "Zeilen:");
-        var rowCount = rowGroup.add("edittext", undefined, "2");
+        var rowCount = rowGroup.add("edittext", undefined, "1");
         rowCount.preferredSize.width = 35;
 
         var btnPanel = win.add("panel", undefined, "");
