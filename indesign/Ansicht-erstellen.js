@@ -11,11 +11,11 @@
     if (!job.nfo) return;
     paths.set_nfo(job.nfo);
 
-    try {
-        app.applyWorkspace("Ansichten");
-    } catch (e) {
-        $.writeln('could not load workspace "Ansichten"');
-    }
+    // try {
+    //     app.applyWorkspace("Ansichten");
+    // } catch (e) {
+    //     $.writeln('could not load workspace "Ansichten"');
+    // }
 
     var mockup = new MonoMockup();
 
