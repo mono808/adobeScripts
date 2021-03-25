@@ -35,12 +35,14 @@ function main() {
         flattenerPreset.convertAllStrokesToOutlines = false;
         flattenerPreset.clipComplexRegions = true;
 
-        var exportPreset = app.pdfExportPresets.itemByName(
-            "monosPDFExportPreset"
-        );
-        if (exportPreset.isValid)
-            app.pdfExportPresets.itemByName("monosPDFExportPreset").remove();
-        exportPreset = app.pdfExportPresets.add();
+        var myExportPresetName = "monosPDFExportPreset";
+        var exportPreset = app.pdfExportPresets.itemByName(myExportPresetName);
+        if (exportPreset.isValid) {
+            exportPreset.remove();
+        }
+        exportPreset = app.pdfExportPresets.add({
+            name: myExportPresetName
+        });
 
         var pEP = app.pdfExportPreferences;
         pEP.acrobatCompatibility = AcrobatCompatibility.ACROBAT_4;
@@ -52,7 +54,8 @@ function main() {
         pEP.generateThumbnails = true;
         pEP.includeICCProfiles = true;
         pEP.optimizePDF = false;
-        pEP.pdfColorSpace = PDFColorSpace.RGB;
+        // pEP.pdfColorSpace = PDFColorSpace.RGB;
+        pEP.pdfColorSpace = PDFColorSpace.UNCHANGED_COLOR_SPACE;
         pEP.viewPDF = true;
         pEP.compressTextAndLineArt = false;
         pEP.colorBitmapCompression = BitmapCompression.JPEG;
