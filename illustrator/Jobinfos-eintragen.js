@@ -21,6 +21,35 @@ function get_artboard_rectangle(doc) {
     return ab.artboardRect;
 }
 
+function format_date(aDate) {
+    var dateString =
+        aDate.getFullYear() +
+        "-" +
+        ("0" + (aDate.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + aDate.getDate()).slice(-2) +
+        " " +
+        ("0" + aDate.getHours()).slice(-2) +
+        ":" +
+        ("0" + aDate.getMinutes()).slice(-2);
+    return dateString;
+}
+
+function capitalize(s) {
+    if (typeof s !== "string") return "";
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function format_user(username) {
+    if (typeof username !== "string") return "";
+    return username
+        .split(".")
+        .map(function (str) {
+            return capitalize(str);
+        })
+        .join(" ");
+}
+
 (function () {
     if (app.documents.length < 1) {
         alert("No document open, please open a document first");
@@ -54,23 +83,12 @@ function get_artboard_rectangle(doc) {
     var job = require("job");
     job.set_nfo(ref.file, true, false);
 
-    var now = new Date();
-    var dateString =
-        now.getFullYear() +
-        "-" +
-        ("0" + (now.getMonth() + 1)).slice(-2) +
-        "-" +
-        ("0" + now.getDate()).slice(-2) +
-        " " +
-        ("0" + now.getHours()).slice(-2) +
-        ":" +
-        ("0" + now.getMinutes()).slice(-2);
-
     var jobText = job.nfo.client + " - Auftrag: " + job.nfo.jobNr;
     if (job.nfo.jobName) {
         jobText += "_" + job.nfo.jobName;
     }
-    jobText += " - erstellt: " + dateString;
+    jobText += "\rAbzug erstellt: " + format_date(new Date());
+    jobText += "\rvon: " + format_user($.getenv("USERNAME"));
 
     // rectangle.array =    0
     //                  2       1
