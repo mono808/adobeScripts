@@ -96,7 +96,6 @@
     };
 
     var generate_wawi_strings = function (rowContent) {
-        var resStrings = [];
         var texString;
         var wawiString;
         var rowStrings = {};
@@ -126,7 +125,6 @@
     };
 
     var show_wawi_string_dialog = function (rowContents, job, copyToClipboard) {
-        var result = null;
         var dialogTitle;
         dialogTitle = "WaWi Infos nachtragen zu ->  ";
         dialogTitle += job
@@ -196,7 +194,8 @@
     var errors = [];
     var rowContents = [];
 
-    for (var i = 0; i < result.files.length; i++) {
+    var i, len;
+    for (i = 0, len = result.files.length; i < len; i++) {
         var myFile = result.files[i];
         var monoMockup = new MonoMockup(app.open(myFile, true));
         var layerToggle = f_id.layerToggle(["Intern"]);
@@ -226,7 +225,7 @@
 
     if (errors.length > 0) {
         var alertStr = "";
-        for (var i = 0, len = errors.length; i < len; i++) {
+        for (i = 0, len = errors.length; i < len; i++) {
             var e = errors[i];
             alertStr += "Motiv ";
             alertStr += e.mG.get_printId();
@@ -260,18 +259,19 @@
         }
     }
 
+    var printPreset;
     if (result.opts.printMock) {
-        var printPreset = app.printerPresets.item("printMockup");
+        printPreset = app.printerPresets.item("printMockup");
         print_docs(result.files, printPreset);
     }
 
     if (result.opts.printFH) {
-        var printPreset = app.printerPresets.item("filmhuelle");
+        printPreset = app.printerPresets.item("filmhuelle");
         print_docs(filmhuelle, printPreset);
     }
 
     if (result.opts.printFilme) {
-        for (var i = 0, len = filme.length; i < len; i++) {
+        for (i = 0, len = filme.length; i < len; i++) {
             var showWindow = false;
             var monoFilm = new MonoFilm(app.open(filme[i]), showWindow);
             monoFilm.print(paths.path("filmIn"), paths.path("filmOut"));
