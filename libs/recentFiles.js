@@ -1,4 +1,5 @@
 ﻿var ioFile = require("ioFile");
+var typeahead = require("typeahead");
 
 var historyFileName;
 switch (BridgeTalk.appName) {
@@ -21,8 +22,8 @@ if (!historyFile.exists) {
     ioFile.write_file(historyFile, [].toSource());
 }
 
-var lastFiles = import_history(historyFile);
-lastFiles = lastFiles.filter(function (elem) {
+var recentFiles = import_history(historyFile);
+recentFiles = recentFiles.filter(function (elem) {
     return File(elem).exists;
 });
 
@@ -41,14 +42,14 @@ function get_primary_screen() {
 }
 
 function move_to_top(idx) {
-    if (idx >= 0 && idx < lastFiles.length) {
-        var tmp = lastFiles.splice(idx, 1);
-        lastFiles.unshift(tmp[0]);
+    if (idx >= 0 && idx < recentFiles.length) {
+        var tmp = recentFiles.splice(idx, 1);
+        recentFiles.unshift(tmp[0]);
     }
 }
 
 function export_history() {
-    var str = lastFiles.toSource();
+    var str = recentFiles.toSource();
     var success = ioFile.write_file(historyFile, str);
     return success;
 }
@@ -68,12 +69,12 @@ function remove_file(aFile) {
         aFile = aFile.fullName;
     }
 
-    var result = lastFiles.filter(function (elem) {
+    var result = recentFiles.filter(function (elem) {
         return elem !== aFile;
     });
 
     $.writeln('removed "' + aFile + '" from recentFiles');
-    lastFiles = result;
+    recentFiles = result;
 
     export_history();
 }
@@ -84,7 +85,7 @@ function add_file(aFile) {
     if (!aFile.exists) return;
 
     // check if this folder is already in the lastFolder
-    var index = lastFiles.findIndex(function (lF) {
+    var index = recentFiles.findIndex(function (lF) {
         return lF == aFile.fullName;
     });
 
@@ -92,12 +93,12 @@ function add_file(aFile) {
         move_to_top(index);
     } else {
         // if not included, add to the front of the array
-        lastFiles.unshift(aFile.fullName);
+        recentFiles.unshift(aFile.fullName);
         $.writeln('added "' + aFile.displayName + '" to recentFiles');
     }
 
-    if (lastFiles.length > maxRecentFolders) {
-        $.writeln('dropped "' + lastFiles.pop() + '" from recentFiles');
+    if (recentFiles.length > maxRecentFolders) {
+        $.writeln('dropped "' + recentFiles.pop() + '" from recentFiles');
     }
 
     export_history();
@@ -133,7 +134,7 @@ function show_dialog() {
     var retval;
 
     // bounds = [left, top, right, bottom]
-    var win = new Window("dialog", "monos lastFiles Tool", undefined);
+    var win = new Window("dialog", "monos recentFiles Tool", undefined);
     this.windowRef = win;
 
     var p = win.add("panel", undefined);
@@ -144,7 +145,7 @@ function show_dialog() {
     filesPnl.spacing = 2;
     filesPnl.orientation = "column";
     filesPnl.alignment = "left";
-    filesPnl.maximumSize.height = lastFiles.length * 50;
+    filesPnl.maximumSize.height = recentFiles.length * 50;
 
     var manualGrp = (win[manualGrp] = win.add("group", undefined));
 
@@ -163,12 +164,14 @@ function show_dialog() {
     manualGrp.add("button", undefined, "Cancel");
 
     var maxLength =
-        lastFiles.length < maxDialogRowes ? lastFiles.length : maxDialogRowes;
+        recentFiles.length < maxDialogRowes
+            ? recentFiles.length
+            : maxDialogRowes;
     var aFullName, aFileName, aFilePath, upstreamTree;
     for (var i = 0; i < maxLength; i++) {
         var fileRow = filesPnl.add("group");
         fileRow.margins = [0, 0, 0, 0];
-        aFullName = lastFiles[i];
+        aFullName = recentFiles[i];
         aFileName = aFullName.substring(
             aFullName.lastIndexOf("/") + 1,
             aFullName.length
@@ -227,7 +230,20 @@ function get_file() {
     return show_dialog();
 }
 
+function get_file_typeahead() {
+    var aFullName = typeahead.show_dialog(
+        recentFiles,
+        undefined, // property to list
+        false, //multiselect
+        "letzte Dateien:"
+    );
+    if (aFullName && File(aFullName).exists) {
+        return File(aFullName);
+    }
+}
+
 //~ show_dialog();
 
 exports.get_file = get_file;
+exports.get_file_typeahead = get_file_typeahead;
 exports.add_file = add_file;
