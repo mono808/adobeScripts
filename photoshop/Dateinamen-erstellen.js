@@ -1,18 +1,15 @@
-﻿//@target photoshop
+﻿//@target photoshop-120.064
+//@include "require.js"
 
 function main() {
-    //@include "require.js"
-
-    var PsBase = require("PsBase"); //#include 'BaseDocPS.jsx'
+    var PsBase = require("PsBase");
     var job = require("job");
     var paths = require("paths");
     var saveOptions = require("saveOptions");
-
-    //#include 'ButtonList.jsx'
-
     var psBase = new PsBase(app.activeDocument);
 
-    job.set_nfo(app.activeDocument, true);
+    job.get_job_nfo(null, true, false);
+    job.get_print_nfo(job.nfo.ref);
     paths.set_nfo(job.nfo);
 
     psBase.save_doc(
