@@ -13,16 +13,16 @@ function setup() {
 function main() {
     var texTool = require("textilTool");
 
-    //texTool.add_textiles();
+    texTool.add_textile();
 
-    texTool.choose_object_layers(app.selection);
+    // texTool.choose_object_layers(app.selection);
 
-    var msg = "Textil als JPG einbetten?";
-    var flatten = Window.confirm(msg, true, "Einbetten?");
+    // var msg = "Textil als JPG einbetten?";
+    // var flatten = Window.confirm(msg, true, "Einbetten?");
 
-    if (flatten) {
-        texTool.flatten_textiles(app.selection);
-    }
+    // if (flatten) {
+    //     texTool.flatten_textile(app.selection);
+    // }
 
     //texTool.reactivate_jpg(app.selection);
 }

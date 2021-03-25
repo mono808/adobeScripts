@@ -10,7 +10,13 @@ $.level = 1;
 
     var texTool = require("textilTool");
 
-    //texTool.add_textiles();
+    //texTool.add_textile();
     texTool.choose_object_layers(app.selection);
-    //texTool.flatten_textiles(app.selection);
+
+    // var msg = "Textil als JPG einbetten?";
+    // var flatten = Window.confirm(msg, true, "Einbetten?");
+
+    // if (flatten) {
+    //     texTool.flatten_textile(app.selection);
+    // }
 })();

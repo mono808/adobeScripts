@@ -1,4 +1,5 @@
 ﻿var typeahead = require("typeahead");
+var _id = require("f_id");
 
 var csroot = Folder($.getenv("csroot")).fullName;
 var ignoreBridge = /^(?!.*(\.bridge)).*$/i;
@@ -28,67 +29,69 @@ function get_tex_files(dir, filter) {
     return result;
 }
 
-function place_image(parent, image, layer) {
-    var placedItemsArray = parent.place(image, undefined, layer);
+function place_image(args) {
+    var placedItemsArray = args.placeTo.place(
+        args.image,
+        undefined,
+        args.layer
+    );
     if (placedItemsArray) {
         return placedItemsArray[0];
     }
 }
 
-function add_textiles() {
+function select_textile(args) {
+    var texFiles = get_tex_files(texRoot, ignoreBridge);
+    var texResult = typeahead.show_dialog(
+        texFiles,
+        "displayName",
+        args.multiselect,
+        "Textilien wählen"
+    );
+    if (!texResult || texResult.length === 0) {
+        alert("Script cancelled, no textiles selected!");
+        return null;
+    }
+    return texResult[0];
+}
+
+function place_textile_graphic(myRect) {
     var doc = app.activeDocument;
     var texLayer = doc.layers.item("Textils");
     texLayer = texLayer.isValid ? texLayer : doc.activeLayer;
 
-    var placedItems = [];
-    // if something is selected,  place image into selected rectangles
-    var texFiles = get_tex_files(texRoot, ignoreBridge);
-    var selectedTex = typeahead.show_dialog(
-        texFiles,
-        "displayName",
-        true,
-        "Textilien wählen"
-    );
-
-    if (!selectedTex || selectedTex.length < 1) {
-        alert("Script cancelled, no textiles to place selected");
-        return;
-    }
-
-    var targetItems = app.selection;
-    targetItems = targetItems.filter(function (item) {
-        return item.constructor.name == "Rectangle";
+    var textile = select_textile({
+        multiselect: false
     });
 
-    var maxT = targetItems.length;
-    var t = 0;
-    var targetItem;
-    for (var j = 0, lenJ = selectedTex.length; j < lenJ; j++) {
-        var tex = selectedTex[j];
-        if (t < maxT) {
-            targetItem = targetItems[t];
-            var fitOps = targetItem.frameFittingOptions;
-            fitOps.fittingAlignment = AnchorPoint.TOP_CENTER_ANCHOR;
-            fitOps.fittingOnEmptyFrame = EmptyFrameFittingOptions.NONE;
-            fitOps.autoFit = false;
-            targetItem.fit(FitOptions.APPLY_FRAME_FITTING_OPTIONS);
+    if (!textile) return;
 
-            placedItems.push(place_image(targetItem, tex));
-            targetItem.fit(FitOptions.CENTER_CONTENT);
-            targetItem.fit(FitOptions.FRAME_TO_CONTENT);
+    if (!myRect) {
+        var placedImage = place_image({
+            placeTo: doc.layoutWindows[0].activePage,
+            image: textile,
+            layer: texLayer
+        });
+        myRect = placedImage.parent;
+        app.selection = [myRect];
+    } else {
+        var frameFitOpts = myRect.frameFittingOptions;
+        frameFitOpts.fittingAlignment = AnchorPoint.TOP_CENTER_ANCHOR;
+        frameFitOpts.fittingOnEmptyFrame = EmptyFrameFittingOptions.NONE;
+        frameFitOpts.autoFit = false;
 
-            t++;
-        } else {
-            placedItems.push(
-                place_image(doc.layoutWindows[0].activePage, tex, texLayer)
-            );
-        }
+        place_image({
+            placeTo: myRect,
+            image: textile,
+            layer: texLayer
+        });
+
+        myRect.fit(FitOptions.APPLY_FRAME_FITTING_OPTIONS);
+        myRect.fit(FitOptions.CENTER_CONTENT);
+        myRect.fit(FitOptions.FRAME_TO_CONTENT);
     }
 
-    // if nothing is selected, just place selected images onto the page
-    if (placedItems && placedItems.length > 0) {
-        app.selection = placedItems;
-    }
+    return myRect;
 }
 
 function get_graphicLayerNames(myImage, skipHiddenLayers, skipFixedLayers) {
@@ -143,47 +146,28 @@ function get_filename_from_path(path) {
     return path.substring(path.lastIndexOf("\\") + 1, path.lastIndexOf("."));
 }
 
-function toggle_graphicLayers(myGraphic, visibleLayerNames) {
-    var rect = myGraphic.parent;
-    var gLO = rect.graphics.item(0).graphicLayerOptions;
-    var gL;
-
-    for (var k = 0, lenK = gLO.graphicLayers.length; k < lenK; k++) {
-        gL = gLO.graphicLayers[k];
-        if (!gL.isValid) continue;
-
-        if (visibleLayerNames.includes(gL.name)) {
-            if (gL.currentVisibility) continue;
-            gL.currentVisibility = true;
-            if (!gLO.isValid) gLO = rect.graphics.item(0).graphicLayerOptions;
-        } else {
-            if (!gL.currentVisibility) continue;
-            gL.currentVisibility = false;
-            if (!gLO.isValid) gLO = rect.graphics.item(0).graphicLayerOptions;
-        }
-    }
-    return rect.graphics.item(0);
-}
-
-function flatten_textiles(myRect, myGraphic) {
-    if (myGraphic.imageTypeName === "JPEG") {
+function flatten_textile(texRect) {
+    var texGraphic = get_tex_graphic(texRect);
+    if (texGraphic.imageTypeName === "JPEG") {
         alert("Image is already a JPG, no need to flatten again");
         return;
     }
 
-    var sourcePath = get_sourcePath(myGraphic);
+    var sourcePath = get_sourcePath(texGraphic);
     var jpgFilename = get_filename_from_path(sourcePath);
     jpgFilename += ".jpg";
     var jpgFile = new File("~/documents/adobeScripts/" + jpgFilename);
 
-    myGraphic.exportFile(ExportFormat.JPG, jpgFile, false);
-    replace_graphic(myRect, jpgFile);
-    myRect.allGraphics[0].itemLink.unlink();
+    texGraphic.exportFile(ExportFormat.JPG, jpgFile, false);
+    replace_graphic(texRect, jpgFile);
+    texRect.allGraphics[0].itemLink.unlink();
     jpgFile.remove();
+    return texRect;
 }
 
-function reactivate_jpg(myRect, myGraphic) {
-    var sourcePath = get_sourcePath(myGraphic);
+function reactivate_jpg(texRect) {
+    var texGraphic = get_tex_graphic(texRect);
+    var sourcePath = get_sourcePath(texGraphic);
     var sourceFilename = get_filename_from_path(sourcePath);
     var searchPattern = new RegExp(sourceFilename, "ig");
     var foundTex = get_tex_files(texRoot, searchPattern);
@@ -202,44 +186,40 @@ function reactivate_jpg(myRect, myGraphic) {
             "Textilien wählen"
         );
     }
-    replace_graphic(myRect, selectedTex);
-    return myRect;
+    replace_graphic(texRect, selectedTex);
+    return texRect;
 }
 
-function handleSelection(mySelection, func) {
-    if (!mySelection || mySelection.length == 0) return;
-
-    for (var i = 0, lenI = mySelection.length; i < lenI; i++) {
-        var selectionItem = mySelection[i];
-        var myRect, myGraphic;
-        if (selectionItem.constructor.name === "Rectangle") {
-            myRect = selectionItem;
-            myGraphic = myRect.graphics[0];
-        } else {
-            myGraphic = selectionItem;
-            myRect = myGraphic.parent;
-        }
-        func(myRect, myGraphic);
+function get_tex_graphic(texRect) {
+    var texGraphic = null;
+    if (
+        texRect.constructor.name === "Rectangle" &&
+        texRect.graphics.length > 0
+    ) {
+        texGraphic = texRect.graphics[0];
     }
+    return texGraphic;
 }
 
-function choose_object_layers(myRect, myGraphic) {
+function choose_object_layers(texRect) {
     var imageTypes = ["Adobe PDF", "Photoshop"];
+    var texGraphic = get_tex_graphic(texRect);
+    $.writeln("choosing object layers on " + texGraphic.constructor.name);
 
-    $.writeln("choosing object layers on " + myGraphic.constructor.name);
-
-    if (myGraphic.imageTypeName === "JPEG") {
+    if (texGraphic.imageTypeName === "JPEG") {
         $.writeln("switching embedded jpg with layered linked graphic");
-        reactivate_jpg(myRect, myGraphic);
-        myGraphic = myRect.graphics[0];
+        reactivate_jpg(texRect, texGraphic);
+        texGraphic = texRect.graphics[0];
     }
 
-    if (!imageTypes.includes(myGraphic.imageTypeName)) {
-        $.writeln("cant choose object layers on " + myGraphic.constructor.name);
+    if (!imageTypes.includes(texGraphic.imageTypeName)) {
+        $.writeln(
+            "cant choose object layers on " + texGraphic.constructor.name
+        );
         return null;
     }
 
-    var graphicLayerNames = get_graphicLayerNames(myGraphic, false, true);
+    var graphicLayerNames = get_graphicLayerNames(texGraphic, false, true);
 
     //inputElements, propertyToList, multiselect, dialogTitle, listAlways
     var selectedLayerNames = typeahead.show_dialog(
@@ -254,17 +234,125 @@ function choose_object_layers(myRect, myGraphic) {
         ? selectedLayerNames.concat(fixedLayerNames)
         : fixedLayerNames;
 
-    if (visibleLayerNames && visibleLayerNames.length > 0) {
-        myGraphic = toggle_graphicLayers(myGraphic, visibleLayerNames);
+    return visibleLayerNames;
+}
+
+function toggle_graphicLayers(texRect, visibleLayerNames) {
+    var texGraphic = get_tex_graphic(texRect);
+    var gLO = texGraphic.graphicLayerOptions;
+    var gL;
+    texRect.visible = false;
+
+    for (var k = 0, lenK = gLO.graphicLayers.length; k < lenK; k++) {
+        gL = gLO.graphicLayers[k];
+        if (!gL.isValid) continue;
+
+        if (visibleLayerNames.includes(gL.name)) {
+            if (gL.currentVisibility) continue;
+            gL.currentVisibility = true;
+            if (!gLO.isValid)
+                gLO = texRect.graphics.item(0).graphicLayerOptions;
+        } else {
+            if (!gL.currentVisibility) continue;
+            gL.currentVisibility = false;
+            if (!gLO.isValid)
+                gLO = texRect.graphics.item(0).graphicLayerOptions;
+        }
+    }
+    texRect.visible = true;
+    return texRect;
+}
+
+function add_tex_rect() {
+    var rectBounds = [0, 0, 800, 600];
+    var rect = app.activeWindow.activePage.rectangles.add({
+        geometricBounds: rectBounds,
+        contentType: ContentType.GRAPHIC_TYPE,
+        strokeColor: "None",
+        fillColor: "None"
+    });
+    var delta = _id.get_center_delta_from_bounds(
+        app.activeWindow.activePage.bounds,
+        rect.geometricBounds
+    );
+    rect.move(undefined, [delta.x, delta.y]);
+    return rect;
+}
+
+function Textil(rect) {
+    var msg = "Textil als JPG einbetten?";
+
+    this.rect = rect || add_tex_rect();
+
+    if (this.rect.allGraphics.length === 0) {
+        place_textile_graphic(this.rect);
+    }
+
+    this.textil = this.rect.allGraphics[0];
+    this.layers = choose_object_layers(this.rect);
+    this.flatten = Window.confirm(msg, true, "Textil als JPG einbetten?");
+}
+
+function apply_settings(textil) {
+    if (textil.layers && textil.layers.length > 0) {
+        toggle_graphicLayers(textil.rect, textil.layers);
+    }
+    if (textil.flatten) {
+        flatten_textile(textil.rect);
     }
 }
 
-exports.add_textiles = add_textiles;
-exports.choose_object_layers = function (selection) {
-    handleSelection(selection, choose_object_layers);
+function handleSelection(textilArray, func) {
+    if (!textilArray || textilArray.length == 0) {
+        return;
+    }
+
+    //var finalSelection = [];
+    var textil;
+    for (var i = 0, lenI = textilArray.length; i < lenI; i++) {
+        textil = textilArray[i];
+        func(textil);
+        //finalSelection.push(textil);
+    }
+    //app.selection = finalSelection;
+}
+
+function init_textils(selection) {
+    var textils = [];
+    if (selection.length == 0) {
+        textils.push(new Textil());
+    } else {
+        selection.forEach(function (sel) {
+            textils.push(new Textil(sel));
+        });
+    }
+    return textils;
+}
+
+exports.add_textile_old = function (selection) {
+    if (selection && selection.length > 0) {
+        handleSelection(selection, place_textile_graphic);
+    } else {
+        place_textile_graphic();
+    }
 };
-exports.flatten_textiles = function (selection) {
-    handleSelection(selection, flatten_textiles);
+
+exports.add_textile = function (selection) {
+    var textils = init_textils(selection);
+    textils.forEach(function (textil) {
+        apply_settings(textil);
+    });
+};
+
+exports.choose_object_layers = function (selection) {
+    //handleSelection(selection, choose_object_layers);
+    var textils = init_textils(selection);
+    textils.forEach(function (textil) {
+        apply_settings(textil);
+    });
+};
+exports.flatten_textile = function (selection) {
+    handleSelection(selection, flatten_textile);
 };
 exports.reactivate_jpg = function (selection) {
     handleSelection(selection, reactivate_jpg);
