@@ -15,7 +15,7 @@ function toggle_standListener(compensate) {
     var MonoGraphic = require("MonoGraphic");
     var MonoTable = require("MonoTable");
 
-    var compensate = false;
+    compensate = compensate || false;
 
     var update_stand = function (myEvent) {
         if (app.selection.length < 1) return;
@@ -51,13 +51,13 @@ function toggle_standListener(compensate) {
     for (var i = 0; i < app.eventListeners.length; i++) {
         var listener = app.eventListeners[i];
         if (listener.eventType == "afterSelectionAttributeChanged") {
-            var standListener = listener;
+            standListener = listener;
         }
     }
-    for (var i = 0; i < doc.eventListeners.length; i++) {
-        var listener = doc.eventListeners[i];
+    for (i = 0; i < doc.eventListeners.length; i++) {
+        listener = doc.eventListeners[i];
         if (listener.eventType == "afterSelectionAttributeChanged") {
-            var standListener = listener;
+            standListener = listener;
         }
     }
 

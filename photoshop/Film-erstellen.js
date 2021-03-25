@@ -42,14 +42,15 @@ function main() {
     iaSwitch.set("none");
 
     var sepFormat = printDoc.get_sep_format();
+    var saveFile, saveOpts;
     switch (sepFormat) {
         case "PSD":
-            var saveFile = paths.file("sdPrintPsd");
-            var saveOpts = saveOptions.sdPrintPsPsd();
+            saveFile = paths.file("sdPrintPsd");
+            saveOpts = saveOptions.sdPrintPsPsd();
             break;
         case "EPS":
-            var saveFile = paths.file("sdPrintEps");
-            var saveOpts = saveOptions.sdPrintPsEps();
+            saveFile = paths.file("sdPrintEps");
+            saveOpts = saveOptions.sdPrintPsEps();
             break;
     }
 
@@ -63,7 +64,7 @@ function main() {
     //---------------------------------------------------------------------
     // create the preview file
 
-    var saveFile = paths.file("previewPs");
+    saveFile = paths.file("previewPs");
 
     var previewDoc = new PsSiebdruckPreview(app.activeDocument);
     var previewSaveOpts = saveOptions.previewPs();

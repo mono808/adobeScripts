@@ -29,17 +29,18 @@ AiSiebdruck.prototype.constructor = AiSiebdruck;
 
 AiSiebdruck.prototype.sort_by_spotColor = function (pIs) {
     var i = pIs.length - 1;
+    var monoSpot, mySpot, pI, fC, j;
     while (i >= 0) {
-        var pI = pIs[i];
-        var monoSpot = null;
+        pI = pIs[i];
+        monoSpot = null;
+        mySpot = null;
 
         if (!pI.filled) {
             i--;
             continue;
         }
 
-        var fC = pI.fillColor;
-        var mySpot = null;
+        fC = pI.fillColor;
 
         switch (fC.constructor.name) {
             case "SpotColor":
@@ -56,7 +57,7 @@ AiSiebdruck.prototype.sort_by_spotColor = function (pIs) {
             continue;
         }
 
-        for (var j = 0; j < this.spots.length; j++) {
+        for (j = 0; j < this.spots.length; j++) {
             if (this.spots[j].spot.name == mySpot.name) {
                 monoSpot = this.spots[j];
                 break;
@@ -82,15 +83,16 @@ AiSiebdruck.prototype.get_sep_coordinates = function () {
     var doc = this.doc;
     var abRect = doc.artboards[0].artboardRect;
 
+    var xRef, yRef;
     try {
-        var xRef = doc.pageItems.getByName("xLine").position[0];
+        xRef = doc.pageItems.getByName("xLine").position[0];
     } catch (e) {
-        var xRef = abRect[0] + (abRect[2] - abRect[0]) / 2;
+        xRef = abRect[0] + (abRect[2] - abRect[0]) / 2;
     }
     try {
-        var yRef = doc.pageItems.getByName("yLine").position[1];
+        yRef = doc.pageItems.getByName("yLine").position[1];
     } catch (e) {
-        var yRef = 300;
+        yRef = 300;
     }
 
     var dist = {};

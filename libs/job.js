@@ -1,35 +1,34 @@
-﻿var f_all = require('f_all');
-var rE = require('rE');
-var recentFolders = require('recentFolders');
-var names = require('names');
+﻿var f_all = require("f_all");
+var rE = require("rE");
+var recentFolders = require("recentFolders");
+var names = require("names");
 
 var nfo = {};
 
-function set_nfo (ref, fullExtract, nachdruckMoeglich) {
+function set_nfo(ref, fullExtract, nachdruckMoeglich) {
     //try to get a reference to a job from the activeDocument
     if (!ref) {
-        ref = get_ref();
+        ref = get_ref_from_activeDoc();
     }
 
     if (ref == null) return null;
 
-    if (ref.constructor.name === 'Document') {
+    if (ref.constructor.name === "Document") {
         try {
             ref = ref.fullName;
         } catch (e) {
-            ref = get_ref();
+            ref = get_ref_from_activeDoc();
         }
     }
 
-    if (ref.constructor.name === 'File') {
+    if (ref.constructor.name === "File") {
         get_nfo_from_filename(ref);
         ref = ref.parent;
     }
 
-    if (ref.constructor.name === 'Folder') {
+    if (ref.constructor.name === "Folder") {
         get_nfo_from_filepath(ref);
     }
-
 
     if (!nfo.jobNr && nachdruckMoeglich) {
         nfo.jobNr = get_jobNr_from_user();
@@ -40,31 +39,88 @@ function set_nfo (ref, fullExtract, nachdruckMoeglich) {
     // if full infos are needed and some are still missing,
     // let the user choose manually
     if (fullExtract && (!nfo.printId || !nfo.tech || !nfo.jobName)) {
-        get_nfo_from_user();
+        var missingProps = [];
+        if (!nfo.printId) missingProps.push("printId");
+        if (!nfo.tech) missingProps.push("tech");
+        if (!nfo.jobName) missingProps.push("jobName");
+        get_nfo_from_user(missingProps);
     }
     return nfo;
 }
 
-function get_ref() {
-    // try to get a reference to a job from active documents or placed graphics
+function get_print_nfo(ref) {
+    get_job_nfo(ref);
+    if (!nfo.printId || !nfo.tech || !nfo.jobName) {
+        var missingProps = [];
+        if (!nfo.printId) missingProps.push("printId");
+        if (!nfo.tech) missingProps.push("tech");
+        if (!nfo.jobName) missingProps.push("jobName");
+        get_nfo_from_user(missingProps);
+    }
+    return nfo;
+}
+
+function get_job_nfo(ref) {
+    //try to get a reference to a job from the activeDocument
+    if (!ref) {
+        ref = get_ref_from_activeDoc();
+    }
+
+    if (ref == null) return null;
+    nfo.ref = ref;
+
+    if (ref.constructor.name === "Document") {
+        try {
+            ref = ref.fullName;
+        } catch (e) {
+            ref = get_ref_from_activeDoc();
+        }
+    }
+
+    if (ref.constructor.name === "File") {
+        get_nfo_from_filename(ref);
+        ref = ref.parent;
+    }
+
+    if (ref.constructor.name === "Folder") {
+        get_nfo_from_filepath(ref);
+    }
+
+    if (!nfo.jobNr && !nfo.refNr) {
+        nfo.jobNr = get_jobNr_from_user();
+    } else {
+        nfo.jobNr = nfo.refNr;
+    }
+
+    if (!nfo.jobName) {
+        get_nfo_from_user(["jobName"]);
+    }
+    return nfo;
+}
+
+// try to get a reference to a job from active documents or placed graphics
+function get_ref_from_activeDoc() {
     var ref = null;
     var doc = null;
     try {
-        if(app.documents.length > 0)
-            doc = app.activeDocument;
-    } catch (e) {}
+        if (app.documents.length > 0) doc = app.activeDocument;
+    } catch (e) {
+        $.writeln('No open document to get ref from!');
+        $.writeln($.fileName + ':' + $.line);
+        $.writeln($.stack);
+    }
 
     if (doc) {
         switch (app.name) {
-            case 'Adobe Illustrator':
+            case "Adobe Illustrator":
                 ref = get_ref_from_ai_doc(doc);
                 break;
 
-            case 'Adobe InDesign':
+            case "Adobe InDesign":
                 ref = get_ref_from_indd_doc(doc);
                 break;
 
-            case 'Adobe Photoshop':
+            case "Adobe Photoshop":
                 ref = get_ref_from_ps_doc(doc);
                 break;
         }
@@ -89,7 +145,7 @@ function get_ref() {
 function get_ref_from_indd_doc(doc) {
     // if no docs are visible, dont try to get a ref
     if (app.layoutWindows.length < 1) {
-        return null
+        return null;
     }
 
     //close leftover docs without a layoutwindow
@@ -104,12 +160,12 @@ function get_ref_from_indd_doc(doc) {
     if (doc.name.match(rE.print)) {
         return doc;
     }
-    
+
     if (doc.allGraphics.length > 0) {
-        var motivLayer = doc.layers.item('motivEbene');
-        if(motivLayer.isValid) {
+        var motivLayer = doc.layers.item("motivEbene");
+        if (motivLayer.isValid) {
             var myGraphic = motivLayer.allGraphics[0];
-            if(myGraphic && myGraphic.isValid)
+            if (myGraphic && myGraphic.isValid)
                 return new File(myGraphic.properties.itemLink.filePath);
         } else {
             return doc;
@@ -152,7 +208,7 @@ function get_ref_from_ai_doc(doc) {
             pI = null;
         for (i = 0; i < doc.placedItems.length; i++) {
             pI = doc.placedItems[i];
-            if (pI.layer == doc.layers.getByName('Motiv')) {
+            if (pI.layer == doc.layers.getByName("Motiv")) {
                 ref = doc.placedItems[0].file;
             }
         }
@@ -166,41 +222,40 @@ function get_ref_from_ai_doc(doc) {
 }
 
 function get_nfo_from_filename(target) {
-
-    if (target.constructor.name === 'File') {
-        add_nfo('file', target);
+    if (target.constructor.name === "File") {
+        add_nfo("file", target);
     }
 
     var fileName = target.displayName;
     var match;
 
-    match = fileName.match(rE.printTag)
+    match = fileName.match(rE.printTag);
     if (match) {
-        add_nfo('printId', match[1]);
-        add_nfo('wxh', match[2]);
-        add_nfo('tech', match[3]);
+        add_nfo("printId", match[1]);
+        add_nfo("wxh", match[2]);
+        add_nfo("tech", match[3]);
     }
 
-    match = fileName.match(rE.printTag2)
+    match = fileName.match(rE.printTag2);
     if (match) {
-        add_nfo('printId', match[1]);
-        add_nfo('tech', match[3]);
+        add_nfo("printId", match[1]);
+        add_nfo("tech", match[3]);
     }
 
-    match = fileName.match(rE.doc)
+    match = fileName.match(rE.doc);
     if (match) {
-        add_nfo('jobNr', match[1]);
-        add_nfo('jobName', match[3]);
-        add_nfo('doc', match[4]);
+        add_nfo("jobNr", match[1]);
+        add_nfo("jobName", match[3]);
+        add_nfo("doc", match[4]);
     }
 
     return nfo;
 }
 
 function get_nfo_from_filepath(fldr) {
-    if (fldr.constructor.name === 'File') {
-        fldr = fldr.parent
-    };
+    if (fldr.constructor.name === "File") {
+        fldr = fldr.parent;
+    }
 
     var jobFolder = get_jobBaseFolder(fldr);
     if (!jobFolder) return null;
@@ -211,133 +266,144 @@ function get_nfo_from_filepath(fldr) {
     match = match ? match : jobFolder.displayName.match(rE.jobNameOld);
     match = match ? match : jobFolder.displayName.match(rE.jobNr);
 
-    add_nfo('refNr', match[1]);
-    add_nfo('shop', match[2].indexOf('wm') != -1 ? 'wme' : 'cs');
-    add_nfo('jobName', match[3] ? match[3] : undefined);
-    add_nfo('folder', jobFolder);
-    add_nfo('client', jobFolder.parent.displayName);
-    add_nfo('c2b', jobFolder.parent.parent.displayName);
+    add_nfo("refNr", match[1]);
+    add_nfo("shop", match[2].indexOf("wm") != -1 ? "wme" : "cs");
+    add_nfo("jobName", match[3] ? match[3] : undefined);
+    add_nfo("folder", jobFolder);
+    add_nfo("client", jobFolder.parent.displayName);
+    add_nfo("c2b", jobFolder.parent.parent.displayName);
 
     return nfo;
 }
 
-function get_nfo_from_user() {
+function get_nfo_from_user(propNames) {
     var n = names;
 
-    var techs = n.get_array('tech', true),
-        ids = n.get_array('printId', true),
+    var techs = n.get_array("tech", true),
+        ids = n.get_array("printId", true),
         jobNames = get_jobNames(nfo.folder);
 
-    var win = new Window('dialog', 'monos Print Id Dialog');
-    win.orientation = 'column';
-    win.alignChildren = 'fill';
+    var win = new Window("dialog", "monos Print Id Dialog");
+    win.orientation = "column";
+    win.alignChildren = "fill";
 
-    win.pgrp = win.add('group', undefined, '');
-    win.pgrp.orientation = 'row';
-    win.pgrp.alignChildren = 'top';
+    win.pgrp = win.add("group", undefined, "");
+    win.pgrp.orientation = "row";
+    win.pgrp.alignChildren = "top";
 
-    win.okgrp = win.add('group', undefined, '');
-    win.okgrp.orientation = 'row';
-    win.okgrp.alignChildren = 'fill';
-
+    win.okgrp = win.add("group", undefined, "");
+    win.okgrp.orientation = "row";
+    win.okgrp.alignChildren = "fill";
 
     var helper = function (b) {
-        return function (e) {
+        return function () {
             if (this.value) {
-                if (this.parent.text == 'Print_id') {
-                    var value = f_all.validateString(this.parent.opts[b]);
-                    add_nfo('printId', value, true);
-
-                } else if (this.parent.text == 'Technique') {
-                    var value = f_all.validateString(this.parent.opts[b]);
-                    add_nfo('tech', value, true);
-
-                } else if (this.parent.text == 'jobNames') {
-                    var value = f_all.validateString(this.parent.opts[b]);
-                    add_nfo('jobName', value, true);
+                var value;
+                if (this.parent.text == "Print_id") {
+                    value = f_all.validateString(this.parent.opts[b]);
+                    add_nfo("printId", value, true);
+                } else if (this.parent.text == "Technique") {
+                    value = f_all.validateString(this.parent.opts[b]);
+                    add_nfo("tech", value, true);
+                } else if (this.parent.text == "jobNames") {
+                    value = f_all.validateString(this.parent.opts[b]);
+                    add_nfo("jobName", value, true);
                 }
             }
         };
     };
 
-    if (!nfo.printId) {
+    if (propNames.includes("printId")) {
         ////////////////////////////////
         // add printId panel with radiobuttons and edittext
-        win.pgrp.idpnl = win.pgrp.add('panel', undefined, 'Print_id');
+        win.pgrp.idpnl = win.pgrp.add("panel", undefined, "Print_id");
         var idpnl = win.pgrp.idpnl;
-        idpnl.alignChildren = 'fill';
+        idpnl.alignChildren = "fill";
         idpnl.opts = ids;
 
         for (var i = 0, maxI = ids.length; i < maxI; i += 1) {
-            idpnl['rad_' + i] = idpnl.add("radiobutton", undefined, n.name('printId', ids[i]));
+            idpnl["rad_" + i] = idpnl.add(
+                "radiobutton",
+                undefined,
+                n.name("printId", ids[i])
+            );
 
             if (nfo.printId == ids[i]) {
-                idpnl['rad_' + i].value = true;
+                idpnl["rad_" + i].value = true;
             }
-            idpnl['rad_' + i].onClick = helper(i);
-        };
-
-        idpnl.newid = idpnl.add('edittext', undefined, 'Enter custom id:');
-        idpnl.newid.onChange = function () {
-            add_nfo('printId', this.text, true);
+            idpnl["rad_" + i].onClick = helper(i);
         }
+
+        idpnl.newid = idpnl.add("edittext", undefined, "Enter custom id:");
+        idpnl.newid.onChange = function () {
+            add_nfo("printId", this.text, true);
+        };
     }
 
-    if (!nfo.tech) {
+    if (propNames.includes("tech")) {
         /////////////////////////////////7
         // add technique panel with radiobuttons
-        win.pgrp.techpnl = win.pgrp.add('panel', undefined, 'Technique');
+        win.pgrp.techpnl = win.pgrp.add("panel", undefined, "Technique");
         var techpnl = win.pgrp.techpnl;
-        techpnl.alignChildren = 'fill';
+        techpnl.alignChildren = "fill";
         techpnl.opts = techs;
 
         for (var i = 0, maxI = techs.length; i < maxI; i += 1) {
-            techpnl['rad_' + i] = techpnl.add("radiobutton", undefined, n.name('tech', techs[i]));
-            techpnl['rad_' + i].onClick = helper(i);
-        };
+            techpnl["rad_" + i] = techpnl.add(
+                "radiobutton",
+                undefined,
+                n.name("tech", techs[i])
+            );
+            techpnl["rad_" + i].onClick = helper(i);
+        }
     }
 
-    if (!nfo.jobName) {
+    if (propNames.includes("jobName")) {
         /////////////////////////////////////
         // add jobName panel with radio buttons and edittext
-        win.pgrp.jobNamepnl = win.pgrp.add('panel', undefined, 'jobNames');
+        win.pgrp.jobNamepnl = win.pgrp.add("panel", undefined, "jobNames");
         var jobNamepnl = win.pgrp.jobNamepnl;
-        jobNamepnl.alignChildren = 'fill';
+        jobNamepnl.alignChildren = "fill";
         jobNamepnl.opts = jobNames;
 
         for (var i = 0, maxI = jobNames.length; i < maxI; i += 1) {
-            jobNamepnl['rad_' + i] = jobNamepnl.add("radiobutton", undefined, jobNames[i]);
+            jobNamepnl["rad_" + i] = jobNamepnl.add(
+                "radiobutton",
+                undefined,
+                jobNames[i]
+            );
             if (nfo.jobName == jobNames[i]) {
-                jobNamepnl['rad_' + i].value = true;
+                jobNamepnl["rad_" + i].value = true;
             }
-            jobNamepnl['rad_' + i].onClick = helper(i);
-        };
-
-        jobNamepnl.newjobName = jobNamepnl.add('edittext', undefined, 'New jobName:');
-        jobNamepnl.newjobName.onChange = function () {
-            add_nfo('jobName', this.text, true);
+            jobNamepnl["rad_" + i].onClick = helper(i);
         }
+
+        jobNamepnl.newjobName = jobNamepnl.add(
+            "edittext",
+            undefined,
+            "New jobName:"
+        );
+        jobNamepnl.newjobName.onChange = function () {
+            add_nfo("jobName", this.text, true);
+        };
     }
 
     /////////////////////////////////////
     // OK Cancel
-    win.okgrp.yes = win.okgrp.add('button', undefined, 'Ok');
-    win.okgrp.no = win.okgrp.add('button', undefined, 'Abbrechen');
+    win.okgrp.yes = win.okgrp.add("button", undefined, "Ok");
+    win.okgrp.no = win.okgrp.add("button", undefined, "Abbrechen");
 
-    var i,
-        maxI,
-        item;
+    var i, maxI, item;
 
     win.okgrp.yes.onClick = function () {
-
         if (nfo.printId && nfo.tech && nfo.jobName) {
             win.close();
         } else {
-            var alertString = ('Diese Info(s) fehlen:\n');
-            alertString += !nfo.printId ? 'Druckposition\n' : '';
-            alertString += !nfo.tech ? 'Druckverfahren\n' : '';
-            alertString += !nfo.jobName ? 'JobName\n' : '';
-            alertString += 'bitte auswählen!';
+            var alertString = "Diese Info(s) fehlen:\n";
+            alertString += !nfo.printId ? "Druckposition\n" : "";
+            alertString += !nfo.tech ? "Druckverfahren\n" : "";
+            alertString += !nfo.jobName ? "JobName\n" : "";
+            alertString += "bitte auswählen!";
             alert(alertString);
             return;
         }
@@ -349,7 +415,6 @@ function get_nfo_from_user() {
     };
 
     win.show();
-
 }
 
 function get_jobBaseFolder(fld) {
@@ -383,47 +448,57 @@ function get_jobNames(jobfolder) {
 }
 
 function get_jobNr_from_user() {
+    var win = new Window("dialog", "monos Print Id Dialog");
+    win.orientation = "column";
+    win.alignChildren = "fill";
 
-    var win = new Window('dialog', 'monos Print Id Dialog');
-    win.orientation = 'column';
-    win.alignChildren = 'fill';
+    win.pgrp = win.add("group", undefined, "");
+    win.pgrp.orientation = "row";
+    win.pgrp.alignChildren = "top";
 
-    win.pgrp = win.add('group', undefined, '');
-    win.pgrp.orientation = 'row';
-    win.pgrp.alignChildren = 'top';
-
-    win.okgrp = win.add('group', undefined, '');
-    win.okgrp.orientation = 'row';
-    win.okgrp.alignChildren = 'fill';
+    win.okgrp = win.add("group", undefined, "");
+    win.okgrp.orientation = "row";
+    win.okgrp.alignChildren = "fill";
 
     /////////////////////////////////////
     // add jobNr panel with edittext
-    win.pgrp.jobPnl = win.pgrp.add('panel', undefined, 'neue Auftragsnr erstellen?');
-    win.pgrp.jobPnl.alignChildren = 'fill';
+    win.pgrp.jobPnl = win.pgrp.add(
+        "panel",
+        undefined,
+        "neue Auftragsnr erstellen?"
+    );
+    win.pgrp.jobPnl.alignChildren = "fill";
 
-    win.pgrp.jobPnl.refNr = win.pgrp.jobPnl.add('statictext', undefined, 'Auftragsnr. des aktuellen Verzeichnis: ' + this.nfo.refNr);
-    win.pgrp.jobPnl.jobNr = win.pgrp.jobPnl.add('edittext', undefined, 'neue Auftragsnr. hier eingeben');
+    win.pgrp.jobPnl.refNr = win.pgrp.jobPnl.add(
+        "statictext",
+        undefined,
+        "Auftragsnr. des aktuellen Verzeichnis: " + this.nfo.refNr
+    );
+    win.pgrp.jobPnl.jobNr = win.pgrp.jobPnl.add(
+        "edittext",
+        undefined,
+        "neue Auftragsnr. hier eingeben"
+    );
     win.pgrp.jobPnl.jobNr.onChange = function () {
-        add_nfo('jobNr', this.text, true);
-    }
+        add_nfo("jobNr", this.text, true);
+    };
 
     /////////////////////////////////////
     // OK Cancel
-    win.okgrp.yes = win.okgrp.add('button', undefined, 'Ok');
-    win.okgrp.no = win.okgrp.add('button', undefined, 'Abbrechen');
+    win.okgrp.yes = win.okgrp.add("button", undefined, "Ok");
+    win.okgrp.no = win.okgrp.add("button", undefined, "Abbrechen");
 
     win.okgrp.yes.onClick = function () {
-
-        if (win.pgrp.jobPnl.jobNr.text == 'neue Auftragsnr. hier eingeben') {
-            add_nfo('jobNr', this.nfo.refNr, overwrite);
+        if (win.pgrp.jobPnl.jobNr.text == "neue Auftragsnr. hier eingeben") {
+            add_nfo("jobNr", this.nfo.refNr, overwrite);
             win.close();
         } else if (rE.jobNr.test(win.pgrp.jobPnl.jobNr.text)) {
-            add_nfo('jobNr', win.pgrp.jobPnl.jobNr.text, overwrite);
+            add_nfo("jobNr", win.pgrp.jobPnl.jobNr.text, overwrite);
             win.close();
         } else {
-            var alertString = 'Auftragsnr. ';
+            var alertString = "Auftragsnr. ";
             alertString += win.pgrp.jobPnl.jobNr.text;
-            alertString += ' ist fehlerhaft. Bitte prüfen!';
+            alertString += " ist fehlerhaft. Bitte prüfen!";
             alert(alertString);
             return;
         }
@@ -457,6 +532,8 @@ function add_nfo(key, value, overwrite) {
 exports.nfo = nfo;
 
 exports.set_nfo = set_nfo;
+exports.get_job_nfo = get_job_nfo;
+exports.get_print_nfo = get_print_nfo;
 
 /*
 exports.get_wxh = function () {
