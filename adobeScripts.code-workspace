@@ -1,12 +1,22 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-<<<<<<< Updated upstream
-	],
-	"settings": {}
-=======
-	]
->>>>>>> Stashed changes
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "..\\adobeSampleScripts"
+        },
+        {
+            "path": "..\\adobePanels"
+        },
+        {
+            "path": "\\\\cs-server16\\caprishare\\gemeinsam\\wawiscript\\auftraginfos"
+        },
+        {
+            "path": "\\\\cs-server16\\caprishare\\gemeinsam\\wawiscript\\einsatzheld"
+        }
+    ],
+    "settings": {
+        "liveServer.settings.multiRootWorkspaceName": "adobePanels"
+    }
 }
