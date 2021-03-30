@@ -1,33 +1,12 @@
 ﻿var typeahead = require("typeahead");
 var _id = require("f_id");
+var ioFile = require("ioFile");
 
 var csroot = Folder($.getenv("csroot")).fullName;
 var ignoreBridge = /^(?!.*(\.bridge)).*$/i;
 var fixedLayerNames = ["Shirt", "Naht", "Tasche", "Beutel", "Hintergrund"];
 var listAlways = "front|back|left|right|side";
 var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
-
-function find_files(dir, filter) {
-    return find_files_sub(dir, [], filter);
-}
-
-function find_files_sub(dir, array, filter) {
-    var f = Folder(dir).getFiles("*.*");
-    for (var i = 0; i < f.length; i++) {
-        if (f[i] instanceof Folder) find_files_sub(f[i], array, filter);
-        else if (f[i] instanceof File && f[i].displayName.search(filter) > -1)
-            array.push(f[i]);
-    }
-    return array;
-}
-
-function get_tex_files(dir, filter) {
-    var result = find_files(dir, filter);
-    result.sort(function (a, b) {
-        return a.displayName.toLowerCase() > b.displayName.toLowerCase();
-    });
-    return result;
-}
 
 function place_image(args) {
     var placedItemsArray = args.placeTo.place(
@@ -41,7 +20,10 @@ function place_image(args) {
 }
 
 function select_textile(args) {
-    var texFiles = get_tex_files(texRoot, ignoreBridge);
+    var texFiles = ioFile.get_files(texRoot, ignoreBridge);
+    texFiles.sort(function (a, b) {
+        return a.displayName.toLowerCase() > b.displayName.toLowerCase();
+    });
     var texResult = typeahead.show_dialog(
         texFiles,
         "displayName",
@@ -170,7 +152,10 @@ function reactivate_jpg(texRect) {
     var sourcePath = get_sourcePath(texGraphic);
     var sourceFilename = get_filename_from_path(sourcePath);
     var searchPattern = new RegExp(sourceFilename, "ig");
-    var foundTex = get_tex_files(texRoot, searchPattern);
+    var foundTex = ioFile.get_files(texRoot, searchPattern);
+    foundTex.sort(function (a, b) {
+        return a.displayName.toLowerCase() > b.displayName.toLowerCase();
+    });
 
     if (!foundTex || foundTex.length === 0) return;
 

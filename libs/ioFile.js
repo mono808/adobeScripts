@@ -41,4 +41,23 @@ ioFile.import_json = function (jsonFile) {
     return jsonObj;
 };
 
+function find_files(dir, filter) {
+    return find_files_sub(dir, [], filter);
+}
+
+function find_files_sub(dir, array, filter) {
+    var f = Folder(dir).getFiles("*.*");
+    for (var i = 0; i < f.length; i++) {
+        if (f[i] instanceof Folder) find_files_sub(f[i], array, filter);
+        else if (f[i] instanceof File && f[i].displayName.search(filter) > -1)
+            array.push(f[i]);
+    }
+    return array;
+}
+
+ioFile.get_files = function (dir, filter) {
+    var result = find_files(dir, filter);
+    return result;
+};
+
 exports = module.exports = ioFile;
