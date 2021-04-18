@@ -88,7 +88,7 @@ function import_history() {
     }
 }
 
-function add_to_recentFolders(ref) {
+function add(ref) {
     // get the folder from these possible inputs (file|document|folder)
     var fd = get_folder_from_ref(ref);
     if (!fd) return null;
@@ -263,11 +263,11 @@ function show_dialog(get_folder, get_file) {
 
     if (win.show() != 2 && retval) {
         if (retval instanceof File) {
-            add_to_recentFolders(retval.parent);
+            add(retval.parent);
             return retval;
         }
         if (retval instanceof Folder) {
-            add_to_recentFolders(retval);
+            add(retval);
             return retval;
         }
     } else {
@@ -288,4 +288,4 @@ function get_folder() {
 exports.show_dialog = show_dialog;
 exports.get_file = get_file;
 exports.get_folder = get_folder;
-exports.add_to_recentFolders = add_to_recentFolders;
+exports.add = add;
