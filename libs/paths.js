@@ -1,71 +1,4 @@
-﻿function set_paths() {
-    varsSet = true;
-    var p = paths;
-    // Filetags
-    if (nfo.wxh) {
-        p.printTag = nfo.printId + "_" + (nfo.wxh || "00x00") + "_" + nfo.tech;
-    } else {
-        p.printTag = nfo.printId + "_" + nfo.tech;
-    }
-
-    p.docTag = nfo.jobNr
-        ? nfo.jobNr + "_" + nfo.jobName
-        : Window.prompt("Please enter a descriptive Jobname");
-
-    // workingfiles
-    p.workingAi = p.working + p.printTag + "_Working.ai";
-    p.workingPs = p.working + p.printTag + "_Working.psd";
-    p.workingEps = p.working + p.printTag + "_Working.eps";
-    p.workingTif = p.working + p.printTag + "_Working.tif";
-    p.backupPs = p.working + p.printTag + "_Backup.psd";
-    p.backupAi = p.working + p.printTag + "_Backup.ai";
-    p.previewAi = p.previews + p.printTag + "_Preview.ai";
-    p.previewPs = p.previews + p.printTag + "_Preview.psd";
-    p.previewEps = p.previews + p.printTag + "_Preview.eps";
-
-    // druckdaten
-    p.sdPrintAi = p.ddSD + p.printTag + "_Print.ai";
-    p.sdPrintEps = p.ddSD + p.printTag + "_Print.eps";
-    p.sdPrintPsd = p.ddSD + p.printTag + "_Print.psd";
-    p.dtgPrintTif = p.ddDTG + p.printTag + "_Print.tif";
-    p.dtaPrintPdf = p.ddDTA + p.printTag + "_Print.pdf";
-    p.dtaxPrintPdf = p.ddDTA + p.printTag + "_Print.pdf";
-    p.dtaoPrintPdf = p.ddDTA + p.printTag + "_Print.pdf";
-    p.flxPrintAi = p.ddFLX + p.printTag + "_Print.ai";
-    p.floPrintAi = p.ddFLO + p.printTag + "_Print.ai";
-    p.dtgPrintTi = p.ddDTG + p.printTag + "_Print.tif";
-    p.stkPrintAi = p.ddSTK + p.printTag + "_Print.ai";
-
-    // filmdaten
-    p.film = p.ddSD + p.docTag + "_" + p.printTag + "_Film.indd";
-    p.filmPs = p.filmIn + p.docTag + "_" + p.printTag + "_Film.ps";
-    p.filmPdf = p.filmOut + p.docTag + "_" + p.printTag + "_Film.pdf";
-
-    // ansicht
-    p.mockUpPdf = p.ansicht + p.docTag + "_Ansicht.pdf";
-    p.mockUpIndd = p.ansicht + p.docTag + "_Ansicht.indd";
-    p.mockUpDist = p.ansichtIn + p.docTag + "_Ansicht.ps";
-    p.mockUpPostDist = p.ansichtOut + p.docTag + "_Ansicht.pdf";
-
-    // organisation
-    p.filmhuelle = p.ddSD + p.docTag + "_Filmhuelle.indd";
-}
-
-function get_path(shortHand) {
-    if (!varsSet) set_paths();
-    if (Object.prototype.hasOwnProperty.call(paths, shortHand)) {
-        return paths[shortHand];
-    } else {
-        return null;
-    }
-}
-
-function create_containing_folder(myFile) {
-    if (!myFile.parent.exists) {
-        var containingFolder = new Folder(myFile.parent);
-        containingFolder.create();
-    }
-}
+﻿var f_all = require("f_all");
 
 var csroot = Folder($.getenv("csroot")).fullName;
 var pcroot = Folder($.getenv("pcroot")).fullName;
@@ -134,17 +67,80 @@ paths.ddSUB = "./Druckdaten-SUB/";
 paths.orga = "./Organisation/";
 paths.working = "./Working/";
 
+function set_paths(nfo) {
+    varsSet = true;
+    var p = paths;
+    
+    // Filetags
+    p.printTag = nfo.printId + "_" + nfo.tech;
+    
+    p.docTag = nfo.jobNr
+        ? nfo.jobNr + "_" + nfo.jobName
+        : Window.prompt("Please enter a descriptive Jobname");
+
+    // workingfiles
+    p.workingAi = p.working + p.printTag + "_Working.ai";
+    p.workingPs = p.working + p.printTag + "_Working.psd";
+    p.workingEps = p.working + p.printTag + "_Working.eps";
+    p.workingTif = p.working + p.printTag + "_Working.tif";
+    p.backupPs = p.working + p.printTag + "_Backup.psd";
+    p.backupAi = p.working + p.printTag + "_Backup.ai";
+    p.previewAi = p.previews + p.printTag + "_Preview.ai";
+    p.previewPs = p.previews + p.printTag + "_Preview.psd";
+    p.previewEps = p.previews + p.printTag + "_Preview.eps";
+
+    // druckdaten
+    p.sdPrintAi = p.ddSD + p.printTag + "_Print.ai";
+    p.sdPrintEps = p.ddSD + p.printTag + "_Print.eps";
+    p.sdPrintPsd = p.ddSD + p.printTag + "_Print.psd";
+    p.dtgPrintTif = p.ddDTG + p.printTag + "_Print.tif";
+    p.dtaPrintPdf = p.ddDTA + p.printTag + "_Print.pdf";
+    p.dtaxPrintPdf = p.ddDTA + p.printTag + "_Print.pdf";
+    p.dtaoPrintPdf = p.ddDTA + p.printTag + "_Print.pdf";
+    p.flxPrintAi = p.ddFLX + p.printTag + "_Print.ai";
+    p.floPrintAi = p.ddFLO + p.printTag + "_Print.ai";
+    p.dtgPrintTi = p.ddDTG + p.printTag + "_Print.tif";
+    p.stkPrintAi = p.ddSTK + p.printTag + "_Print.ai";
+
+    // filmdaten
+    p.film = p.ddSD + p.docTag + "_" + p.printTag + "_Film.indd";
+    p.filmPs = p.filmIn + p.docTag + "_" + p.printTag + "_Film.ps";
+    p.filmPdf = p.filmOut + p.docTag + "_" + p.printTag + "_Film.pdf";
+
+    // ansicht
+    p.mockUpPdf = p.ansicht + p.docTag + "_Ansicht.pdf";
+    p.mockUpIndd = p.ansicht + p.docTag + "_Ansicht.indd";
+    p.mockUpDist = p.ansichtIn + p.docTag + "_Ansicht.ps";
+    p.mockUpPostDist = p.ansichtOut + p.docTag + "_Ansicht.pdf";
+
+    // organisation
+    p.filmhuelle = p.ddSD + p.docTag + "_Filmhuelle.indd";
+}
+
+function get_path(shortHand) {
+    //if (!varsSet) set_paths();
+    if (Object.prototype.hasOwnProperty.call(paths, shortHand)) {
+        return paths[shortHand];
+    } else {
+        return null;
+    }
+}
+
+function create_containing_folder(myFile) {
+    if (!myFile.parent.exists) {
+        var containingFolder = new Folder(myFile.parent);
+        containingFolder.create();
+    }
+}
+
 function set_nfo(input) {
-    if (input.folder && input.folder.constructor.name == "Folder") {
+    if (input && input.folder && input.folder.constructor.name == "Folder") {
         Folder.current = input.folder;
     }
-    for (var p in input) {
-        if (Object.prototype.hasOwnProperty.call(input, p) && input[p]) {
-            nfo[p] = input[p];
-        }
-    }
 
-    set_paths();
+    nfo = f_all.copy_props(nfo, input, true);
+
+    set_paths(nfo);
 }
 
 function folder(shortHand, nfoInput) {

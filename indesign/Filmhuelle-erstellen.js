@@ -19,16 +19,17 @@ function myGetBounds(myDoc, myPage) {
     var myPageWidth = myDoc.documentPreferences.pageWidth;
     var myPageHeight = myDoc.documentPreferences.pageHeight;
 
+    var myX1, myX2;
     if (myPage.side == PageSideOptions.leftHand) {
-        var myX2 = myPage.marginPreferences.left;
-        var myX1 = myPage.marginPreferences.right;
+        myX2 = myPage.marginPreferences.left;
+        myX1 = myPage.marginPreferences.right;
     } else {
-        var myX1 = myPage.marginPreferences.left;
-        var myX2 = myPage.marginPreferences.right;
+        myX1 = myPage.marginPreferences.left;
+        myX2 = myPage.marginPreferences.right;
     }
+    myX2 = myPageWidth - myX2;
 
     var myY1 = myPage.marginPreferences.top;
-    var myX2 = myPageWidth - myX2;
     var myY2 = myPageHeight - myPage.marginPreferences.bottom;
 
     return [myY1, myX1, myY2, myX2];
@@ -71,99 +72,75 @@ function checkCreateStyle(type, name) {
 }
 
 function createStyles(doc) {
-    var defaultPStyle;
-    defaultPStyle = checkCreateStyle("paragraph", "defaultPStyle");
-    with (defaultPStyle) {
-        fillColor = doc.colors.item("Black");
-        pointSize = 11;
-        leading = "11 points";
-        spaceBefore = 0;
-        justification = Justification.LEFT_ALIGN;
-        try {
-            appliedFont = app.fonts.item("Myriad Pro");
-        } catch (e) {}
-        try {
-            fontStyle = "Regular";
-        } catch (e) {}
-    }
+    var defaultPStyle = checkCreateStyle("paragraph", "defaultPStyle");
+    defaultPStyle.fillColor = doc.colors.item("Black");
+    defaultPStyle.pointSize = 11;
+    defaultPStyle.leading = "11 points";
+    defaultPStyle.spaceBefore = 0;
+    defaultPStyle.justification = Justification.LEFT_ALIGN;
+    try {
+        defaultPStyle.appliedFont = app.fonts.item("Myriad Pro");
+    } catch (e) {}
+    try {
+        defaultPStyle.fontStyle = "Regular";
+    } catch (e) {}
 
-    var jobPStyle;
-    jobPStyle = checkCreateStyle("paragraph", "jobPStyle");
-    with (jobPStyle) {
-        basedOn = defaultPStyle;
-        pointSize = 16;
-        leading = "16 points";
-        justification = Justification.CENTER_ALIGN;
-        fontStyle = "Bold";
-    }
+    var jobPStyle = checkCreateStyle("paragraph", "jobPStyle");
+    jobPStyle.basedOn = defaultPStyle;
+    jobPStyle.pointSize = 16;
+    jobPStyle.leading = "16 points";
+    jobPStyle.justification = Justification.CENTER_ALIGN;
+    jobPStyle.fontStyle = "Bold";
 
-    var posPStyle;
-    posPStyle = checkCreateStyle("paragraph", "posPStyle");
-    with (posPStyle) {
-        basedOn = jobPStyle;
-        pointSize = 14;
-        leading = "14 points";
-    }
+    var posPStyle = checkCreateStyle("paragraph", "posPStyle");
+    posPStyle.basedOn = jobPStyle;
+    posPStyle.pointSize = 14;
+    posPStyle.leading = "14 points";
 
-    var colorsPStyle;
-    colorPStyle = checkCreateStyle("paragraph", "colorsPStyle");
-    with (colorPStyle) {
-        basedOn = defaultPStyle;
-        justification = Justification.RIGHT_ALIGN;
-        hyphenation = false;
-    }
+    var colorPStyle = checkCreateStyle("paragraph", "colorsPStyle");
+    colorPStyle.basedOn = defaultPStyle;
+    colorPStyle.justification = Justification.RIGHT_ALIGN;
+    colorPStyle.hyphenation = false;
 
     var defaultCStyle;
     defaultCStyle = checkCreateStyle("cell", "defaultCStyle");
-    with (defaultCStyle) {
-        leftInset = 2;
-        rightInset = 2;
-        bottomInset = 2;
-        topInset = 2;
+    defaultCStyle.leftInset = 2;
+    defaultCStyle.rightInset = 2;
+    defaultCStyle.bottomInset = 2;
+    defaultCStyle.topInset = 2;
 
-        topEdgeStrokeTint = 20;
-        leftEdgeStrokeTint = 20;
-        bottomEdgeStrokeTint = 20;
-        rightEdgeStrokeTint = 20;
+    defaultCStyle.topEdgeStrokeTint = 20;
+    defaultCStyle.leftEdgeStrokeTint = 20;
+    defaultCStyle.bottomEdgeStrokeTint = 20;
+    defaultCStyle.rightEdgeStrokeTint = 20;
 
-        topEdgeStrokeWeight = 2;
-        leftEdgeStrokeWeight = 2;
-        bottomEdgeStrokeWeight = 2;
-        rightEdgeStrokeWeight = 2;
+    defaultCStyle.topEdgeStrokeWeight = 2;
+    defaultCStyle.leftEdgeStrokeWeight = 2;
+    defaultCStyle.bottomEdgeStrokeWeight = 2;
+    defaultCStyle.rightEdgeStrokeWeight = 2;
 
-        topEdgeStrokeColor = doc.swatches.item("Black");
-        leftEdgeStrokeColor = doc.swatches.item("Black");
-        bottomEdgeStrokeColor = doc.swatches.item("Black");
-        rightEdgeStrokeColor = doc.swatches.item("Black");
-    }
+    defaultCStyle.topEdgeStrokeColor = doc.swatches.item("Black");
+    defaultCStyle.leftEdgeStrokeColor = doc.swatches.item("Black");
+    defaultCStyle.bottomEdgeStrokeColor = doc.swatches.item("Black");
+    defaultCStyle.rightEdgeStrokeColor = doc.swatches.item("Black");
 
-    var colorsCStyle;
-    colorsCStyle = checkCreateStyle("cell", "colorsCStyle");
-    with (colorsCStyle) {
-        basedOn = defaultCStyle;
-        appliedParagraphStyle = doc.paragraphStyles.item("colorsPStyle");
-    }
+    var colorsCStyle = checkCreateStyle("cell", "colorsCStyle");
+    colorsCStyle.basedOn = defaultCStyle;
+    colorsCStyle.appliedParagraphStyle = doc.paragraphStyles.item(
+        "colorsPStyle"
+    );
 
-    var posCStyle;
-    posCStyle = checkCreateStyle("cell", "posCStyle");
-    with (posCStyle) {
-        basedOn = defaultCStyle;
-        appliedParagraphStyle = doc.paragraphStyles.item("posPStyle");
-    }
+    var posCStyle = checkCreateStyle("cell", "posCStyle");
+    posCStyle.basedOn = defaultCStyle;
+    posCStyle.appliedParagraphStyle = doc.paragraphStyles.item("posPStyle");
 
-    var jobCStyle;
-    jobCStyle = checkCreateStyle("cell", "jobCStyle");
-    with (jobCStyle) {
-        basedOn = defaultCStyle;
-        appliedParagraphStyle = doc.paragraphStyles.item("jobPStyle");
-    }
+    var jobCStyle = checkCreateStyle("cell", "jobCStyle");
+    jobCStyle.basedOn = defaultCStyle;
+    jobCStyle.appliedParagraphStyle = doc.paragraphStyles.item("jobPStyle");
 
-    var defaultTStyle;
-    defaultTStyle = checkCreateStyle("table", "defaultTStyle");
-    with (defaultTStyle) {
-        bodyRegionCellStyle = "defaultCStyle";
-        headerRegionCellStyle = "jobCStyle";
-    }
+    var defaultTStyle = checkCreateStyle("table", "defaultTStyle");
+    defaultTStyle.bodyRegionCellStyle = "defaultCStyle";
+    defaultTStyle.headerRegionCellStyle = "jobCStyle";
 }
 
 function createTable(doc) {
@@ -287,26 +264,26 @@ function fill_table_with_printNfo(monoPrints, myTable, names) {
     var imageRow = myTable.rows.item(3);
     imageRow.height = tFHeight - rowsHeight;
 
-    for (var i = 0; i < monoPrints.length; i++) {
-        var imageCell = myTable.rows.item(3).cells.item(i);
-        var myImage = monoPrints[i].preview;
+    for (var j = 0; j < monoPrints.length; j++) {
+        var imageCell = myTable.rows.item(3).cells.item(j);
+        var myImage = monoPrints[j].preview;
         import_graphic_to_cell(myImage, imageCell);
     }
 }
 
-function fill_table_with_jobNfo(table2Fill, job) {
+function fill_table_with_jobNfo(table2Fill, jobNfo) {
     var jobRow = table2Fill.rows.item(0);
 
     var clCell = jobRow.cells.item(0).merge(jobRow.cells.item(1));
-    clCell.contents = job.nfo.client;
+    clCell.contents = jobNfo.client;
     clCell.appliedCellStyle = "jobCStyle";
 
     var jobNrCell = jobRow.cells.item(1);
-    jobNrCell.contents = job.nfo.jobNr;
+    jobNrCell.contents = jobNfo.jobNr;
     jobNrCell.appliedCellStyle = "jobCStyle";
 
     var jobNameCell = jobRow.cells.item(2);
-    jobNameCell.contents = job.nfo.jobName;
+    jobNameCell.contents = jobNfo.jobName;
     jobNameCell.appliedCellStyle = "jobCStyle";
 }
 
@@ -315,36 +292,30 @@ function create_aufkleber() {
     var docHeight = 146;
 
     var myDocPreset = app.documentPresets.item("filmhuellePreset");
-    try {
-        var myPresetName = myDocPreset.name;
-    } catch (myError) {
+    if (!myDocPreset.isValid) {
         myDocPreset = app.documentPresets.add({ name: "filmhuellePreset" });
     }
 
-    with (myDocPreset) {
-        facingPages = false;
-        pageHeight = docHeight;
-        pageWidth = docWidth;
-        top = 20;
-        left = 3;
-        bottom = 20;
-        right = 3;
-    }
+    myDocPreset.facingPages = false;
+    myDocPreset.pageHeight = docHeight;
+    myDocPreset.pageWidth = docWidth;
+    myDocPreset.top = 20;
+    myDocPreset.left = 3;
+    myDocPreset.bottom = 20;
+    myDocPreset.right = 3;
 
     var myDoc = app.documents.add(true, myDocPreset, {});
-    var myPage = myDoc.pages.item(0);
     var myDocument = app.activeDocument;
     myDoc.transparencyPreferences.blendingSpace = BlendingSpace.RGB;
 
-    with (myDocument.viewPreferences) {
-        horizontalMeasurementUnits = MeasurementUnits.millimeters;
-        verticalMeasurementUnits = MeasurementUnits.millimeters;
-        rulerOrigin = RulerOrigin.pageOrigin;
-    }
+    var vP = myDocument.viewPreferences;
+    vP.horizontalMeasurementUnits = MeasurementUnits.millimeters;
+    vP.verticalMeasurementUnits = MeasurementUnits.millimeters;
+    vP.rulerOrigin = RulerOrigin.pageOrigin;
 
     createStyles(myDoc);
 
-    var myTable = createTable(myDoc);
+    createTable(myDoc);
 
     myDoc.textDefaults.hyphenation = false;
 
@@ -361,16 +332,17 @@ function main() {
     var names = require("names");
     var BaseDoc = require("BaseDoc");
 
-    job.set_nfo(null, false, false);
-    paths.set_nfo(job.nfo);
-    jobFolder.set_folder(job.nfo.folder);
+    //job.set_nfo(null, false, false);
+    var jobNfo = job.get_jobNfo();
+    paths.set_nfo(jobNfo);
+    jobFolder.set_folder(jobNfo.folder);
 
     var doc = create_aufkleber();
 
     var myPage = doc.pages.item(0);
     var myTable = myPage.textFrames.item(0).tables.item(0);
 
-    fill_table_with_jobNfo(myTable, job);
+    fill_table_with_jobNfo(myTable, jobNfo);
 
     var monoPrints = jobFolder.get_prints();
 

@@ -3,13 +3,16 @@
 
 function main(report) {
     var job = require("job");
+    var print = require("print");
     var paths = require("paths");
     var AiSiebdruckPrint = require("AiSiebdruckPrint");
     var AiSiebdruckPreview = require("AiSiebdruckPreview");
     var saveOptions = require("saveOptions");
 
-    job.set_nfo(null, true, false);
-    paths.set_nfo(job.nfo);
+    var jobNfo = job.get_jobNfo_from_doc(app.activeDocument);
+    var printNfo = print.get_printNfo(jobNfo.file);
+    paths.set_nfo(jobNfo);
+    paths.set_nfo(printNfo);
 
     var printDoc = new AiSiebdruckPrint(app.activeDocument);
 

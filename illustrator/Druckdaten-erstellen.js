@@ -1,22 +1,25 @@
-﻿//@target illustrator
+﻿ //@target illustrator
 //@include "require.js"
 
 function main(report) {
     var f_all = require("f_all");
     var AiBase = require("AiBase");
     var job = require("job");
+    var print = require("print");
     var paths = require("paths");
     var saveOptions = require("saveOptions");
 
-    job.set_nfo(null, true, false);
-    paths.set_nfo(job.nfo);
+    var jobNfo = job.get_jobNfo_from_doc(app.activeDocument);
+    var printNfo = print.get_printNfo(jobNfo.file);
+    paths.set_nfo(jobNfo);
+    paths.set_nfo(printNfo);
 
     //-------------------------------------------------------
     var aiDoc = new AiBase(app.activeDocument);
 
     aiDoc.fit_artboard_to_art("Motiv");
 
-    //job.nfo.wxh = aiDoc.get_wxh();
+    //jobNfo.wxh = aiDoc.get_wxh();
 
     aiDoc.delete_layer("BG");
 
@@ -26,7 +29,7 @@ function main(report) {
 
     var printFile;
     var printSaveOpts;
-    switch (job.nfo.tech.toLowerCase()) {
+    switch (printNfo.tech.toLowerCase()) {
         case "flx":
             printFile = paths.file("flxPrintAi");
             printSaveOpts = saveOptions.workingAi();

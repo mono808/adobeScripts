@@ -941,7 +941,7 @@ MonoFilm.prototype.add_pictogram = function () {
     var pictogram = this.create_pictogram(type);
 };
 
-MonoFilm.prototype.add_jobInfo = function (job) {
+MonoFilm.prototype.add_jobInfo = function (jobNfo, printNfo) {
     this.layers.info = this.check_create_layer("infoEbene", "job");
     this.filmDoc.activeLayer = this.layers.info;
 
@@ -952,14 +952,14 @@ MonoFilm.prototype.add_jobInfo = function (job) {
     infoText.hyphenation = false;
 
     var jobString = "";
-    if (job.nfo.client && job.nfo.jobNr && job.nfo.jobName && job.nfo.printId) {
-        var printId = names.name("printId", job.nfo.printId);
+    if (jobNfo.client && jobNfo.jobNr && jobNfo.jobName && printNfo.printId) {
+        var printId = names.name("printId", printNfo.printId);
         jobString +=
-            job.nfo.client +
+            jobNfo.client +
             " | " +
-            job.nfo.jobNr +
+            jobNfo.jobNr +
             "_" +
-            job.nfo.jobName +
+            jobNfo.jobName +
             "\n" +
             printId;
     } else {
@@ -1078,7 +1078,7 @@ MonoFilm.prototype.print_direct = function () {
     this.print_to_postscript(this.filmDoc, psFile, "monoFilms");
 };
 
-MonoFilm.prototype.save = function (job, showDialog, close) {
+MonoFilm.prototype.save = function (jobNfo, showDialog, close) {
     var wxhRE = /\d{2,3}x\d{2,3}_/i;
     var saveFolder = this.sep.folder;
     var saveName = this.sep.name.substring(0, this.sep.name.lastIndexOf("."));
@@ -1086,8 +1086,8 @@ MonoFilm.prototype.save = function (job, showDialog, close) {
     saveName = saveName.replace(/_(sep|print|druck)/i, "");
     saveName += "_Film.indd";
 
-    if (job && job.nfo.jobNr && job.nfo.jobName) {
-        var jobTag = job.nfo.jobNr + "_" + job.nfo.jobName + "_";
+    if (jobNfo && jobNfo.jobNr && jobNfo.jobName) {
+        var jobTag = jobNfo.jobNr + "_" + jobNfo.jobName + "_";
         saveName = jobTag + saveName;
     }
 

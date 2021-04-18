@@ -124,11 +124,11 @@
         return rowStrings;
     };
 
-    var show_wawi_string_dialog = function (rowContents, job, copyToClipboard) {
+    var show_wawi_string_dialog = function (rowContents, jobNfo, copyToClipboard) {
         var dialogTitle;
         dialogTitle = "WaWi Infos nachtragen zu ->  ";
-        dialogTitle += job
-            ? job.nfo.jobNr + " - " + job.nfo.client
+        dialogTitle += jobNfo
+            ? jobNfo.jobNr + " - " + jobNfo.client
             : "irgendeinem bekloppten Auftrag";
 
         var win = new Window("dialog", dialogTitle);
@@ -175,14 +175,15 @@
     var MonoFilm = require("MonoFilm");
 
     var interactSwitch = require("InteractionSwitch");
+    interactSwitch.set("all");    
 
-    job.set_nfo(null, false);
-    if (!job.nfo.folder) return;
-    paths.set_nfo(job.nfo);
-    jobFolder.set_folder(job.nfo.folder);
+    if(app.documents.length > 0 && app.activeDocument) {
+        var jobNfo = job.get_jobNfo(app.activeDocument);
+    } else {
+        var jobNfo = job.get_jobNfo();
+    }
 
-    interactSwitch.set("all");
-
+    jobFolder.set_folder(jobNfo.folder);
     var ansichten = jobFolder.get_mockups();
     var filmhuelle = jobFolder.get_filmhuelle();
     var filme = jobFolder.get_filme();
@@ -282,6 +283,6 @@
     interactSwitch.set("all");
 
     if (rowContents.length > 0) {
-        show_wawi_string_dialog(rowContents, job, f_all.copyToClipboard);
+        show_wawi_string_dialog(rowContents, jobNfo, f_all.copyToClipboard);
     }
 })();

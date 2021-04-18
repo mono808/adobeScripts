@@ -2,14 +2,21 @@
 //@include "require.js"
 
 (function () {
-    var job = require("job");
     var jobFolder = require("jobFolder");
     var paths = require("paths");
     var MonoMockup = require("MonoMockup");
 
-    job.set_nfo(null, false);
-    if (!job.nfo) return;
-    paths.set_nfo(job.nfo);
+    var job = require("job");
+    var print = require("print");
+    if(app.documents.length > 0 && app.activeDocument) {
+        var jobNfo = job.get_jobNfo(app.activeDocument);
+    } else {
+        var jobNfo = job.get_jobNfo();
+    }
+    paths.set_nfo(jobNfo);
+    
+    //var printNfo = print.get_printNfo(jobNfo.ref);
+    //paths.set_nfo(printNfo);
 
     // try {
     //     app.applyWorkspace("Ansichten");
@@ -28,11 +35,11 @@
 
     mockup.save_doc(paths.file("mockUpIndd"));
 
-    mockup.show_shop_logo(job.nfo.shop);
+    mockup.show_shop_logo(jobNfo.shop);
 
-    mockup.fill_job_infos(job.nfo);
+    mockup.fill_job_infos(jobNfo);
 
-    jobFolder.set_folder(job.nfo.folder);
+    jobFolder.set_folder(jobNfo.folder);
     var monoPrints = jobFolder.get_prints();
 
     mockup.place_prints_on_page(monoPrints);

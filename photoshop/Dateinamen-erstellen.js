@@ -4,13 +4,15 @@
 function main() {
     var PsBase = require("PsBase");
     var job = require("job");
+    var print = require("print");
     var paths = require("paths");
     var saveOptions = require("saveOptions");
     var psBase = new PsBase(app.activeDocument);
 
-    job.get_job_nfo(null, true, false);
-    job.get_print_nfo(job.nfo.ref);
-    paths.set_nfo(job.nfo);
+    var jobNfo = job.get_jobNfo_from_doc(app.activeDocument);
+    var printNfo = print.get_printNfo(jobNfo.file);
+    paths.set_nfo(jobNfo);
+    paths.set_nfo(printNfo);
 
     psBase.save_doc(
         paths.file("workingPs"),

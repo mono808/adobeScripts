@@ -3,19 +3,20 @@
 
 (function () {
     var f_all = require("f_all");
-
-    var job = require("job");
     var jobFolder = require("jobFolder");
     var paths = require("paths");
     var names = require("names");
 
+    var job = require("job");
+    //var print = require("print");
+    var jobNfo = job.get_jobNfo(app.activeDocument);
+    //var printNfo = print.get_printNfo(jobNfo.ref);
+    paths.set_nfo(jobNfo);
+    //paths.set_nfo(printNfo);
+
     var MonoMockup = require("MonoMockup");
     var MonoTable = require("MonoTable");
     var saveOptions = require("saveOptions");
-
-    job.set_nfo(null, false);
-    if (!job.nfo) return;
-    paths.set_nfo(job.nfo);
 
     var monoMockup = new MonoMockup();
     monoMockup.init(app.activeDocument);

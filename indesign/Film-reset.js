@@ -8,11 +8,14 @@
     }
 
     var job = require("job");
+    var print = require("print");
     var paths = require("paths");
     var MonoFilm = require("MonoFilm");
 
-    job.set_nfo(null, false);
-    paths.set_nfo(job.nfo);
+    var jobNfo = job.get_jobNfo_from_doc(app.activeDocument);
+    var printNfo = print.get_printNfo(jobNfo.file);
+    paths.set_nfo(jobNfo);
+    paths.set_nfo(printNfo);
 
     var myDoc = app.activeDocument;
 
@@ -33,7 +36,7 @@
 
     monoFilm.add_pictogram();
 
-    monoFilm.add_jobInfo(job);
+    monoFilm.add_jobInfo(jobNfo, printNfo);
 
     monoFilm.add_spotInfo_numbered();
 
@@ -45,7 +48,7 @@
         myDoc.layers.item("motivEbene").visible = true;
     } catch (e) {}
 
-    monoFilm.save(job, true, false);
+    monoFilm.save(jobNfo, true, false);
 
     monoFilm.print(paths.path("filmIn"), paths.path("filmOut"));
 })();
