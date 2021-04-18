@@ -1,0 +1,9 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "eslint.options": {
+        "extensions": [".jsx", ".js"]
+    },
+    "eslint.validate": ["javascript", "javascriptreact", "jsx"]
+}
