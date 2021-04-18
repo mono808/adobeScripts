@@ -7,12 +7,15 @@
         return;
     }
 
-    var job = require("job");
     var paths = require("paths");
     var MonoFilm = require("MonoFilm");
 
-    job.set_nfo(null, false);
-    paths.set_nfo(job.nfo);
+//~     var job = require("job");
+//~     var print = require("print");
+//~     var jobNfo = job.get_jobNfo(app.activeDocument);
+//~     var printNfo = print.get_printNfo(jobNfo.file);
+//~     paths.set_nfo(jobNfo);
+//~     paths.set_nfo(printNfo);
 
     var myDoc = app.activeDocument;
 
