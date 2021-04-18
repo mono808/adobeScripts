@@ -1,14 +1,16 @@
 ﻿var MonoPrint = require('MonoPrint');
 var MonoFilm = require('MonoFilm');
 var MonoTextil = require('MonoTextil');
+var rE = require("rE");
 
 function MonoGraphic (myGraphic)
 {
+    if(!myGraphic) return;
     var check_folder = function (fldr) {
         var jobFolder;
         if(!fldr) return null;
         if(!fldr instanceof Folder) return null;
-        if (fldr.displayName.match(reJobNr)) {
+        if (fldr.displayName.match(rE.jobNr)) {
             jobFolder = fldr;
         } else {
             jobFolder = check_folder(fldr.parent)
