@@ -1,13 +1,96 @@
 ﻿//@target indesign
 //@include "require.js"
 
+function handlePresets (collection, pattern, modify) {
+    var preset, i = collection.length;
+    while (i--) {
+        preset = collection[i];
+        if(preset.name.indexOf(pattern) != -1) {
+            modify(preset);
+        }
+    }
+}
+
+function setPdfExportPreferences(resolution) {
+    var myFlattenerPresetName = "mockupFlattener";
+    
+    handlePresets(app.flattenerPresets, myFlattenerPresetName, function(preset) {
+        preset.remove();
+    })
+
+    flattenerPreset = app.flattenerPresets.add({
+        name: myFlattenerPresetName
+    });
+
+    flattenerPreset.rasterVectorBalance = 0;
+    flattenerPreset.lineArtAndTextResolution = 150;
+    flattenerPreset.gradientAndMeshResolution = 150;
+    flattenerPreset.convertAllTextToOutlines = false;
+    flattenerPreset.convertAllStrokesToOutlines = false;
+    flattenerPreset.clipComplexRegions = true;
+
+    var myExportPresetName = "monosPDFExportPreset";
+    handlePresets(app.pdfExportPresets, myExportPresetName, function(preset) {
+        preset.remove();
+    })
+
+    exportPreset = app.pdfExportPresets.add({
+        name: myExportPresetName
+    });
+
+    var pEP = app.pdfExportPreferences;
+    pEP.acrobatCompatibility = AcrobatCompatibility.ACROBAT_4;
+    pEP.appliedFlattenerPreset = flattenerPreset;
+    pEP.cropImagesToFrames = true;
+    pEP.exportGuidesAndGrids = false;
+    pEP.exportLayers = false;
+    pEP.exportNonprintingObjects = false;
+    pEP.generateThumbnails = true;
+    pEP.includeICCProfiles = true;
+    pEP.optimizePDF = false;
+    // pEP.pdfColorSpace = PDFColorSpace.RGB;
+    pEP.pdfColorSpace = PDFColorSpace.UNCHANGED_COLOR_SPACE;
+    pEP.viewPDF = true;
+    pEP.compressTextAndLineArt = false;
+    pEP.colorBitmapCompression = BitmapCompression.JPEG;
+    pEP.colorBitmapQuality = CompressionQuality.HIGH;
+    pEP.colorBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+    pEP.colorBitmapSamplingDPI = resolution;
+    pEP.thresholdToCompressColor = resolution*1.5;
+    pEP.grayscaleBitmapCompression = BitmapCompression.JPEG;
+    pEP.grayscaleBitmapQuality = CompressionQuality.HIGH;
+    pEP.grayscaleBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+    pEP.grayscaleBitmapSamplingDPI = resolution;
+    pEP.thresholdToCompressGray = resolution*1.5;
+    pEP.monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
+    pEP.monochromeBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
+    pEP.monochromeBitmapSamplingDPI = resolution*2;
+    pEP.thresholdToCompressMonochrome = resolution*3;
+}
+
+function setJpgExportPreferences(resolution) {
+    var jpegEP = app.jpegExportPreferences;
+    jpegEP.antiAlias = true; //	If true, use anti-aliasing for text and vectors during export.
+    jpegEP.embedColorProfile = true;
+    jpegEP.exportResolution = resolution; //range: 1 - 2400
+    jpegEP.exportingSpread = true; //	If true, exports each spread as a single JPEG file. If false, exports facing pages as separate files and appends sequential numbers to each file name.
+    jpegEP.jpegColorSpace = JpegColorSpaceEnum.RGB;
+    jpegEP.jpegExportRange = ExportRangeOrAllPages.EXPORT_ALL; // ExportRangeOrAllPages.EXPORT_RANGE
+    jpegEP.pageString = "1-3"; // The page(s) to export, specified as a page number or an array of page numbers. Note: Valid when JPEG export range is not all.
+    jpegEP.jpegQuality = JPEGOptionsQuality.HIGH; // LOW MEDIUM HIGH MAXIMUM
+    jpegEP.jpegRenderingStyle = JPEGOptionsFormat.BASELINE_ENCODING; // PROGRESSIVE_ENCODING
+    jpegEP.simulateOverprint = false; //	If true, simulates the effects of overprinting spot and process colors in the same way they would occur when printing.
+    jpegEP.useDocumentBleeds = false; //	If true, uses the document's bleed settings in the exported JPEG.
+}
+   
+
 function main() {
     var job = require("job");
     var paths = require("paths");
     var f_id = require("f_id");
 
-    job.set_nfo(null, false);
-    paths.set_nfo(job.nfo);
+//~     var jobNfo = job.get_jobNfo(app.activeDocument);
+//~     paths.set_nfo(jobNfo);
 
     var myDoc = app.activeDocument;
     var myFolder = myDoc.fullName.parent;
@@ -15,79 +98,6 @@ function main() {
     var savePath = myFolder + "/" + saveName;
     var docScale = myDoc.documentPreferences.pageWidth / 297;
     var resolution = docScale > 4.5 ? 36 : 54;
-
-    function setPdfExportPreferences() {
-        var myFlattenerPresetName = "mockupFlattener";
-
-        var flattenerPreset = app.flattenerPresets.itemByName(
-            myFlattenerPresetName
-        );
-        if (!flattenerPreset.isValid) {
-            flattenerPreset = app.flattenerPresets.add({
-                name: myFlattenerPresetName
-            });
-        }
-
-        flattenerPreset.rasterVectorBalance = FlattenerLevel.MEDIUM_LOW;
-        flattenerPreset.lineArtAndTextResolution = resolution * 2.5;
-        flattenerPreset.gradientAndMeshResolution = resolution * 2.5;
-        flattenerPreset.convertAllTextToOutlines = false;
-        flattenerPreset.convertAllStrokesToOutlines = false;
-        flattenerPreset.clipComplexRegions = true;
-
-        var myExportPresetName = "monosPDFExportPreset";
-        var exportPreset = app.pdfExportPresets.itemByName(myExportPresetName);
-        if (exportPreset.isValid) {
-            exportPreset.remove();
-        }
-        exportPreset = app.pdfExportPresets.add({
-            name: myExportPresetName
-        });
-
-        var pEP = app.pdfExportPreferences;
-        pEP.acrobatCompatibility = AcrobatCompatibility.ACROBAT_4;
-        pEP.appliedFlattenerPreset = flattenerPreset;
-        pEP.cropImagesToFrames = true;
-        pEP.exportGuidesAndGrids = false;
-        pEP.exportLayers = false;
-        pEP.exportNonprintingObjects = false;
-        pEP.generateThumbnails = true;
-        pEP.includeICCProfiles = true;
-        pEP.optimizePDF = false;
-        // pEP.pdfColorSpace = PDFColorSpace.RGB;
-        pEP.pdfColorSpace = PDFColorSpace.UNCHANGED_COLOR_SPACE;
-        pEP.viewPDF = true;
-        pEP.compressTextAndLineArt = false;
-        pEP.colorBitmapCompression = BitmapCompression.JPEG;
-        pEP.colorBitmapQuality = CompressionQuality.HIGH;
-        pEP.colorBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
-        pEP.colorBitmapSamplingDPI = resolution;
-        pEP.thresholdToCompressColor = resolution;
-        pEP.grayscaleBitmapCompression = BitmapCompression.JPEG;
-        pEP.grayscaleBitmapQuality = CompressionQuality.HIGH;
-        pEP.grayscaleBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
-        pEP.grayscaleBitmapSamplingDPI = resolution;
-        pEP.thresholdToCompressGray = resolution;
-        pEP.monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
-        pEP.monochromeBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
-        pEP.monochromeBitmapSamplingDPI = resolution * 2;
-        pEP.thresholdToCompressMonochrome = resolution * 2;
-    }
-
-    function setJpgExportPreferences() {
-        var jpegEP = app.jpegExportPreferences;
-        jpegEP.antiAlias = true; //	If true, use anti-aliasing for text and vectors during export.
-        jpegEP.embedColorProfile = true;
-        jpegEP.exportResolution = resolution; //range: 1 - 2400
-        jpegEP.exportingSpread = true; //	If true, exports each spread as a single JPEG file. If false, exports facing pages as separate files and appends sequential numbers to each file name.
-        jpegEP.jpegColorSpace = JpegColorSpaceEnum.RGB;
-        jpegEP.jpegExportRange = ExportRangeOrAllPages.EXPORT_ALL; // ExportRangeOrAllPages.EXPORT_RANGE
-        jpegEP.pageString = "1-3"; // The page(s) to export, specified as a page number or an array of page numbers. Note: Valid when JPEG export range is not all.
-        jpegEP.jpegQuality = JPEGOptionsQuality.HIGH; // LOW MEDIUM HIGH MAXIMUM
-        jpegEP.jpegRenderingStyle = JPEGOptionsFormat.BASELINE_ENCODING; // PROGRESSIVE_ENCODING
-        jpegEP.simulateOverprint = false; //	If true, simulates the effects of overprinting spot and process colors in the same way they would occur when printing.
-        jpegEP.useDocumentBleeds = false; //	If true, uses the document's bleed settings in the exported JPEG.
-    }
 
     var exportStyleDialog = function () {
         var returnValue = {
@@ -162,7 +172,7 @@ function main() {
     layerToggle.hide();
 
     if (exportStyle) {
-        exportStyle.setPreferences();
+        exportStyle.setPreferences(resolution);
         if (exportStyle.neutral) {
             var pageItemsToHide = ["csLogo", "wmeLogo", "jobFrame"];
             var pIToggle = f_id.smartPageItemsVisibilityToggle();
