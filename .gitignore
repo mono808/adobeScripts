@@ -1,7 +1,8 @@
 *.swp
-/pantones.txt
+*~
 samplescripts/**
 launch.json
-.vscode
 runscript.txt
-dev/**
+tests/output/**
+node_modules/**
+templates/

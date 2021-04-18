@@ -1,8 +1,0 @@
-﻿function reflect_props (obj) {
-    
-    var props = obj.reflect.properties;
-    props.sort(function(a,b) {return a.name < b.name});
-    for (var i = 0; i < props.length; i++) {        
-        $.writeln(props[i].name);
-    }
-}
