@@ -6,4 +6,4 @@ runscript.txt
 tests/output/**
 node_modules/**
 templates/
-adobeScripts.code-workspace
+*.code-workspace

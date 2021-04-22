@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-//@target photoshop
+////@target photoshop
 
 app.displayDialogs = DialogModes.NO;
 
@@ -102,6 +102,13 @@ function setup() {
     cmyk.black = 0;
 }
 
+function calculatePxPerCm(resolution) {  
+    var cmPerInch = UnitValue(1,'in');
+    cmPerInch.convert('cm');
+    var pixelPerCM = resolution / cmPerInch.value;
+    return pixelPerCM;   
+}
+
 function createMeasure() {
     setup();
 
@@ -111,10 +118,19 @@ function createMeasure() {
 
     var textSize = docRef.width;
     textSize.value *= 0.025;
+    
+    var pixelLength, logicalUnits, logicalLength;
+    var mS = docRef.measurementScale;
+    if(mS.logicalUnits === 'Pixel' && mS.logicalLength === 1 && mS.pixelLength === 1) {
+        pixelLength =  calculatePxPerCm (docRef.resolution);
+        logicalUnits = 'cm';
+        logicalLength = 1;
+    } else {
+        pixelLength = docRef.measurementScale.pixelLength;
+        logicalUnits = docRef.measurementScale.logicalUnits;
+        logicalLength = docRef.measurementScale.logicalLength;
+    }
 
-    var logicalUnits = docRef.measurementScale.logicalUnits;
-    var logicalLength = docRef.measurementScale.logicalLength;
-    var pixelLength = docRef.measurementScale.pixelLength;
     var logicalRatio = logicalLength / pixelLength;
 
     // =======================================================
