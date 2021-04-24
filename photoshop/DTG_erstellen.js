@@ -4,12 +4,16 @@
 (function () {
     var PsDtg = require("PsDtg");
     var saveOptions = require("saveOptions");
-    var job = require("job");
-    var paths = require("paths");
     var iaSwitch = require("interactionSwitch");
 
-    job.set_nfo(null, true);
-    paths.set_nfo(job.nfo);
+    var job = require("job");
+    var print = require("print");
+    var paths = require("paths");
+
+    var jobNfo = job.get_jobNfo_from_doc(app.activeDocument);
+    var printNfo = print.get_printNfo(jobNfo.file);
+    paths.set_nfo(jobNfo);
+    paths.set_nfo(printNfo);
 
     iaSwitch.set("none");
 
