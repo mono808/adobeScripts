@@ -189,10 +189,10 @@ function get_tex_graphic(texRect) {
 function choose_object_layers(texRect) {
     var imageTypes = ["Adobe PDF", "Photoshop"];
     var texGraphic = get_tex_graphic(texRect);
-    $.writeln("choosing object layers on " + texGraphic.constructor.name);
+    //$.writeln("choosing object layers on " + texGraphic.constructor.name);
 
     if (texGraphic.imageTypeName === "JPEG") {
-        $.writeln("switching embedded jpg with layered linked graphic");
+        //$.writeln("switching embedded jpg with layered linked graphic");
         reactivate_jpg(texRect, texGraphic);
         texGraphic = texRect.graphics[0];
     }
