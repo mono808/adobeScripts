@@ -58,10 +58,7 @@ function main() {
     function remove_pdfs(pdfs) {
         var pcroot = new Folder($.getenv("pcroot"));
         var removedCounter = 0,
-            filmOutRE = new RegExp(
-                f_all.escapeRegExp(pcroot + "/distiller/filme/out"),
-                "i"
-            );
+            filmOutRE = new RegExp(f_all.escapeRegExp(pcroot + "/distiller/filme/out"), "i");
 
         var i, pdf, pdfFile;
 
@@ -81,7 +78,7 @@ function main() {
     do {
         myPage = myDoc.pages[i];
         if (myPage.pageItems.length > 0) {
-            f_id.fitPageWidth2Art(myPage);
+            f_id.fit_page_to_art(myPage, true, true);
         } else {
             myPage.remove();
         }
@@ -104,9 +101,7 @@ function main() {
 
     myDoc.close();
     $.sleep(0000);
-    if (
-        Window.confirm("Verwendete Film-PDFs aus dem Output-Ordner entfernen?")
-    ) {
+    if (Window.confirm("Verwendete Film-PDFs aus dem Output-Ordner entfernen?")) {
         remove_pdfs(linkedPdfs);
     }
 }

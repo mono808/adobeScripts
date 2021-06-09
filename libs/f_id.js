@@ -7,23 +7,17 @@
             this.myOldBlendSpace = this.myDoc.transparencyPreferences.blendingSpace;
             switch (mode) {
                 case "fast":
-                    this.myLayoutWin.viewDisplaySetting =
-                        ViewDisplaySettings.OPTIMIZED;
-                    this.myDoc.transparencyPreferences.blendingSpace =
-                        BlendingSpace.RGB;
+                    this.myLayoutWin.viewDisplaySetting = ViewDisplaySettings.OPTIMIZED;
+                    this.myDoc.transparencyPreferences.blendingSpace = BlendingSpace.RGB;
 
                     break;
                 case "normal":
-                    this.myLayoutWin.viewDisplaySetting =
-                        ViewDisplaySettings.TYPICAL;
-                    this.myDoc.transparencyPreferences.blendingSpace =
-                        BlendingSpace.RGB;
+                    this.myLayoutWin.viewDisplaySetting = ViewDisplaySettings.TYPICAL;
+                    this.myDoc.transparencyPreferences.blendingSpace = BlendingSpace.RGB;
                     break;
                 case "quality":
-                    this.myLayoutWin.viewDisplaySetting =
-                        ViewDisplaySettings.HIGH_QUALITY;
-                    this.myDoc.transparencyPreferences.blendingSpace =
-                        BlendingSpace.RGB;
+                    this.myLayoutWin.viewDisplaySetting = ViewDisplaySettings.HIGH_QUALITY;
+                    this.myDoc.transparencyPreferences.blendingSpace = BlendingSpace.RGB;
                     break;
             }
             if (save) {
@@ -111,81 +105,73 @@
         //app.layoutWindows[0].activePage = doc.pages[0];
         app.layoutWindows[0].zoom(ZoomOptions.FIT_PAGE);
     },
-    fitPageWidth2Art: function (myPage) {
-        var newPageBounds = [];
 
-        var k,
-            //maxK = myPage.rectangles.length,
-            maxK = myPage.pageItems.length,
-            pI;
+    get_bounds_from_collection: function (collection, ignoreLocked) {
+        var collectionBounds = [];
 
-        for (k = 0; k < maxK; k += 1) {
-            pI = myPage.pageItems[k];
+        for (var k = 0; k < collection.length; k += 1) {
+            var item = collection[k];
 
-            if (!pI.locked) {
-                if (k === 0) {
-                    newPageBounds = pI.geometricBounds;
-                    continue;
-                }
+            if (ignoreLocked && item.locked) continue;
 
-                var j,
-                    maxJ = pI.geometricBounds.length,
-                    bound,
-                    newPageBound;
+            if (k === 0) {
+                collectionBounds = item.geometricBounds;
+                continue;
+            }
 
-                for (j = 0; j < maxJ; j += 1) {
-                    bound = pI.geometricBounds[j];
-                    newPageBound = newPageBounds[j];
+            var maxJ = item.geometricBounds.length;
+            var itemBound;
+            var collectionBound;
 
-                    // only checks the y coordinates, pagewidth has to remain constant
-                    if (j === 0) {
-                        if (bound < newPageBound) {
-                            newPageBounds[j] = bound;
-                        }
-                    } else if (j === 2) {
-                        if (bound > newPageBound) {
-                            newPageBounds[j] = bound;
-                        }
-                    }
+            for (var j = 0; j < maxJ; j += 1) {
+                itemBound = item.geometricBounds[j];
+                collectionBound = collectionBounds[j];
+
+                switch (j) {
+                    case 0:
+                    case 1:
+                        collectionBounds[j] = Math.min(itemBound, collectionBound);
+                        break;
+                    case 2:
+                    case 3:
+                        collectionBounds[j] = Math.max(itemBound, collectionBound);
+                        break;
                 }
             }
         }
+        return collectionBounds;
+    },
 
-        // pageWidth has to remain constant;
-        newPageBounds[1] = 0;
-        newPageBounds[3] = myPage.bounds[3];
+    fit_page_to_art: function (myPage, fitWidth, fitHeight) {
+        var collectionBounds = this.get_bounds_from_collection(myPage.pageItems, true);
+        var newPageBounds = myPage.bounds;
+
+        if (fitHeight) {
+            newPageBounds[0] = collectionBounds[0];
+            newPageBounds[2] = collectionBounds[2];
+        }
+        if (fitWidth) {
+            newPageBounds[1] = collectionBounds[1];
+            newPageBounds[3] = collectionBounds[3];
+        }
 
         this.reframeIt(myPage, newPageBounds);
     },
+
     reframeIt: function (item, newBounds) {
         var rec;
         if (item.constructor.name === "Page") {
             rec = item.rectangles.add({
-                geometricBounds: [
-                    newBounds[0],
-                    newBounds[1],
-                    newBounds[2],
-                    newBounds[3]
-                ]
+                geometricBounds: [newBounds[0], newBounds[1], newBounds[2], newBounds[3]]
             });
         } else {
             if (item.parentPage) {
                 rec = item.parentPage.rectangles.add({
-                    geometricBounds: [
-                        newBounds[0],
-                        newBounds[1],
-                        newBounds[2],
-                        newBounds[3]
-                    ]
+                    geometricBounds: [newBounds[0], newBounds[1], newBounds[2], newBounds[3]]
                 });
             } else {
                 rec = item.parent.rectangles.add({
-                    geometricBounds: [
-                        newBounds[0],
-                        newBounds[1],
-                        newBounds[2],
-                        newBounds[3]
-                    ]
+                    geometricBounds: [newBounds[0], newBounds[1], newBounds[2], newBounds[3]]
                 });
             }
         }
@@ -272,25 +258,16 @@
         return (item.geometricBounds[3] - item.geometricBounds[1]).toFixed(0);
     },
     move_item1_below_item2: function (item1, item2, distance) {
-        var xy = [
-            item1.geometricBounds[1],
-            item2.geometricBounds[2] + distance
-        ];
+        var xy = [item1.geometricBounds[1], item2.geometricBounds[2] + distance];
         item1.move(xy);
     },
     move_item1_above_item2: function (item1, item2, distance) {
         var item1Height = item1.geometricBounds[2] - item1.geometricBounds[0];
-        var xy = [
-            item1.geometricBounds[1],
-            item2.geometricBounds[0] - item1Height - distance
-        ];
+        var xy = [item1.geometricBounds[1], item2.geometricBounds[0] - item1Height - distance];
         item1.move(xy);
     },
     align_item1_vertically_to_item2: function (item1, item2) {
-        var delta = this.get_center_delta_from_bounds(
-            item2.geometricBounds,
-            item1.geometricBounds
-        );
+        var delta = this.get_center_delta_from_bounds(item2.geometricBounds, item1.geometricBounds);
         // var item1Height = item1.geometricBounds[2] - item1.geometricBounds[0];
         // var item2Height = item2.geometricBounds[2] - item2.geometricBounds[0];
 
@@ -301,10 +278,7 @@
     },
 
     center_item_on_page: function (item, page) {
-        var delta = this.get_center_delta_from_bounds(
-            page.bounds,
-            item.geometricBounds
-        );
+        var delta = this.get_center_delta_from_bounds(page.bounds, item.geometricBounds);
 
         item.move(undefined, [delta.x, delta.y]);
     },
@@ -343,23 +317,13 @@
 
         while (tF.overflows) {
             oldBounds = tF.geometricBounds;
-            newBounds = [
-                oldBounds[0],
-                oldBounds[1],
-                oldBounds[2] + 1,
-                oldBounds[3]
-            ];
+            newBounds = [oldBounds[0], oldBounds[1], oldBounds[2] + 1, oldBounds[3]];
             this.reframeIt(tF, newBounds);
         }
 
         while (!tF.overflows) {
             oldBounds = tF.geometricBounds;
-            newBounds = [
-                oldBounds[0],
-                oldBounds[1] + 1,
-                oldBounds[2],
-                oldBounds[3] - 1
-            ];
+            newBounds = [oldBounds[0], oldBounds[1] + 1, oldBounds[2], oldBounds[3] - 1];
             this.reframeIt(tF, newBounds);
         }
 
@@ -394,11 +358,9 @@
             myDPreset.bottom = myMPrefs.bottom;
             myDPreset.columnCount = myMPrefs.columnCount;
             myDPreset.columnGutter = myMPrefs.columnGutter;
-            myDPreset.documentBleedBottomOffset =
-                myDPrefs.documentBleedBottomOffset;
+            myDPreset.documentBleedBottomOffset = myDPrefs.documentBleedBottomOffset;
             myDPreset.documentBleedTopOffset = myDPrefs.documentBleedTopOffset;
-            myDPreset.documentBleedInsideOrLeftOffset =
-                myDPrefs.documentBleedInsideOrLeftOffset;
+            myDPreset.documentBleedInsideOrLeftOffset = myDPrefs.documentBleedInsideOrLeftOffset;
             myDPreset.documentBleedOutsideOrRightOffset =
                 myDPrefs.documentBleedOutsideOrRightOffset;
             myDPreset.facingPages = myDPrefs.facingPages;
@@ -409,16 +371,12 @@
             myDPreset.slugBottomOffset = myDPrefs.slugBottomOffset;
             myDPreset.slugTopOffset = myDPrefs.slugTopOffset;
             myDPreset.slugInsideOrLeftOffset = myDPrefs.slugInsideOrLeftOffset;
-            myDPreset.slugRightOrOutsideOffset =
-                myDPrefs.slugRightOrOutsideOffset;
+            myDPreset.slugRightOrOutsideOffset = myDPrefs.slugRightOrOutsideOffset;
         }
         return myDPreset;
     },
     copyStyles: function (source, dest) {
-        dest.importStyles(
-            ImportFormat.PARAGRAPH_STYLES_FORMAT,
-            source.fullName
-        );
+        dest.importStyles(ImportFormat.PARAGRAPH_STYLES_FORMAT, source.fullName);
         dest.importStyles(ImportFormat.CELL_STYLES_FORMAT, source.fullName);
         dest.importStyles(ImportFormat.TABLE_STYLES_FORMAT, source.fullName);
         dest.importStyles(ImportFormat.OBJECT_STYLES_FORMAT, source.fullName);
@@ -437,11 +395,7 @@
         dest.layers.item("Ebene 1").remove();
     },
     copyMasterPages: function (sourceDoc, destDoc) {
-        for (
-            var i = 0, maxI = sourceDoc.masterSpreads.length;
-            i < maxI;
-            i += 1
-        ) {
+        for (var i = 0, maxI = sourceDoc.masterSpreads.length; i < maxI; i += 1) {
             var mS = sourceDoc.masterSpreads[i];
             mS.duplicate(LocationOptions.AT_END, destDoc);
         }
@@ -489,9 +443,7 @@
             show: function () {
                 for (var i = 0, len = layernames.length; i < len; i++) {
                     try {
-                        app.activeDocument.layers.item(
-                            layernames[i]
-                        ).visible = true;
+                        app.activeDocument.layers.item(layernames[i]).visible = true;
                     } catch (e) {
                         continue;
                     }
@@ -548,8 +500,7 @@
             },
             reset: function () {
                 for (var i = 0, len = processedPageItems.length; i < len; i++) {
-                    processedPageItems[i].pI.visible =
-                        processedPageItems[i].oldVisibilty;
+                    processedPageItems[i].pI.visible = processedPageItems[i].oldVisibilty;
                 }
             }
         };
