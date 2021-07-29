@@ -5,12 +5,16 @@ var recentFolders = require("recentFolders");
 var rE = require("rE");
 var csroot = Folder($.getenv("csroot")).fullName;
 
+// TODO when starting without document, show list of available json files
+// TODO start with jsonfile, then only ask when job folder is not found
+
 exports.get_jobNfo = function (doc) {
     var jobNfo;
     if (doc) {
         jobNfo = exports.get_jobNfo_from_doc(doc);
     } else {
-        jobNfo = exports.get_jobNfo_from_recentFolders();
+        jobNfo = exports.get_jobNfo_from_json();
+        //jobNfo = exports.get_jobNfo_from_recentFolders();
     }
     if (jobNfo.folder) {
         recentFolders.add(jobNfo.folder);
@@ -19,17 +23,19 @@ exports.get_jobNfo = function (doc) {
 };
 
 exports.get_jobNfo_from_doc = function (doc) {
-    var jobNfo = {}, refFile, result;
+    var jobNfo = {},
+        refFile,
+        result;
 
     if (!doc) return null;
-    
-    if(doc.constructor.name == "Document") {
-        var refFile = refTool.get_ref_from_doc(doc);
+
+    if (doc.constructor.name == "Document") {
+        refFile = refTool.get_ref_from_doc(doc);
     } else if (doc.constructor.name == "File") {
         refFile = doc;
     }
     if (!refFile || refFile.constructor.name != "File") return null;
-    
+
     result = get_jobNfo_from_file(refFile);
     jobNfo = f_all.copy_props(jobNfo, result, true);
 
@@ -76,14 +82,11 @@ exports.get_jobNfo_from_json = function (jobNr) {
             ? jsonNfo.kunde.firma
             : jsonNfo.kunde.name + " " + jsonNfo.kunde.vorname;
     }
-    var match = jsonNfo.auftragsnummer.match(
-        /^\d{1,5}(a|cs|cn|eh|mt|wm)(21)(-\d\d\d)?/i
-    );
+    var match = jsonNfo.auftragsnummer.match(/^\d{1,5}(a|cs|cn|eh|mt|wm)(21)(-\d\d\d)?/i);
     var year = Number(20 + match[2]);
 
     if (!jsonNfo.referenzauftrag && year >= 2021) {
-        var jobPath =
-            csroot + "/auftragsdaten/" + year + "/" + jsonNfo.auftragsnummer;
+        var jobPath = csroot + "/auftragsdaten/" + year + "/" + jsonNfo.auftragsnummer;
         nfo.folder = Folder(jobPath);
     } else {
         //nfo.folder = get_job_folder();
