@@ -27,6 +27,8 @@ function main(report) {
     printDoc.make(printFile, printSaveOpts);
     printDoc.place_on_film(printFile, printDoc.get_sep_coordinates());
 
+    if (!Window.confirm("PreviewDatei erstellen?")) return;
+
     var previewDoc = new AiSiebdruckPreview(app.activeDocument);
     var previewFile = paths.file("previewAi");
     var previewSaveOpts = saveOptions.previewAi();
