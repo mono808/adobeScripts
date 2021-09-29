@@ -1,4 +1,5 @@
 ﻿//@include "require.js"
+//@target photoshop-120.064
 
 var buttonList = require("buttonList");
 
@@ -19,12 +20,17 @@ function modify_collection(collection, modify) {
     return collection;
 }
 
+function strip_design_name(name) {
+    return name.replace("-front", "").replace("-back", "");
+}
+
 function add_to_collection(collection, array) {
     array.forEach(function (elem) {
-        if (collection[elem.name] === undefined) {
-            collection[elem.name] = [];
+        var designName = strip_design_name(elem.name);
+        if (collection[designName] === undefined) {
+            collection[designName] = [];
         }
-        collection[elem.name].push(elem);
+        collection[designName].push(elem);
     });
     return collection;
 }
@@ -71,11 +77,11 @@ function main(export_all) {
         frontDesigns = filter_visible(frontDesigns);
         backDesigns = filter_visible(backDesigns);
         shirts = filter_visible(shirts);
-    } else {
-        hide(shirts);
-        hide(frontDesigns);
-        hide(backDesigns);
     }
+
+    hide(shirts);
+    hide(frontDesigns);
+    hide(backDesigns);
 
     add_to_collection(designCollection, frontDesigns);
     add_to_collection(designCollection, backDesigns);
@@ -92,14 +98,22 @@ function main(export_all) {
             //app.refresh();
             export_jpg(doc, jpgName);
             counter += 1;
-            if (export_all) hide([shirt]);
+            hide([shirt]);
         });
 
-        if (export_all) hide(designArray);
+        hide(designArray);
     });
+
+    //reset visibility if only visible layers have been exported
+    if (!export_all) {
+        show(shirts);
+        show(frontDesigns);
+        show(backDesigns);
+    }
 
     alert("exported " + counter + " files");
 }
+
 function get_settings() {
     var styles = ["alle Ebenen", "nur aktive Ebenen"];
     var dialogTitle = "alle Ebenen exportieren?";
