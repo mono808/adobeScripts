@@ -1,11 +1,12 @@
 ﻿//@target indesign
 //@include "require.js"
 
-function handlePresets (collection, pattern, modify) {
-    var preset, i = collection.length;
+function handlePresets(collection, pattern, modify) {
+    var preset,
+        i = collection.length;
     while (i--) {
         preset = collection[i];
-        if(preset.name.indexOf(pattern) != -1) {
+        if (preset.name.indexOf(pattern) != -1) {
             modify(preset);
         }
     }
@@ -13,12 +14,12 @@ function handlePresets (collection, pattern, modify) {
 
 function setPdfExportPreferences(resolution) {
     var myFlattenerPresetName = "mockupFlattener";
-    
-    handlePresets(app.flattenerPresets, myFlattenerPresetName, function(preset) {
-        preset.remove();
-    })
 
-    flattenerPreset = app.flattenerPresets.add({
+    handlePresets(app.flattenerPresets, myFlattenerPresetName, function (preset) {
+        preset.remove();
+    });
+
+    var flattenerPreset = app.flattenerPresets.add({
         name: myFlattenerPresetName
     });
 
@@ -30,13 +31,13 @@ function setPdfExportPreferences(resolution) {
     flattenerPreset.clipComplexRegions = true;
 
     var myExportPresetName = "monosPDFExportPreset";
-    handlePresets(app.pdfExportPresets, myExportPresetName, function(preset) {
+    handlePresets(app.pdfExportPresets, myExportPresetName, function (preset) {
         preset.remove();
-    })
-
-    exportPreset = app.pdfExportPresets.add({
-        name: myExportPresetName
     });
+
+    // var exportPreset = app.pdfExportPresets.add({
+    //     name: myExportPresetName
+    // });
 
     var pEP = app.pdfExportPreferences;
     pEP.acrobatCompatibility = AcrobatCompatibility.ACROBAT_4;
@@ -56,16 +57,16 @@ function setPdfExportPreferences(resolution) {
     pEP.colorBitmapQuality = CompressionQuality.HIGH;
     pEP.colorBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
     pEP.colorBitmapSamplingDPI = resolution;
-    pEP.thresholdToCompressColor = resolution*1.5;
+    pEP.thresholdToCompressColor = resolution * 1.5;
     pEP.grayscaleBitmapCompression = BitmapCompression.JPEG;
     pEP.grayscaleBitmapQuality = CompressionQuality.HIGH;
     pEP.grayscaleBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
     pEP.grayscaleBitmapSamplingDPI = resolution;
-    pEP.thresholdToCompressGray = resolution*1.5;
+    pEP.thresholdToCompressGray = resolution * 1.5;
     pEP.monochromeBitmapCompression = MonoBitmapCompression.CCIT4;
     pEP.monochromeBitmapSampling = Sampling.BICUBIC_DOWNSAMPLE;
-    pEP.monochromeBitmapSamplingDPI = resolution*2;
-    pEP.thresholdToCompressMonochrome = resolution*3;
+    pEP.monochromeBitmapSamplingDPI = resolution * 2;
+    pEP.thresholdToCompressMonochrome = resolution * 3;
 }
 
 function setJpgExportPreferences(resolution) {
@@ -82,15 +83,14 @@ function setJpgExportPreferences(resolution) {
     jpegEP.simulateOverprint = false; //	If true, simulates the effects of overprinting spot and process colors in the same way they would occur when printing.
     jpegEP.useDocumentBleeds = false; //	If true, uses the document's bleed settings in the exported JPEG.
 }
-   
 
 function main() {
     var job = require("job");
     var paths = require("paths");
     var f_id = require("f_id");
 
-//~     var jobNfo = job.get_jobNfo(app.activeDocument);
-//~     paths.set_nfo(jobNfo);
+    //~     var jobNfo = job.get_jobNfo(app.activeDocument);
+    //~     paths.set_nfo(jobNfo);
 
     var myDoc = app.activeDocument;
     var myFolder = myDoc.fullName.parent;
@@ -109,27 +109,11 @@ function main() {
         var win = new Window("dialog", "Neutral Ansicht erstellen?", undefined);
         this.windowRef = win;
         win.presetGroup = win.add("group", undefined, "presetGroup");
-        win.presetGroup.pdfButton = win.presetGroup.add(
-            "button",
-            [15, 15, 115, 45],
-            "pdf"
-        );
-        win.presetGroup.jpgButton = win.presetGroup.add(
-            "button",
-            [130, 15, 230, 45],
-            "jpg"
-        );
+        win.presetGroup.pdfButton = win.presetGroup.add("button", [15, 15, 115, 45], "pdf");
+        win.presetGroup.jpgButton = win.presetGroup.add("button", [130, 15, 230, 45], "jpg");
         win.styleGroup = win.add("group", undefined, "styleGroup");
-        win.styleGroup.normalBtn = win.styleGroup.add(
-            "button",
-            [15, 15, 115, 45],
-            "Normal"
-        );
-        win.styleGroup.neutralBtn = win.styleGroup.add(
-            "button",
-            [130, 15, 230, 45],
-            "NEUTRAL"
-        );
+        win.styleGroup.normalBtn = win.styleGroup.add("button", [15, 15, 115, 45], "Normal");
+        win.styleGroup.neutralBtn = win.styleGroup.add("button", [130, 15, 230, 45], "NEUTRAL");
         // Register event listeners that define the button behavior
         win.presetGroup.pdfButton.onClick = function () {
             returnValue.exportFormat = ExportFormat.PDF_TYPE;
@@ -168,6 +152,7 @@ function main() {
 
     if (!exportStyle) return;
 
+    //if (exportStyle.saveFile.exists)
     var layerToggle = f_id.layerToggle(["Intern", "HL"]);
     layerToggle.hide();
 
