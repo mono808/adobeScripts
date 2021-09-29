@@ -30,17 +30,9 @@
         var monoFilm = new MonoFilm();
         monoFilm.create_template();
         var sepFile = monoGraphic.get_file("print");
-        var width = monoGraphic.get_width();
-        var height = monoGraphic.get_height();
-        var deltaX = monoGraphic.get_placement().deltaX;
-        var rotation = monoGraphic.get_rotationAngle();
-        monoFilm.place_sep(
-            sepFile,
-            width,
-            height,
-            deltaX,
-            rotation
-        );
+        var sepPos = monoGraphic.get_placement();
+
+        monoFilm.place_sep(sepFile, sepPos.width, sepPos.height, sepPos.deltaX, sepPos.rotation);
         monoFilm.get_sep_type();
         monoFilm.add_centermarks();
         monoFilm.add_pictogram();
