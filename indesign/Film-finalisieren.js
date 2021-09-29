@@ -26,9 +26,10 @@
         return;
     }
 
-    try {
-        myDoc.layers.item("motivEbene").visible = false;
-    } catch (e) {}
+    var motivLayer = myDoc.layers.item("motivEbene");
+    if (motivLayer.isValid) {
+        motivLayer.visible = false;
+    }
 
     monoFilm.add_centermarks();
 
@@ -42,18 +43,18 @@
 
     monoFilm.resize_page();
 
-    try {
-        myDoc.layers.item("motivEbene").visible = true;
-    } catch (e) {}
-
-    monoFilm.save(jobNfo, true, false);
+    //monoFilm.save(jobNfo, true, false);
 
     var paths = require("paths");
     var scriptName = "indesign/Passer-erstellen.js";
     var scriptFile = new File(paths.pcroot + "/adobescripts/" + scriptName);
     app.doScript(scriptFile);
 
-    //monoFilm.save(jobNfo, true, false);
+    if (motivLayer.isValid) {
+        motivLayer.visible = true;
+    }
+    monoFilm.save(jobNfo, true, false);
 
+    $.sleep(500);
     monoFilm.print(paths.path("filmIn"), paths.path("filmOut"));
 })();
