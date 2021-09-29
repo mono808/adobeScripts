@@ -28,10 +28,20 @@ var inddFiles = jobFiles.filter(function (file) {
     return file.displayName.indexOf(".indd") > -1;
 });
 
+function create_path_msg(aFile) {
+    var arr = aFile.fsName.split("\\");
+    var msg = arr.pop();
+    msg += "\n\n";
+    msg += arr.join("\n");
+
+    return msg;
+}
+
 inddFiles.forEach(function (inddFile) {
-    var inddFileStrings = inddFile.fsName.split("\\");
-    var multiLinePath = inddFileStrings.join("\n");
-    if (!Window.confirm("Do you want to update the links in:" + multiLinePath)) return;
+    var msg = "Do you want to update the links in:\n\n";
+    msg += create_path_msg(inddFile);
+
+    if (!Window.confirm(msg)) return;
     var myDoc = app.open(inddFile);
     var myLinks = make_array(myDoc.links);
 
@@ -40,11 +50,13 @@ inddFiles.forEach(function (inddFile) {
             return elem.displayName == link.name;
         });
         if (localFile) {
-            var fileStrings = localFile.fsName.split("\\");
-            var msg = "Do you want to relink '" + link.name + "' to:";
-            msg += "\n\n";
-            msg += fileStrings.join("\n");
-            if (Window.confirm(msg)) link.relink(localFile);
+            // var msg = "Do you want to relink '" + link.name + "' to:\n\n";
+            // msg += create_path_msg(localFile);
+            // if (Window.confirm(msg)) {
+            link.relink(localFile);
+            // };
+        } else {
+            Window.alert("cant find a local file for " + link.name);
         }
     });
     myDoc.save();

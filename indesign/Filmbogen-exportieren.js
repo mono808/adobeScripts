@@ -28,26 +28,20 @@ function main() {
     }
 
     function generate_array_of_pdf_names(pdfs) {
-        var i,
-            maxI,
-            pdf,
-            tempRegEx,
-            namesArray = [],
-            pdfName,
-            shorty;
+        var namesArray = [];
 
-        for (i = 0, maxI = pdfs.length; i < maxI; i += 1) {
-            pdf = pdfs[i];
+        for (var i = 0, maxI = pdfs.length; i < maxI; i += 1) {
+            var pdf = pdfs[i];
             var filename = pdf.split("\\").pop();
             var jobNrResults = rE.jobNrShort.exec(filename);
             if (jobNrResults && jobNrResults.length > 0) {
-                pdfName = jobNrResults[0];
-                pdfName = rE.jobNrVeryShort.exec(pdfName)[0];
+                var pdfName = jobNrResults[0];
+                //pdfName = rE.jobNrVeryShort.exec(pdfName)[0];
             } else {
                 pdfName = filename.substring(0, filename.lastIndexOf("."));
             }
 
-            tempRegEx = new RegExp(String(pdfName));
+            var tempRegEx = new RegExp(String(pdfName));
             if (!tempRegEx.test(namesArray)) {
                 namesArray.push(pdfName);
             }
