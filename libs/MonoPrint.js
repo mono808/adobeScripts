@@ -1,11 +1,7 @@
 ﻿function MonoPrint(aFile, baseFolder) {
     this.get_tag = function (aFile) {
         var match = aFile.displayName.match(tagRegEx);
-        if (!match)
-            return aFile.displayName.substring(
-                0,
-                aFile.displayName.lastIndexOf(".")
-            );
+        if (!match) return aFile.displayName.substring(0, aFile.displayName.lastIndexOf("."));
         var tag = (this.id = match[1]);
         if (match[3]) {
             tag += match[2];
@@ -63,32 +59,19 @@
     if (printsFolder == undefined)
         printsFolder = this.tech ? "druckdaten-" + this.tech : "druckdaten";
 
-    if (!this.print)
-        this.print = this.get_tagged_files(printsFolder, this.tag + "*");
-    if (!this.print)
-        this.print = this.choose_file_manually(
-            "Choose PrintFile to " + aFile.name
-        );
+    if (!this.print) this.print = this.get_tagged_files(printsFolder, this.tag + "*");
+    if (!this.print) this.print = this.choose_file_manually("Choose PrintFile to " + aFile.name);
 
-    if (!this.preview)
-        this.preview = this.get_tagged_files(
-            "previews",
-            this.tag + "_Preview.*"
-        );
-    if (!this.preview)
-        this.preview = this.choose_file_manually(
-            "Choose PreviewFile to " + aFile.name
-        );
+    if (!this.preview) this.preview = this.get_tagged_files("previews", this.tag + "_Preview.*");
+    // if (!this.preview)
+    //     this.preview = this.choose_file_manually(
+    //         "Choose PreviewFile to " + aFile.name
+    //     );
 
     if (this.tech == "SD" && !this.film)
-        this.film = this.get_tagged_files(
-            "druckdaten-sd",
-            "*" + this.tag + "_Film.indd"
-        );
+        this.film = this.get_tagged_files("druckdaten-sd", "*" + this.tag + "_Film.indd");
     if (this.tech == "SD" && !this.film)
-        this.film = this.choose_file_manually(
-            "Choose Film.indd to " + aFile.name
-        );
+        this.film = this.choose_file_manually("Choose Film.indd to " + aFile.name);
 
     this.working = this.get_tagged_files("working", this.tag + "_Working.*");
 }
