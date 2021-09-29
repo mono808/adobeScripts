@@ -1,4 +1,4 @@
-﻿//@target photoshop
+﻿//@target photoshop-120.064
 //@include "require.js"
 
 (function () {
@@ -11,15 +11,22 @@
     var paths = require("paths");
 
     var jobNfo = job.get_jobNfo_from_doc(app.activeDocument);
-    var printNfo = print.get_printNfo(jobNfo.file);
-    paths.set_nfo(jobNfo);
-    paths.set_nfo(printNfo);
+    
+    var saveFile; 
+    
+    if(jobNfo) {
+        var printNfo = print.get_printNfo(jobNfo.file);
+        paths.set_nfo(jobNfo);
+        paths.set_nfo(printNfo);
+        saveFile = paths.file("dtgPrintTif");
+        
+    } else {        
+        saveFile = File.saveDialog();
+    }
 
     iaSwitch.set("none");
 
     var psDtg = new PsDtg(app.activeDocument);
-
-    var saveFile = paths.file("dtgPrintTif");
     var saveOpts = saveOptions.dtgPrintPsTif();
     psDtg.make(saveFile, saveOpts);
 
