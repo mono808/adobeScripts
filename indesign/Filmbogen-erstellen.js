@@ -2,7 +2,6 @@
 //@include "require.js"
 
 function main() {
-    var f_all = require("f_all");
     var paths = require("paths");
 
     var f = {
@@ -15,7 +14,6 @@ function main() {
                     pageCounter = 1,
                     nrOfPages = [],
                     pI,
-                    rec,
                     pdf,
                     pdfPageNr,
                     myStartPage,
@@ -66,46 +64,38 @@ function main() {
 
         create_rollen_doc: function (docSize) {
             var myDocPreset = app.documentPresets.item("filmRollePreset");
-            try {
-                var myPresetName = myDocPreset.name;
-            } catch (myError) {
+            if (!myDocPreset.isValid) {
                 myDocPreset = app.documentPresets.add({
                     name: "filmRollePreset"
                 });
             }
 
-            with (myDocPreset) {
-                facingPages = false;
-                pageHeight = docSize.h;
-                pageWidth = docSize.w;
-                top = 0;
-                left = 0;
-                bottom = 0;
-                right = 0;
-            }
+            myDocPreset.facingPages = false;
+            myDocPreset.pageHeight = docSize.h;
+            myDocPreset.pageWidth = docSize.w;
+            myDocPreset.top = 0;
+            myDocPreset.left = 0;
+            myDocPreset.bottom = 0;
+            myDocPreset.right = 0;
 
-            var myDoc = app.documents.add(true, myDocPreset, {}),
-                myPage = myDoc.pages.item(0),
-                myDocument = app.activeDocument;
+            var myDoc = app.documents.add(true, myDocPreset, {});
+            var myDocument = app.activeDocument;
 
-            with (myDocument.viewPreferences) {
-                horizontalMeasurementUnits = MeasurementUnits.millimeters;
-                verticalMeasurementUnits = MeasurementUnits.millimeters;
-                rulerOrigin = RulerOrigin.pageOrigin;
-            }
+            var viewPrefs = myDocument.viewPreferences;
+            viewPrefs.horizontalMeasurementUnits = MeasurementUnits.millimeters;
+            viewPrefs.verticalMeasurementUnits = MeasurementUnits.millimeters;
+            viewPrefs.rulerOrigin = RulerOrigin.pageOrigin;
 
-            with (myDoc.documentPreferences) {
-                pageOrientation = PageOrientation.PORTRAIT;
-                pagesPerDocument = 1;
-            }
+            var docPrefs = myDoc.documentPreferences;
+            docPrefs.pageOrientation = PageOrientation.PORTRAIT;
+            docPrefs.pagesPerDocument = 1;
 
-            with (myDoc.textDefaults) {
-                appliedFont = app.fonts.item("Myriad Pro");
-                justification = Justification.CENTER_ALIGN;
-                pointSize = 11;
-                leading = 11;
-                hyphenation = false;
-            }
+            var textDefs = myDoc.textDefaults;
+            textDefs.appliedFont = app.fonts.item("Myriad Pro");
+            textDefs.justification = Justification.CENTER_ALIGN;
+            textDefs.pointSize = 11;
+            textDefs.leading = 11;
+            textDefs.hyphenation = false;
 
             // remove default Swatches
             var i, swatch;
@@ -128,45 +118,26 @@ function main() {
 
             // erstelle haarlinie am rand der filmrolle
 
-            function make_haarlinie(p1, p2) {
-                var mPage = myDoc.masterSpreads
-                    .item("A-Musterseite")
-                    .pages.item(0);
-                var myLine = mPage.graphicLines.add(
-                    hilfsLayer,
-                    LocationOptions.AT_BEGINNING
-                );
+            // function make_haarlinie(p1, p2) {
+            //     var mPage = myDoc.masterSpreads.item("A-Musterseite").pages.item(0);
+            //     var myLine = mPage.graphicLines.add(hilfsLayer, LocationOptions.AT_BEGINNING);
 
-                with (myLine) {
-                    paths.item(0).pathPoints.item(0).anchor = p1;
-                    paths.item(0).pathPoints.item(1).anchor = p2;
-                    strokeWeight = 2;
-                    strokeColor = myDoc.swatches.item("Registration");
-                }
-            }
+            //     myLine.paths.item(0).pathPoints.item(0).anchor = p1;
+            //     myLine.paths.item(0).pathPoints.item(1).anchor = p2;
+            //     myLine.strokeWeight = 2;
+            //     myLine.strokeColor = myDoc.swatches.item("Registration");
+            // }
 
-            var r1 = [
-                myDoc.masterSpreads.item("A-Musterseite").pages.item(0)
-                    .bounds[3],
-                0
-            ];
-            var r2 = [
-                myDoc.masterSpreads.item("A-Musterseite").pages.item(0)
-                    .bounds[3],
-                myDoc.masterSpreads.item("A-Musterseite").pages.item(0)
-                    .bounds[2]
-            ];
-            var l1 = [
-                myDoc.masterSpreads.item("A-Musterseite").pages.item(0)
-                    .bounds[1],
-                0
-            ];
-            var l2 = [
-                myDoc.masterSpreads.item("A-Musterseite").pages.item(0)
-                    .bounds[0],
-                myDoc.masterSpreads.item("A-Musterseite").pages.item(0)
-                    .bounds[2]
-            ];
+            // var r1 = [myDoc.masterSpreads.item("A-Musterseite").pages.item(0).bounds[3], 0];
+            // var r2 = [
+            //     myDoc.masterSpreads.item("A-Musterseite").pages.item(0).bounds[3],
+            //     myDoc.masterSpreads.item("A-Musterseite").pages.item(0).bounds[2]
+            // ];
+            // var l1 = [myDoc.masterSpreads.item("A-Musterseite").pages.item(0).bounds[1], 0];
+            // var l2 = [
+            //     myDoc.masterSpreads.item("A-Musterseite").pages.item(0).bounds[0],
+            //     myDoc.masterSpreads.item("A-Musterseite").pages.item(0).bounds[2]
+            // ];
 
             // make_haarlinie(r1,r2);
             // make_haarlinie(l1,l2);
