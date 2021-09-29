@@ -24,6 +24,7 @@ function show_dialog() {
     win.setPnl.aussen = win.setPnl.add("button", undefined, "aussen");
     win.setPnl.quer = win.setPnl.add("button", undefined, "quer");
     win.setPnl.hoch = win.setPnl.add("button", undefined, "hoch");
+    win.setPnl.hoch = win.setPnl.add("button", undefined, "ohne");
 
     win.setPnl.center.onClick = function () {
         result = "center";
@@ -39,6 +40,10 @@ function show_dialog() {
     };
     win.setPnl.hoch.onClick = function () {
         result = "hoch";
+        win.close();
+    };
+    win.setPnl.hoch.onClick = function () {
+        result = "ohne";
         win.close();
     };
 
@@ -85,12 +90,8 @@ function initSidePasser(passerLayout, passerSettings) {
     var passerArray = [];
     passerArray.push(new Passer(pB.left, pB.top, "lefttop", passerSettings));
     passerArray.push(new Passer(pB.right, pB.top, "righttop", passerSettings));
-    passerArray.push(
-        new Passer(pB.left, pB.bottom, "leftbottom", passerSettings)
-    );
-    passerArray.push(
-        new Passer(pB.right, pB.bottom, "rightbottom", passerSettings)
-    );
+    passerArray.push(new Passer(pB.left, pB.bottom, "leftbottom", passerSettings));
+    passerArray.push(new Passer(pB.right, pB.bottom, "rightbottom", passerSettings));
 
     return passerArray;
 }
@@ -171,8 +172,7 @@ function draw_passer(passer) {
 }
 
 exports.add_passer = function () {
-    var oldXUnits =
-        app.activeDocument.viewPreferences.horizontalMeasurementUnits;
+    var oldXUnits = app.activeDocument.viewPreferences.horizontalMeasurementUnits;
     var oldYUnits = app.activeDocument.viewPreferences.verticalMeasurementUnits;
     var myDoc = app.activeDocument;
 
@@ -194,10 +194,8 @@ exports.add_passer = function () {
         return;
     }
 
-    app.activeDocument.viewPreferences.horizontalMeasurementUnits =
-        MeasurementUnits.millimeters;
-    app.activeDocument.viewPreferences.verticalMeasurementUnits =
-        MeasurementUnits.millimeters;
+    app.activeDocument.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.millimeters;
+    app.activeDocument.viewPreferences.verticalMeasurementUnits = MeasurementUnits.millimeters;
 
     var i, maxI, passerArray;
 
@@ -214,6 +212,8 @@ exports.add_passer = function () {
         case "aussen":
             passerArray = initSidePasser("aussen", sidePasserSettings);
             break;
+        case "ohne":
+            passerArray = [];
     }
 
     for (i = 0, maxI = passerArray.length; i < maxI; i += 1) {
