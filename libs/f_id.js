@@ -1,4 +1,24 @@
 ﻿var _id = {
+    add_cmyk_color: function (colorValues) {
+        var doc = app.activeDocument;
+        var name = "C=" + colorValues[0];
+        name += " M=" + colorValues[1];
+        name += " Y=" + colorValues[2];
+        name += " K=" + colorValues[3];
+
+        var color = doc.colors.item(name);
+        if (!color.isValid) {
+            var props = {
+                space: ColorSpace.CMYK,
+                model: ColorModel.PROCESS,
+                colorValues: colorValues,
+                name: name
+            };
+            color = doc.colors.add(props);
+        }
+        return color;
+    },
+
     viewPrefSwitch: {
         set: function (mode, save) {
             this.myDoc = app.activeDocument;
