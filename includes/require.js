@@ -32,7 +32,7 @@
  * //@include "es6.jsxinc"
  */
 
-$.level = 0;
+$.level = 1;
 
 (function (root) {
     var require = (root.require = function require(id) {
