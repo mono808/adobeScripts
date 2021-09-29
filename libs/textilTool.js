@@ -6,14 +6,11 @@ var csroot = Folder($.getenv("csroot")).fullName;
 var ignoreBridge = /^(?!.*(\.bridge)).*$/i;
 var fixedLayerNames = ["Shirt", "Naht", "Tasche", "Beutel", "Hintergrund"];
 var listAlways = "front|back|left|right|side";
-var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
+//var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
+var texRoot = new Folder("/c/textilien");
 
 function place_image(args) {
-    var placedItemsArray = args.placeTo.place(
-        args.image,
-        undefined,
-        args.layer
-    );
+    var placedItemsArray = args.placeTo.place(args.image, undefined, args.layer);
     if (placedItemsArray) {
         return placedItemsArray[0];
     }
@@ -147,6 +144,7 @@ function flatten_textile(texRect) {
     return texRect;
 }
 
+// TODO reactivate jpg when trying to edit original
 function reactivate_jpg(texRect) {
     var texGraphic = get_tex_graphic(texRect);
     var sourcePath = get_sourcePath(texGraphic);
@@ -177,10 +175,7 @@ function reactivate_jpg(texRect) {
 
 function get_tex_graphic(texRect) {
     var texGraphic = null;
-    if (
-        texRect.constructor.name === "Rectangle" &&
-        texRect.graphics.length > 0
-    ) {
+    if (texRect.constructor.name === "Rectangle" && texRect.graphics.length > 0) {
         texGraphic = texRect.graphics[0];
     }
     return texGraphic;
@@ -198,9 +193,7 @@ function choose_object_layers(texRect) {
     }
 
     if (!imageTypes.includes(texGraphic.imageTypeName)) {
-        $.writeln(
-            "cant choose object layers on " + texGraphic.constructor.name
-        );
+        $.writeln("cant choose object layers on " + texGraphic.constructor.name);
         return null;
     }
 
@@ -235,13 +228,11 @@ function toggle_graphicLayers(texRect, visibleLayerNames) {
         if (visibleLayerNames.includes(gL.name)) {
             if (gL.currentVisibility) continue;
             gL.currentVisibility = true;
-            if (!gLO.isValid)
-                gLO = texRect.graphics.item(0).graphicLayerOptions;
+            if (!gLO.isValid) gLO = texRect.graphics.item(0).graphicLayerOptions;
         } else {
             if (!gL.currentVisibility) continue;
             gL.currentVisibility = false;
-            if (!gLO.isValid)
-                gLO = texRect.graphics.item(0).graphicLayerOptions;
+            if (!gLO.isValid) gLO = texRect.graphics.item(0).graphicLayerOptions;
         }
     }
     texRect.visible = true;
@@ -249,7 +240,7 @@ function toggle_graphicLayers(texRect, visibleLayerNames) {
 }
 
 function add_tex_rect() {
-    var rectBounds = [0, 0, 800, 600];
+    var rectBounds = [0, 0, 400, 300];
     var rect = app.activeWindow.activePage.rectangles.add({
         geometricBounds: rectBounds,
         contentType: ContentType.GRAPHIC_TYPE,
