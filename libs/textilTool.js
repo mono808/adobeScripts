@@ -6,8 +6,10 @@ var csroot = Folder($.getenv("csroot")).fullName;
 var ignoreBridge = /^(?!.*(\.bridge)).*$/i;
 var fixedLayerNames = ["Shirt", "Naht", "Tasche", "Beutel", "Hintergrund"];
 var listAlways = "front|back|left|right|side";
-//var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
 var texRoot = new Folder("/c/textilien");
+if (!texRoot.exists) {
+    texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
+}
 
 function place_image(args) {
     var placedItemsArray = args.placeTo.place(args.image, undefined, args.layer);
@@ -45,8 +47,9 @@ function place_textile_graphic(myRect) {
 
     if (!textile) return;
 
+    var placedImage;
     if (!myRect) {
-        var placedImage = place_image({
+        placedImage = place_image({
             placeTo: doc.layoutWindows[0].activePage,
             image: textile,
             layer: texLayer
@@ -59,7 +62,7 @@ function place_textile_graphic(myRect) {
         frameFitOpts.fittingOnEmptyFrame = EmptyFrameFittingOptions.NONE;
         frameFitOpts.autoFit = false;
 
-        place_image({
+        placedImage = place_image({
             placeTo: myRect,
             image: textile,
             layer: texLayer
@@ -144,7 +147,6 @@ function flatten_textile(texRect) {
     return texRect;
 }
 
-// TODO reactivate jpg when trying to edit original
 function reactivate_jpg(texRect) {
     var texGraphic = get_tex_graphic(texRect);
     var sourcePath = get_sourcePath(texGraphic);
@@ -261,8 +263,9 @@ function Textil(rect) {
     this.rect = rect || add_tex_rect();
 
     if (this.rect.allGraphics.length === 0) {
-        place_textile_graphic(this.rect);
+        var placedImage = place_textile_graphic(this.rect);
     }
+    if (!placedImage) return null;
 
     this.textil = this.rect.allGraphics[0];
     this.layers = choose_object_layers(this.rect);
@@ -296,10 +299,12 @@ function handleSelection(textilArray, func) {
 function init_textils(selection) {
     var textils = [];
     if (selection.length == 0) {
-        textils.push(new Textil());
+        var textil = new Textil();
+        if (textil) textils.push(textil);
     } else {
-        selection.forEach(function (sel) {
-            textils.push(new Textil(sel));
+        selection.forEach(function (selectionItem) {
+            var textil = new Textil(selectionItem);
+            if (textil) textils.push(textil);
         });
     }
     return textils;
