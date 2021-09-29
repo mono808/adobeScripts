@@ -1,7 +1,7 @@
-﻿ //@target illustrator
+﻿//@target illustrator
 //@include "require.js"
 
-function main(report) {
+(function () {
     var f_all = require("f_all");
     var AiBase = require("AiBase");
     var job = require("job");
@@ -35,6 +35,7 @@ function main(report) {
             printSaveOpts = saveOptions.workingAi();
             break;
         case "flo":
+            printFile = paths.file("floPrintAi");
             printSaveOpts = saveOptions.workingAi();
             break;
         case "dtax":
@@ -69,6 +70,4 @@ function main(report) {
     aiDoc.save_doc(previewFile, previewSaveOpts, false);
 
     app.open(printFile);
-}
-
-main();
+})();
