@@ -32,13 +32,13 @@ MonoSep.prototype.resize = function (newWidth, newHeight, rotationAngle) {
 MonoSep.prototype.get_width = function () {
     return (
         this.graphic.geometricBounds[3] - this.graphic.geometricBounds[1]
-    ).toFixed(0);
+    );
 };
 
 MonoSep.prototype.get_height = function () {
     return (
         this.graphic.geometricBounds[2] - this.graphic.geometricBounds[0]
-    ).toFixed(0);
+    );
 };
 
 MonoSep.prototype.get_spots = function () {
