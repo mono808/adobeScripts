@@ -1,7 +1,18 @@
 ﻿//@target illustrator
 //@include "require.js"
 
-function main(report) {
+(function () {
+    
+    if (app.documents.length < 1) {
+        alert("Please open a document first");
+        return;
+    }
+
+    if (app.activeDocument.colorProfileName === "") {
+        alert("Please assign a color profile!");
+        return;
+    }
+
     var job = require("job");
     var print = require("print");
     var paths = require("paths");
@@ -33,8 +44,4 @@ function main(report) {
     var previewFile = paths.file("previewAi");
     var previewSaveOpts = saveOptions.previewAi();
     previewDoc.make(previewFile, previewSaveOpts);
-}
-
-if (app.documents.length > 0) {
-    main();
-}
+})()
