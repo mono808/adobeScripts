@@ -262,8 +262,11 @@ function Textil(rect) {
 
     this.rect = rect || add_tex_rect();
 
+    var placedImage;
     if (this.rect.allGraphics.length === 0) {
-        var placedImage = place_textile_graphic(this.rect);
+        placedImage = place_textile_graphic(this.rect);
+    } else {
+        placedImage = this.rect.allGraphics[0];
     }
     if (!placedImage) return null;
 
