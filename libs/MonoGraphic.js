@@ -295,37 +295,35 @@ function MonoGraphic(myGraphic) {
             if (!jobFolder) jobFolder = check_folder(myFolder);
             if (!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
 
-            if (monoPrint.tech) {
-                switch (monoPrint.tech.toUpperCase()) {
-                    case "SD":
-                        if (monoPrint.film) {
-                            var monoFilm = new MonoFilm(monoPrint.film);
-                            result = monoFilm.get_sepPos();
-                            monoFilm.filmDoc.close(SaveOptions.NO);
-                        }
-                        break;
-                    default:
-                        switch (fileExtension) {
-                            case ".psd":
-                            case ".tif":
-                                result = bridgeTalker(
-                                    "photoshop-120.064",
-                                    new File("/c/monodev/adobescripts/photoshop/get-doc-infos.js"),
-                                    new File(monoPrint.print)
-                                );
-                                break;
-                            case ".ai":
-                                result = bridgeTalker(
-                                    "illustrator",
-                                    new File(
-                                        "/c/monodev/adobescripts/illustrator/get-doc-infos.js"
-                                    ),
-                                    new File(monoPrint.print)
-                                );
-                                break;
-                        }
-                }
+            if (!monoPrint.tech) monoPrint.tech = "default";
+            switch (monoPrint.tech.toLowerCase()) {
+                case "sd":
+                    if (monoPrint.film) {
+                        var monoFilm = new MonoFilm(monoPrint.film);
+                        result = monoFilm.get_sepPos();
+                        monoFilm.filmDoc.close(SaveOptions.NO);
+                    }
+                    break;
+                case "default":
+                    switch (fileExtension) {
+                        case ".psd":
+                        case ".tif":
+                            result = bridgeTalker(
+                                "photoshop-120.064",
+                                new File("/c/monodev/adobescripts/photoshop/get-doc-infos.js"),
+                                new File(monoPrint.print)
+                            );
+                            break;
+                        case ".ai":
+                            result = bridgeTalker(
+                                "illustrator",
+                                new File("/c/monodev/adobescripts/illustrator/get-doc-infos.js"),
+                                new File(monoPrint.print)
+                            );
+                            break;
+                    }
             }
+
             return result;
         },
 
