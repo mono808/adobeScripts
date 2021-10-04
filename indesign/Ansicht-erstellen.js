@@ -13,6 +13,7 @@
     } else {
         var jobNfo = job.get_jobNfo();
     }
+    if(!jobNfo) return;
     paths.set_nfo(jobNfo);
     
     //var printNfo = print.get_printNfo(jobNfo.ref);

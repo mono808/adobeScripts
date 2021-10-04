@@ -67,7 +67,7 @@ MonoMockup.prototype.import_empty_template = function () {
 
 MonoMockup.prototype.create_mockupDoc = function () {
     var retArray = typeahead.show_dialog(this.templates, "type", false);
-    this.template = retArray[0] ? retArray[0] : null;
+    this.template = retArray && retArray[0] ? retArray[0] : null;
 
     if (!this.template) return null;
     this.templateDoc = app.open(this.template.file);
