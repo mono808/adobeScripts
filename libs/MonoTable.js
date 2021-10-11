@@ -26,14 +26,9 @@ function MonoTable(initPage) {
 
         //~         var index = getIndex(myColumn);
 
-        for (
-            var i = myColumn.index + 1, maxI = myTable.columns.length;
-            i < maxI;
-            i += 1
-        ) {
+        for (var i = myColumn.index + 1, maxI = myTable.columns.length; i < maxI; i += 1) {
             var otherColumn = myTable.columns.item(i);
-            otherColumn.width +=
-                deltaW / (myTable.columns.length - 1 - myColumn.index);
+            otherColumn.width += deltaW / (myTable.columns.length - 1 - myColumn.index);
         }
     };
 
@@ -64,17 +59,15 @@ function MonoTable(initPage) {
         var myTable = get_table(myPage);
         if (myTable && myTable.name) myTable.remove();
 
-        var tFBounds = myDoc.masterSpreads
-            .item("A-FixedStuff")
-            .pageItems.item("printTabFrame").geometricBounds;
+        var tFBounds = myDoc.masterSpreads.item("A-FixedStuff").pageItems.item("printTabFrame")
+            .geometricBounds;
         var myTF = myPage.textFrames.add({
             geometricBounds: tFBounds,
             itemLayer: myLayer,
             name: "printTableFrame"
         });
 
-        myTF.textFramePreferences.verticalJustification =
-            VerticalJustification.CENTER_ALIGN;
+        myTF.textFramePreferences.verticalJustification = VerticalJustification.CENTER_ALIGN;
         myTF.contents = tableInitString;
         myTF.texts.item(0).convertToTable();
         myTable = myTF.tables.item(0);
@@ -93,19 +86,14 @@ function MonoTable(initPage) {
 
     var style_table = function (myTable) {
         var headerRow = myTable.rows.item(0);
-        if (headerRow.rowType != RowTypes.HEADER_ROW)
-            headerRow.rowType = RowTypes.HEADER_ROW;
+        if (headerRow.rowType != RowTypes.HEADER_ROW) headerRow.rowType = RowTypes.HEADER_ROW;
 
-        headerRow.cells.everyItem().appliedCellStyle = myDoc.cellStyles.item(
-            "headerCellStyle"
-        );
+        headerRow.cells.everyItem().appliedCellStyle = myDoc.cellStyles.item("headerCellStyle");
 
         myTable.appliedTableStyle = myDoc.tableStyles.item("defaultTStyle");
         myTable.alternatingFills = AlternatingFillsTypes.ALTERNATING_ROWS;
 
-        var totalWidth =
-            myTable.parent.geometricBounds[3] -
-            myTable.parent.geometricBounds[1];
+        var totalWidth = myTable.parent.geometricBounds[3] - myTable.parent.geometricBounds[1];
         switch (docScale) {
             case 4.5: // for bags
                 var columnWidths = [8, 12, 15, 10, 15, 15, 10, 22, 5];
@@ -125,9 +113,7 @@ function MonoTable(initPage) {
         }
 
         var myRow = myTable.rows.item(1);
-        myRow.cells.everyItem().appliedCellStyle = myDoc.cellStyles.item(
-            "defaultCellStyle"
-        );
+        myRow.cells.everyItem().appliedCellStyle = myDoc.cellStyles.item("defaultCellStyle");
         myRow.cells.everyItem().autoGrow = true;
 
         return myTable;
@@ -206,9 +192,7 @@ function MonoTable(initPage) {
     };
 
     var write_nfo_to_row = function (myRow, rowContents) {
-        myRow.cells.everyItem().appliedCellStyle = myDoc.cellStyles.item(
-            "defaultCellStyle"
-        );
+        myRow.cells.everyItem().appliedCellStyle = myDoc.cellStyles.item("defaultCellStyle");
         myRow.cells.everyItem().autoGrow = true;
 
         for (var p in rowContents) {
@@ -252,10 +236,7 @@ function MonoTable(initPage) {
         rC.textilName = monoGraphic.get_textil_name();
         rC.textilColor = monoGraphic.get_textil_color();
         rC.printId = names.name("printId", monoGraphic.get_printId());
-        rC.width =
-            monoGraphic.get_width().toFixed(0) +
-            " x " +
-            monoGraphic.get_height().toFixed(0);
+        rC.width = monoGraphic.get_width().toFixed(0) + " x " + monoGraphic.get_height().toFixed(0);
         rC.height = monoGraphic.get_height().toFixed(0);
         rC.stand = monoGraphic.get_stand();
         rC.tech = names.name("tech", monoGraphic.get_tech());
@@ -277,42 +258,26 @@ function MonoTable(initPage) {
         var win = new Window("dialog", "Textilangaben:");
 
         //win.textilPanel = win.add('panel', [0, 0, 400, 110], "verwendeter Artikel und Farbe(n):");
-        win.textilPanel = win.add(
-            "panel",
-            undefined,
-            "verwendeter Artikel und Farbe(n):"
-        );
+        win.textilPanel = win.add("panel", undefined, "verwendeter Artikel und Farbe(n):");
 
-        win.textilPanel.textil = win.textilPanel.add(
-            "edittext",
-            [5, 10, 390, 35],
-            rC.textilName,
-            { enterKeySignalsOnChange: true }
-        );
-        win.textilPanel.color = win.textilPanel.add(
-            "edittext",
-            [5, 40, 390, 65],
-            rC.textilColor,
-            { enterKeySignalsOnChange: true }
-        );
-        win.textilPanel.run = win.textilPanel.add(
-            "edittext",
-            [5, 70, 390, 95],
-            "000",
-            { enterKeySignalsOnChange: true }
-        );
+        win.textilPanel.textil = win.textilPanel.add("edittext", [5, 10, 390, 35], rC.textilName, {
+            enterKeySignalsOnChange: true
+        });
+        win.textilPanel.color = win.textilPanel.add("edittext", [5, 40, 390, 65], rC.textilColor, {
+            enterKeySignalsOnChange: true
+        });
+        win.textilPanel.run = win.textilPanel.add("edittext", [5, 70, 390, 95], "000", {
+            enterKeySignalsOnChange: true
+        });
         win.textilPanel.beidseitig = win.textilPanel.add(
             "checkbox",
             [5, 100, 390, 125],
             "Textil beidseitig bedrucken",
             { enabled: true }
         );
-        win.textilPanel.hinweis = win.textilPanel.add(
-            "edittext",
-            [5, 130, 390, 155],
-            "Hinweise",
-            { enterKeySignalsOnChange: true }
-        );
+        win.textilPanel.hinweis = win.textilPanel.add("edittext", [5, 130, 390, 155], "Hinweise", {
+            enterKeySignalsOnChange: true
+        });
 
         win.quitBtn = win.add("button", [120, 275, 200, 295], "OK");
 
@@ -322,9 +287,7 @@ function MonoTable(initPage) {
             rC.run = win.textilPanel.run.text;
             rC.beidseitig = win.textilPanel.beidseitig.value;
             rC.hinweis =
-                win.textilPanel.hinweis.text != "Hinweise"
-                    ? win.textilPanel.hinweis.text
-                    : null;
+                win.textilPanel.hinweis.text != "Hinweise" ? win.textilPanel.hinweis.text : null;
             win.close();
         };
 
@@ -373,9 +336,7 @@ function MonoTable(initPage) {
 
         var selectedRow = choose_id_dialog(rows);
         if (selectedRow) {
-            selectedRow.cells.item(
-                columnOrder["id"]
-            ).contents = newID.toString();
+            selectedRow.cells.item(columnOrder["id"]).contents = newID.toString();
             return selectedRow;
         }
         return null;
@@ -398,14 +359,14 @@ function MonoTable(initPage) {
     var docScale;
     var myTable;
     var headerCols = [
-        "Menge:",
+        "Stk.:",
         "Artikel:",
-        "Farbe(n):",
+        "Textilfarben:",
         "Position:",
-        "Druck: B x H (mm)",
+        "Druck: BxH (mm)",
         "Druckstand:",
         "Verfahren:",
-        "Druckfarben:",
+        "Farben:",
         "Id:"
     ];
     var tableInitString = headerCols.join("\t") + "\r";
@@ -440,11 +401,9 @@ function MonoTable(initPage) {
             if (lastRow.contents.join("") == "") {
                 var myRow = lastRow;
             } else {
-                var myRow = myTable.rows.add(
-                    LocationOptions.AT_END,
-                    undefined,
-                    { name: monoGraphic.get_id() }
-                );
+                var myRow = myTable.rows.add(LocationOptions.AT_END, undefined, {
+                    name: monoGraphic.get_id()
+                });
             }
 
             write_nfo_to_row(myRow, rowContents);
@@ -502,10 +461,7 @@ function MonoTable(initPage) {
 
             if (myRow) {
                 var oldContents = read_nfo_from_row(myRow);
-                newContents.stand = update_standString(
-                    newContents,
-                    oldContents
-                );
+                newContents.stand = update_standString(newContents, oldContents);
                 write_nfo_to_row(myRow, newContents);
             }
         },
@@ -513,12 +469,9 @@ function MonoTable(initPage) {
         update_columnWidths: function () {
             if (!myTable) return null;
             var chars = get_chars(myTable);
-            var totalWidth =
-                myTable.parent.geometricBounds[3] -
-                myTable.parent.geometricBounds[1];
+            var totalWidth = myTable.parent.geometricBounds[3] - myTable.parent.geometricBounds[1];
             for (var i = 0, len = chars.columnChars.length; i < len; i++) {
-                var newWidth =
-                    (chars.columnChars[i] / chars.totalChars) * totalWidth;
+                var newWidth = (chars.columnChars[i] / chars.totalChars) * totalWidth;
                 resize_column(myTable.columns[i], newWidth);
             }
         }

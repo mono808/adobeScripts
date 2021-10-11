@@ -184,17 +184,12 @@ function show_dialog(get_folder, get_file) {
     list.orientation = "column";
     list.alignment = "left";
 
-    var maxLength =
-        lastFolders.length < maxDialogRowes
-            ? lastFolders.length
-            : maxDialogRowes;
+    var maxLength = lastFolders.length < maxDialogRowes ? lastFolders.length : maxDialogRowes;
     for (var i = 0; i < maxLength; i++) {
         var row = list.add("group");
         var aFolder = lastFolders[i];
 
-        var parentTxt = (row["parentTxt"] = row.add(
-            'statictext {justify:"right"}'
-        ));
+        var parentTxt = (row["parentTxt"] = row.add('statictext {justify:"right"}'));
         parentTxt.preferredSize.width = 150;
         parentTxt.text = aFolder.parent.displayName;
         parentTxt.alignment = "center";
@@ -240,6 +235,10 @@ function show_dialog(get_folder, get_file) {
     };
 
     var manualGrp = (win[manualGrp] = win.add("group", undefined));
+
+    var auftragsdatenBtn = manualGrp.add("button", undefined, "2021");
+    auftragsdatenBtn.preferredSize.width = 50;
+    auftragsdatenBtn.onClick = browse_Helper_folder(csroot + "/auftragsdaten/2021");
 
     var b2bBtn = manualGrp.add("button", undefined, "B2B");
     b2bBtn.preferredSize.width = 50;

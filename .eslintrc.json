@@ -12,7 +12,7 @@
     "extends": ["eslint:recommended", "prettier"],
     "plugins": ["extendscript"],
     "parserOptions": {
-        "ecmaVersion": 5
+        "ecmaVersion": 3
     },
     "rules": {}
 }

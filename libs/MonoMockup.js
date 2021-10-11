@@ -1,7 +1,8 @@
 ﻿var pcroot = Folder($.getenv("pcroot"));
 var names = require("names");
+var f_id = require("f_id");
 var typeahead = require("typeahead");
-var texTool = require("textilTool");
+//var texTool = require("textilTool");
 
 var MonoGraphic = require("MonoGraphic");
 var IdBase = require("IdBase");
@@ -12,26 +13,17 @@ function MonoMockup(initDoc) {
     this.templates = [
         {
             type: "bags",
-            file: File(
-                pcroot.fullName +
-                    "/adobeScripts/templates/Ansicht_Taschen_Master.indd"
-            ),
+            file: File(pcroot.fullName + "/adobeScripts/templates/Ansicht_Taschen_Master.indd"),
             scale: 4.5
         },
         {
             type: "shirts",
-            file: File(
-                pcroot.fullName +
-                    "/adobeScripts/templates/Ansicht_Shirt_Master.indd"
-            ),
+            file: File(pcroot.fullName + "/adobeScripts/templates/Ansicht_Shirt_Master.indd"),
             scale: 6.5
         },
         {
             type: "accessoires",
-            file: File(
-                pcroot.fullName +
-                    "/adobeScripts/templates/Ansicht_Accessoires_Master.indd"
-            ),
+            file: File(pcroot.fullName + "/adobeScripts/templates/Ansicht_Accessoires_Master.indd"),
             scale: 3
         }
     ];
@@ -53,11 +45,7 @@ MonoMockup.prototype.import_pages = function () {
     this.templateDoc = app.open(this.template.file, false);
 
     this.label_pages(this.templateDoc);
-    var pagesToImport = typeahead.show_dialog(
-        this.templateDoc.pages,
-        "label",
-        true
-    );
+    var pagesToImport = typeahead.show_dialog(this.templateDoc.pages, "label", true);
 
     //var selectedPages = this.select_textile_pages(this.templateDoc);
     this.copy_pages(this.templateDoc, this.doc, pagesToImport);
@@ -79,7 +67,7 @@ MonoMockup.prototype.import_empty_template = function () {
 
 MonoMockup.prototype.create_mockupDoc = function () {
     var retArray = typeahead.show_dialog(this.templates, "type", false);
-    this.template = retArray[0] ? retArray[0] : null;
+    this.template = retArray && retArray[0] ? retArray[0] : null;
 
     if (!this.template) return null;
     this.templateDoc = app.open(this.template.file);
@@ -124,13 +112,10 @@ MonoMockup.prototype.createDocPresetFromMaster = function () {
         myDPreset.bottom = myMPrefs.bottom;
         myDPreset.columnCount = myMPrefs.columnCount;
         myDPreset.columnGutter = myMPrefs.columnGutter;
-        myDPreset.documentBleedBottomOffset =
-            myDPrefs.documentBleedBottomOffset;
+        myDPreset.documentBleedBottomOffset = myDPrefs.documentBleedBottomOffset;
         myDPreset.documentBleedTopOffset = myDPrefs.documentBleedTopOffset;
-        myDPreset.documentBleedInsideOrLeftOffset =
-            myDPrefs.documentBleedInsideOrLeftOffset;
-        myDPreset.documentBleedOutsideOrRightOffset =
-            myDPrefs.documentBleedOutsideOrRightOffset;
+        myDPreset.documentBleedInsideOrLeftOffset = myDPrefs.documentBleedInsideOrLeftOffset;
+        myDPreset.documentBleedOutsideOrRightOffset = myDPrefs.documentBleedOutsideOrRightOffset;
         myDPreset.facingPages = myDPrefs.facingPages;
         myDPreset.pageHeight = myDPrefs.pageHeight;
         myDPreset.pageWidth = myDPrefs.pageWidth;
@@ -212,8 +197,7 @@ MonoMockup.prototype.show_shop_logo = function (shop) {
 };
 
 MonoMockup.prototype.fill_job_infos = function (nfo) {
-    var jobFrameBounds = this.masterPages.fixed.pageItems.item("mJobFrame")
-        .geometricBounds;
+    var jobFrameBounds = this.masterPages.fixed.pageItems.item("mJobFrame").geometricBounds;
 
     var tf = this.masterPages.fixed.textFrames.item("jobFrame");
     if (!tf.isValid) {
@@ -245,7 +229,7 @@ MonoMockup.prototype.fill_job_infos = function (nfo) {
     jobString += "\rAuftragsname:\r";
     jobString += nfo.jobName;
     jobString += "\rReferenz:\r";
-    jobString += nfo.jobNr != nfo.refNr ? nfo.refNr : "---";
+    jobString += nfo.refNr && nfo.jobNr != nfo.refNr ? nfo.refNr : "---";
 
     tf.contents = jobString;
     var j,
@@ -261,13 +245,11 @@ MonoMockup.prototype.fill_job_infos = function (nfo) {
     }
 
     // fill the intern jobNr textframe
-    var intern_job_frame = this.masterPages.fixed.pageItems.item(
-        "jobNr_kuerzel"
-    );
+    var intern_job_frame = this.masterPages.fixed.pageItems.item("jobNr_kuerzel");
     jobString = nfo.client;
     jobString += " - ";
     jobString += nfo.jobNr;
-    if (nfo.jobNr != nfo.refNr) {
+    if (nfo.refNr && nfo.jobNr != nfo.refNr) {
         jobString += "\nND ";
         jobString += nfo.refNr;
     }
@@ -283,9 +265,7 @@ MonoMockup.prototype.get_kuerzel = function () {
 
     if (username.indexOf(".") > 0) {
         // if username contains . make kuerzel from username jan.untiedt -> JU
-        return (
-            username.split(".")[0][0] + username.split(".")[1][0]
-        ).toUpperCase();
+        return (username.split(".")[0][0] + username.split(".")[1][0]).toUpperCase();
     } else {
         return username;
     }
@@ -303,15 +283,9 @@ MonoMockup.prototype.label_pages = function (templateDoc) {
             pageGraphics = myPage.allGraphics;
             for (j = 0, maxJ = pageGraphics.length; j < maxJ; j += 1) {
                 //if graphic is on textil-layer
-                if (
-                    pageGraphics[j].itemLayer ===
-                    templateDoc.layers.item("Textils")
-                ) {
+                if (pageGraphics[j].itemLayer === templateDoc.layers.item("Textils")) {
                     textilName = pageGraphics[j].itemLink.name;
-                    textilName = textilName.substring(
-                        0,
-                        textilName.lastIndexOf(".")
-                    );
+                    textilName = textilName.substring(0, textilName.lastIndexOf("."));
                     break;
                 }
             }
@@ -388,10 +362,7 @@ MonoMockup.prototype.copy_pages = function (sourceDoc, destDoc, pages2copy) {
 
     for (var i = 0, maxI = pages2copy.length; i < maxI; i += 1) {
         var myPage = pages2copy[i];
-        var dupedSpread = myPage.duplicate(
-            LocationOptions.AFTER,
-            destDoc.pages.lastItem()
-        );
+        var dupedSpread = myPage.duplicate(LocationOptions.AFTER, destDoc.pages.lastItem());
         //texTool.choose_object_layers(this.layers.textils.allGraphics);
         dupedSpreads.push(dupedSpread);
     }
@@ -498,10 +469,7 @@ MonoMockup.prototype.get_monoGraphics = function (myPage, myLayer) {
     }
 
     myGraphics.sort(function (a, b) {
-        return (
-            names.name("posOrder", a.get_side()) >
-            names.name("posOrder", b.get_side())
-        );
+        return names.name("posOrder", a.get_side()) > names.name("posOrder", b.get_side());
     });
 
     return myGraphics;
@@ -514,11 +482,7 @@ MonoMockup.prototype.get_all_monoGraphics = function () {
     for (var i = 0; i < this.doc.allGraphics.length; i++) {
         var graphic = this.doc.allGraphics[i];
         if (graphic.parent.itemLayer != printsLayer) continue;
-        if (
-            !graphic.parentPage ||
-            graphic.parentPage.appliedMaster == previewMaster
-        )
-            continue;
+        if (!graphic.parentPage || graphic.parentPage.appliedMaster == previewMaster) continue;
         monoGraphics.push(new MonoGraphic(graphic));
     }
     return monoGraphics;
@@ -526,9 +490,7 @@ MonoMockup.prototype.get_all_monoGraphics = function () {
 
 MonoMockup.prototype.show_wawiString_dialog = function (rowObjs, job) {
     var dialogName = "WaWi Infos nachtragen zu ->  ";
-    dialogName += job
-        ? job.nfo.jobNr + " - " + job.nfo.client
-        : "irgendeinem bekloppten Auftrag";
+    dialogName += job ? job.nfo.jobNr + " - " + job.nfo.client : "irgendeinem bekloppten Auftrag";
 
     var win = new Window("palette", dialogName); // bounds = [left, top, right, bottom]
     this.windowRef = win;
@@ -587,12 +549,12 @@ MonoMockup.prototype.show_hinweisDialog = function () {
     btnPanel.cancelBtn = btnPanel.add("button", undefined, "Cancel");
 
     btnPanel.internBtn.onClick = function () {
-        returnValue.layername = "Intern";
+        returnValue.intern = true;
         returnValue.hinweis = collect_hinweise();
         win.close();
     };
     btnPanel.kundeBtn.onClick = function () {
-        returnValue.layername = "Infos";
+        returnValue.intern = false;
         returnValue.hinweis = collect_hinweise();
         win.close();
     };
@@ -612,16 +574,56 @@ MonoMockup.prototype.show_hinweisDialog = function () {
     return returnValue;
 };
 
+MonoMockup.prototype.update_style = function (collection, props) {
+    var doc = app.activeDocument;
+    var style = doc[collection].item(props.name);
+    if (!style.isValid) {
+        style = doc[collection].add(props);
+    } else {
+        for (var key in props) {
+            if (Object.hasOwnProperty.call(props, key)) {
+                style[key] = props[key];
+            }
+        }
+    }
+    return style;
+};
+
 MonoMockup.prototype.add_hinweis = function () {
     var myPage = app.activeWindow.activePage;
     var doc = myPage.parent.parent;
+    var lastLayer = doc.activeLayer;
+
+    var hinweisStyleProps = {
+        appliedFont: "Myriad Pro",
+        fontStyle: "Regular",
+        pointSize: 15 * this.scale,
+        justification: Justification.LEFT_ALIGN
+    };
 
     var dialogResult = this.show_hinweisDialog();
 
     if (!dialogResult) return;
 
-    var lastLayer = doc.activeLayer;
-    var myLayer = doc.layers.item(dialogResult.layername);
+    var myLayer, textStyle;
+    if (dialogResult.intern) {
+        var internStyleProps = Object.assign({}, hinweisStyleProps);
+        internStyleProps.fillColor = f_id.add_cmyk_color([100, 0, 0, 0]);
+        internStyleProps.name = "internTextStyle";
+
+        var internStyle = this.update_style("paragraphStyles", internStyleProps);
+        myLayer = doc.layers.item("Intern");
+        textStyle = internStyle;
+    } else {
+        var externStyleProps = Object.assign({}, hinweisStyleProps);
+        externStyleProps.fillColor = f_id.add_cmyk_color([0, 100, 0, 0]);
+        externStyleProps.name = "hinweisTextStyle";
+
+        var externStyle = this.update_style("paragraphStyles", externStyleProps);
+        myLayer = doc.layers.item("Infos");
+        textStyle = externStyle;
+    }
+
     doc.activeLayer = myLayer;
 
     var objStyle = doc.objectStyles.item("hinweisFrameStyle");
@@ -639,18 +641,12 @@ MonoMockup.prototype.add_hinweis = function () {
 
     myTF.contents = dialogResult.hinweis;
 
-    var paragraphStyle = doc.paragraphStyles.item("hinweisTextStyle");
-    if (!paragraphStyle.isValid) {
-        paragraphStyle = doc.paragraphStyles.add();
-    }
+    // var paragraphStyle = doc.paragraphStyles.item("hinweisTextStyle");
+    // if (!paragraphStyle.isValid) {
+    //     paragraphStyle = doc.paragraphStyles.add();
+    // }
 
-    paragraphStyle.appliedFont = "Myriad Pro";
-    paragraphStyle.fontStyle = "Regular";
-    paragraphStyle.pointSize = 15 * this.scale;
-    paragraphStyle.fillColor = "C=0 M=100 Y=0 K=0";
-    paragraphStyle.justification = Justification.LEFT_ALIGN;
-
-    myTF.paragraphs.everyItem().applyParagraphStyle(paragraphStyle);
+    myTF.paragraphs.everyItem().applyParagraphStyle(textStyle);
 
     doc.activeLayer = lastLayer;
     return myTF;
@@ -719,19 +715,14 @@ MonoMockup.prototype.copyMasterPages = function (sourceDoc, destDoc) {
 };
 
 MonoMockup.prototype.split_frame = function (myFrame) {
-    app.scriptPreferences.userInteractionLevel =
-        UserInteractionLevels.interactWithAll;
+    app.scriptPreferences.userInteractionLevel = UserInteractionLevels.interactWithAll;
 
     var myObjectList = new Array();
     if (myFrame) {
         myDisplayDialog([myFrame]);
     } else if (app.documents.length != 0) {
         if (app.selection.length != 0) {
-            for (
-                var myCounter = 0;
-                myCounter < app.selection.length;
-                myCounter++
-            ) {
+            for (var myCounter = 0; myCounter < app.selection.length; myCounter++) {
                 switch (app.selection[myCounter].constructor.name) {
                     case "GraphicLine":
                     case "Oval":
@@ -802,14 +793,11 @@ MonoMockup.prototype.split_frame = function (myFrame) {
         myRetainFormatting,
         myDeleteObject
     ) {
-        var myOldXUnits =
-            app.activeDocument.viewPreferences.horizontalMeasurementUnits;
-        var myOldYUnits =
-            app.activeDocument.viewPreferences.verticalMeasurementUnits;
+        var myOldXUnits = app.activeDocument.viewPreferences.horizontalMeasurementUnits;
+        var myOldYUnits = app.activeDocument.viewPreferences.verticalMeasurementUnits;
         app.activeDocument.viewPreferences.horizontalMeasurementUnits =
             MeasurementUnits.millimeters;
-        app.activeDocument.viewPreferences.verticalMeasurementUnits =
-            MeasurementUnits.millimeters;
+        app.activeDocument.viewPreferences.verticalMeasurementUnits = MeasurementUnits.millimeters;
         for (var myCounter = 0; myCounter < myObjectList.length; myCounter++) {
             mySplitFrame(
                 myObjectList[myCounter],
@@ -846,20 +834,10 @@ MonoMockup.prototype.split_frame = function (myFrame) {
             myColumnGutter * (myNumberOfColumns - 1) < myWidth
         ) {
             var myColumnWidth =
-                (myWidth - myColumnGutter * (myNumberOfColumns - 1)) /
-                myNumberOfColumns;
-            var myRowHeight =
-                (myHeight - myRowGutter * (myNumberOfRows - 1)) /
-                myNumberOfRows;
-            for (
-                var myRowCounter = 0;
-                myRowCounter < myNumberOfRows;
-                myRowCounter++
-            ) {
-                myY1 =
-                    myBounds[0] +
-                    myRowHeight * myRowCounter +
-                    myRowGutter * myRowCounter;
+                (myWidth - myColumnGutter * (myNumberOfColumns - 1)) / myNumberOfColumns;
+            var myRowHeight = (myHeight - myRowGutter * (myNumberOfRows - 1)) / myNumberOfRows;
+            for (var myRowCounter = 0; myRowCounter < myNumberOfRows; myRowCounter++) {
+                myY1 = myBounds[0] + myRowHeight * myRowCounter + myRowGutter * myRowCounter;
                 myY2 = myY1 + myRowHeight;
                 for (
                     var myColumnCounter = 0;

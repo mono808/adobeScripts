@@ -40,7 +40,7 @@ function main() {
                         ulRect.overprintFill = true;
                         ulRect.name = color.name;
                         
-                        ulRect.contents = 'U';
+                        ulRect.contents = 'UL';
                         var pg = ulRect.paragraphs[0]
                         pg.fillColor = doc.swatches[2];
                         pg.pointSize = textSize;
@@ -62,18 +62,18 @@ function main() {
                         colorRect.strokeColor = doc.swatches[0];
                         colorRect.overprintFill = true;
                         
-                        colorRect.contents = abc[colorRects.length - 1];
-                        colorRect.textFramePreferences.verticalJustification = VerticalJustification.BOTTOM_ALIGN;
-                        var pg = colorRect.paragraphs[0];
-                        pg.fillColor = doc.swatches[2];
-                        pg.pointSize = textSize;
+                        // colorRect.contents = abc[colorRects.length - 1];
+                        // colorRect.textFramePreferences.verticalJustification = VerticalJustification.BOTTOM_ALIGN;
+                        // var pg = colorRect.paragraphs[0];
+                        // pg.fillColor = doc.swatches[2];
+                        // pg.pointSize = textSize;
                         
                         allRects.push(colorRect);  
                     break;
                 };                         
             };
 
-            ulRect.geometricBounds = [startY, startX, startY + recHeight /2, colorsGB[3] - recWidth ];
+            ulRect.geometricBounds = [startY, startX-recWidth, startY + recHeight /2, colorsGB[3] - recWidth ];
             var ulTester = myPage.groups.add(allRects);
             ulTester.name = 'UL-Tester';
             return ulTester;

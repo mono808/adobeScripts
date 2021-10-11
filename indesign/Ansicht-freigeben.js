@@ -24,11 +24,7 @@
 
         for (var i = 0; i < arrayOfFiles.length; i++) {
             checkBoxes.push(
-                filesPnl.add(
-                    "checkbox",
-                    undefined,
-                    "\u00A0" + arrayOfFiles[i].displayName
-                )
+                filesPnl.add("checkbox", undefined, "\u00A0" + arrayOfFiles[i].displayName)
             );
         }
 
@@ -36,21 +32,9 @@
         optsPnl.alignChildren = "left";
         optsPnl.margins = [10, 25, 10, 10];
 
-        optsPnl.printMock = optsPnl.add(
-            "checkbox",
-            undefined,
-            "Ansicht drucken"
-        );
-        optsPnl.printFH = optsPnl.add(
-            "checkbox",
-            undefined,
-            "Filmhülle drucken"
-        );
-        optsPnl.printFilme = optsPnl.add(
-            "checkbox",
-            undefined,
-            "Film PDFs erstellen"
-        );
+        optsPnl.printMock = optsPnl.add("checkbox", undefined, "Ansicht drucken");
+        optsPnl.printFH = optsPnl.add("checkbox", undefined, "Filmhülle drucken");
+        optsPnl.printFilme = optsPnl.add("checkbox", undefined, "Film PDFs erstellen");
 
         var btnGrp = w.add("group");
         btnGrp.alignChildren = "fill";
@@ -86,13 +70,14 @@
         return result;
     };
 
-    var print_docs = function (myFiles, printPreset) {
-        for (var i = 0; i < myFiles.length; i++) {
-            var myFile = myFiles[i];
-            var doc = app.open(myFile, true);
-            doc.print(false, printPreset);
-            doc.close(SaveOptions.NO);
-        }
+    var print_ansicht = function (myFile) {
+        var doc = app.open(myFile, true);
+
+        var scriptName = "indesign/Ansicht-drucken.js";
+        var scriptFile = new File(paths.pcroot + "/adobescripts/" + scriptName);
+        app.doScript(scriptFile);
+
+        doc.close(SaveOptions.NO);
     };
 
     var generate_wawi_strings = function (rowContent) {
@@ -110,9 +95,7 @@
 
         wawiString = "Produktionsdetails: ";
         wawiString +=
-            rowContent.tech == "Siebdruck"
-                ? "Druckfarben (~ Pantone C): "
-                : "Druckfarben: ";
+            rowContent.tech == "Siebdruck" ? "Druckfarben (~ Pantone C): " : "Druckfarben: ";
         wawiString += rowContent.colors;
         wawiString += " - Druckbreite: ca. ";
         wawiString += rowContent.width / 10;
@@ -143,11 +126,7 @@
             aPnl.add("statictext", undefined, rowStrings.textil);
             aPnl.wawiGroup = aPnl.add("group", undefined, "");
             aPnl.wawiGroup.alignChildren = "fill";
-            aPnl.wawiGroup.wawiText = aPnl.wawiGroup.add(
-                "edittext",
-                undefined,
-                rowStrings.wawi
-            );
+            aPnl.wawiGroup.wawiText = aPnl.wawiGroup.add("edittext", undefined, rowStrings.wawi);
             aPnl.wawiGroup.wawiText.preferredSize = [500, 25];
             aPnl.wawiGroup.copyButton = aPnl.wawiGroup.add(
                 "button",
@@ -175,9 +154,9 @@
     var MonoFilm = require("MonoFilm");
 
     var interactSwitch = require("InteractionSwitch");
-    interactSwitch.set("all");    
+    interactSwitch.set("all");
 
-    if(app.documents.length > 0 && app.activeDocument) {
+    if (app.documents.length > 0 && app.activeDocument) {
         var jobNfo = job.get_jobNfo(app.activeDocument);
     } else {
         var jobNfo = job.get_jobNfo();
@@ -232,16 +211,12 @@
             alertStr += e.mG.get_printId();
             alertStr += ":\r";
             if (e.result.sizeDif == null) {
-                alertStr =
-                    "Größe / Platzierung konnte nicht geprüft werden\r\r";
+                alertStr = "Größe / Platzierung konnte nicht geprüft werden\r\r";
                 continue;
             }
 
             if (Math.abs(e.result.sizeDif) > 2) {
-                alertStr +=
-                    "Größe abweichend um: " +
-                    e.result.sizeDif.toFixed(1) +
-                    " mm\r\r";
+                alertStr += "Größe abweichend um: " + e.result.sizeDif.toFixed(1) + " mm\r\r";
             }
 
             if (Math.abs(e.result.placedDif) > 1) {
@@ -262,13 +237,16 @@
 
     var printPreset;
     if (result.opts.printMock) {
-        printPreset = app.printerPresets.item("printMockup");
-        print_docs(result.files, printPreset);
+        result.files.forEach(function (file) {
+            print_ansicht(file);
+        });
     }
 
     if (result.opts.printFH) {
         printPreset = app.printerPresets.item("filmhuelle");
-        print_docs(filmhuelle, printPreset);
+        var doc = app.open(filmhuelle, true);
+        doc.print(false, printPreset);
+        doc.close(SaveOptions.NO);
     }
 
     if (result.opts.printFilme) {

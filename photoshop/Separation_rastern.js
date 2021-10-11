@@ -229,17 +229,15 @@ function rastern() {
     }
 
     function convert_to_bitmap(doc, settings) {
-        var chan = doc.activeChannels[0],
-            s = settings,
-            bmpConvOpts = new BitmapConversionOptions();
+        var chan = doc.activeChannels[0];
+        var s = settings;
+        var bmpConvOpts = new BitmapConversionOptions();
 
-        with (bmpConvOpts) {
-            method = BitmapConversionType.HALFTONESCREEN;
-            angle = chan.name === "sisBlack" ? s.wnklK : s.wnkl;
-            frequency = s.lpi;
-            resolution = s.res;
-            shape = s.dot;
-        }
+        bmpConvOpts.method = BitmapConversionType.HALFTONESCREEN;
+        bmpConvOpts.angle = chan.name === "sisBlack" ? s.wnklK : s.wnkl;
+        bmpConvOpts.frequency = s.lpi;
+        bmpConvOpts.resolution = s.res;
+        bmpConvOpts.shape = s.dot;
 
         doc.changeMode(ChangeMode.BITMAP, bmpConvOpts);
         return doc;
@@ -255,14 +253,7 @@ function rastern() {
             Cross: "BitmapHalfToneType.CROSS"
         };
 
-        var bmpList = [
-            "Round",
-            "Diamond",
-            "Ellipse",
-            "Line",
-            "Square",
-            "Cross"
-        ];
+        var bmpList = ["Round", "Diamond", "Ellipse", "Line", "Square", "Cross"];
 
         var resList = [300, 600, 720, 900, 1200, 1440];
 
@@ -272,11 +263,7 @@ function rastern() {
 
         var win = new Window("dialog", "monos Raster-Script");
 
-        win.setPnl = win.add(
-            "panel",
-            [10, 10, 240, 225],
-            "Raster-Einstellungen:"
-        );
+        win.setPnl = win.add("panel", [10, 10, 240, 225], "Raster-Einstellungen:");
         win.okGrp = win.add("group", [10, 235, 240, 265], "Ready?");
 
         win.setPnl.lpi = win.setPnl.add("group", [5, 10, 225, 45]);
@@ -290,55 +277,23 @@ function rastern() {
             [5, 5, 130, 25],
             "LPI (Linien pro Zoll):"
         );
-        win.setPnl.lpi.set = win.setPnl.lpi.add(
-            "dropdownlist",
-            [135, 5, 210, 25],
-            55
-        );
+        win.setPnl.lpi.set = win.setPnl.lpi.add("dropdownlist", [135, 5, 210, 25], 55);
 
-        win.setPnl.wnkl.txt = win.setPnl.wnkl.add(
-            "statictext",
-            [5, 5, 160, 25],
-            "Rasterwinkel:"
-        );
-        win.setPnl.wnkl.set = win.setPnl.wnkl.add(
-            "edittext",
-            [165, 5, 210, 25],
-            162
-        );
+        win.setPnl.wnkl.txt = win.setPnl.wnkl.add("statictext", [5, 5, 160, 25], "Rasterwinkel:");
+        win.setPnl.wnkl.set = win.setPnl.wnkl.add("edittext", [165, 5, 210, 25], 162);
 
         win.setPnl.wnklK.txt = win.setPnl.wnklK.add(
             "statictext",
             [5, 5, 160, 25],
             "Rasterwinkel sisBlack:"
         );
-        win.setPnl.wnklK.set = win.setPnl.wnklK.add(
-            "edittext",
-            [165, 5, 210, 25],
-            12
-        );
+        win.setPnl.wnklK.set = win.setPnl.wnklK.add("edittext", [165, 5, 210, 25], 12);
 
-        win.setPnl.res.txt = win.setPnl.res.add(
-            "statictext",
-            [5, 5, 130, 25],
-            "Auflösung:"
-        );
-        win.setPnl.res.set = win.setPnl.res.add(
-            "dropdownlist",
-            [135, 5, 210, 25],
-            900
-        );
+        win.setPnl.res.txt = win.setPnl.res.add("statictext", [5, 5, 130, 25], "Auflösung:");
+        win.setPnl.res.set = win.setPnl.res.add("dropdownlist", [135, 5, 210, 25], 900);
 
-        win.setPnl.dot.txt = win.setPnl.dot.add(
-            "statictext",
-            [5, 5, 130, 25],
-            "Punktform:"
-        );
-        win.setPnl.dot.set = win.setPnl.dot.add(
-            "dropdownlist",
-            [135, 5, 210, 25],
-            "Ellipse"
-        );
+        win.setPnl.dot.txt = win.setPnl.dot.add("statictext", [5, 5, 130, 25], "Punktform:");
+        win.setPnl.dot.set = win.setPnl.dot.add("dropdownlist", [135, 5, 210, 25], "Ellipse");
 
         win.okGrp.yes = win.okGrp.add("button", [10, 5, 110, 30], "Ok");
         win.okGrp.no = win.okGrp.add("button", [120, 5, 220, 30], "Abbrechen");

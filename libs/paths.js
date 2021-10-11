@@ -43,11 +43,9 @@ paths.templates = paths.dv + "/scriptVorlagen/filme/";
 paths.vorlagen = paths.dv + "/scriptVorlagen/filme/";
 paths.mock = paths.dv + "/scriptVorlagen/ansicht/";
 paths.mockShirtMaster =
-    paths.dv +
-    "/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master_cc2018.indd";
+    paths.dv + "/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master_cc2018.indd";
 paths.mockBagMaster =
-    paths.dv +
-    "/scriptVorlagen/ansicht/taschen/Ansicht_Taschen_Master_cc2018.indd";
+    paths.dv + "/scriptVorlagen/ansicht/taschen/Ansicht_Taschen_Master_cc2018.indd";
 
 paths.client_folder = "../";
 paths.job_folder = "./";
@@ -70,10 +68,10 @@ paths.working = "./Working/";
 function set_paths(nfo) {
     varsSet = true;
     var p = paths;
-    
+
     // Filetags
     p.printTag = nfo.printId + "_" + nfo.tech;
-    
+
     p.docTag = nfo.jobNr
         ? nfo.jobNr + "_" + nfo.jobName
         : Window.prompt("Please enter a descriptive Jobname");
@@ -174,3 +172,5 @@ exports.folder = folder;
 exports.path = path;
 exports.file = file;
 exports.set_nfo = set_nfo;
+exports.pcroot = pcroot;
+exports.csroot = csroot;

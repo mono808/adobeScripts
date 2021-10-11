@@ -25,6 +25,11 @@ if (validateState()) {
     app.activeDocument.suspendHistory("Pixel Measure", "createMeasure();");
 }
 
+function round_point5(num) {
+    num = Math.round(num * 2) / 2;
+    return num;
+}
+
 function validateState() {
     if (app.documents.length == 0) {
         alert("No document open");
@@ -39,14 +44,7 @@ function validateState() {
     return true;
 }
 
-function find_good_offsets_horizontal(
-    docRef,
-    textLayerRef,
-    width,
-    textSize,
-    x1,
-    y1
-) {
+function find_good_offsets_horizontal(docRef, textLayerRef, width, textSize, x1, y1) {
     var textWidth, textX, textY;
     var textItemRef = textLayerRef.textItem;
     textWidth = textLayerRef.bounds[2].value - textLayerRef.bounds[0].value;
@@ -70,14 +68,7 @@ function find_good_offsets_horizontal(
     return Array(Math.floor(textX), Math.floor(textY));
 }
 
-function find_good_offset_vertical(
-    docRef,
-    textLayerRef,
-    height,
-    textSize,
-    x1,
-    y1
-) {
+function find_good_offset_vertical(docRef, textLayerRef, height, textSize, x1, y1) {
     var textWidth, textX, textY;
     var textItemRef = textLayerRef.textItem;
     textWidth = textLayerRef.bounds[2].value - textLayerRef.bounds[0].value;
@@ -102,11 +93,11 @@ function setup() {
     cmyk.black = 0;
 }
 
-function calculatePxPerCm(resolution) {  
-    var cmPerInch = UnitValue(1,'in');
-    cmPerInch.convert('cm');
+function calculatePxPerCm(resolution) {
+    var cmPerInch = UnitValue(1, "in");
+    cmPerInch.convert("cm");
     var pixelPerCM = resolution / cmPerInch.value;
-    return pixelPerCM;   
+    return pixelPerCM;
 }
 
 function createMeasure() {
@@ -118,12 +109,12 @@ function createMeasure() {
 
     var textSize = docRef.width;
     textSize.value *= 0.025;
-    
+
     var pixelLength, logicalUnits, logicalLength;
     var mS = docRef.measurementScale;
-    if(mS.logicalUnits === 'Pixel' && mS.logicalLength === 1 && mS.pixelLength === 1) {
-        pixelLength =  calculatePxPerCm (docRef.resolution);
-        logicalUnits = 'cm';
+    if (mS.logicalUnits === "Pixel" && mS.logicalLength === 1 && mS.pixelLength === 1) {
+        pixelLength = calculatePxPerCm(docRef.resolution);
+        logicalUnits = "cm";
         logicalLength = 1;
     } else {
         pixelLength = docRef.measurementScale.pixelLength;
@@ -201,7 +192,7 @@ function createMeasure() {
     textItemRef.antiAliasMethod = AntiAlias.NONE;
 
     if (horizontal) {
-        var logicalWidth = (widthpx * logicalRatio).toFixed(0);
+        var logicalWidth = round_point5(widthpx * logicalRatio);
         textItemRef.contents = logicalWidth + " " + logicalUnits;
         textItemRef.justification = Justification.CENTER;
 
@@ -214,7 +205,7 @@ function createMeasure() {
             y1
         );
     } else {
-        var logicalHeight = (heightpx * logicalRatio).toFixed(0);
+        var logicalHeight = round_point5(heightpx * logicalRatio);
         textItemRef.contents = logicalHeight + " " + logicalUnits;
 
         textItemRef.position = find_good_offset_vertical(
@@ -263,10 +254,7 @@ function drawLine(x1, y1, x2, y2) {
     var lineSubPathArray = new Array();
     lineSubPathArray.push(line);
 
-    var linePath = app.activeDocument.pathItems.add(
-        "TempPath",
-        lineSubPathArray
-    );
+    var linePath = app.activeDocument.pathItems.add("TempPath", lineSubPathArray);
     linePath.strokePath(ToolType.PENCIL, false);
     app.activeDocument.pathItems.removeAll();
 }

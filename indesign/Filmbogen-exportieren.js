@@ -28,26 +28,20 @@ function main() {
     }
 
     function generate_array_of_pdf_names(pdfs) {
-        var i,
-            maxI,
-            pdf,
-            tempRegEx,
-            namesArray = [],
-            pdfName,
-            shorty;
+        var namesArray = [];
 
-        for (i = 0, maxI = pdfs.length; i < maxI; i += 1) {
-            pdf = pdfs[i];
+        for (var i = 0, maxI = pdfs.length; i < maxI; i += 1) {
+            var pdf = pdfs[i];
             var filename = pdf.split("\\").pop();
             var jobNrResults = rE.jobNrShort.exec(filename);
             if (jobNrResults && jobNrResults.length > 0) {
-                pdfName = jobNrResults[0];
-                pdfName = rE.jobNrVeryShort.exec(pdfName)[0];
+                var pdfName = jobNrResults[0];
+                //pdfName = rE.jobNrVeryShort.exec(pdfName)[0];
             } else {
                 pdfName = filename.substring(0, filename.lastIndexOf("."));
             }
 
-            tempRegEx = new RegExp(String(pdfName));
+            var tempRegEx = new RegExp(String(pdfName));
             if (!tempRegEx.test(namesArray)) {
                 namesArray.push(pdfName);
             }
@@ -58,10 +52,7 @@ function main() {
     function remove_pdfs(pdfs) {
         var pcroot = new Folder($.getenv("pcroot"));
         var removedCounter = 0,
-            filmOutRE = new RegExp(
-                f_all.escapeRegExp(pcroot + "/distiller/filme/out"),
-                "i"
-            );
+            filmOutRE = new RegExp(f_all.escapeRegExp(pcroot + "/distiller/filme/out"), "i");
 
         var i, pdf, pdfFile;
 
@@ -81,7 +72,7 @@ function main() {
     do {
         myPage = myDoc.pages[i];
         if (myPage.pageItems.length > 0) {
-            f_id.fitPageWidth2Art(myPage);
+            f_id.fit_page_to_art(myPage, true, true);
         } else {
             myPage.remove();
         }
@@ -104,9 +95,7 @@ function main() {
 
     myDoc.close();
     $.sleep(0000);
-    if (
-        Window.confirm("Verwendete Film-PDFs aus dem Output-Ordner entfernen?")
-    ) {
+    if (Window.confirm("Verwendete Film-PDFs aus dem Output-Ordner entfernen?")) {
         remove_pdfs(linkedPdfs);
     }
 }

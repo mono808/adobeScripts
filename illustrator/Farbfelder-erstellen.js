@@ -1,76 +1,98 @@
 ﻿/*
 This script gos through the selected Items / all pathItems
-and adds all used fill & strokecolors to the swatches palette
+and adds all used fill & strokecolors to the swatches palette as a global color
 */
 
 //@target illustrator
 
-function main () {
+var _fp = require("_fp");
+
+function compare_props(obj1, obj2) {
+    for (var key in obj1) {
+        if (Object.hasOwnProperty.call(obj1, key)) {
+            if (obj1[key] != obj2[key]) return false;
+        }
+    }
+    return true;
+}
+
+function compare_wrapper(col1) {
+    function compare_colors(col2) {
+        if (col1.typename != col2.typename) return false;
+
+        switch (col1.typename) {
+            case "RGBColor":
+            case "CMYKColor":
+                return compare_props(col1, col2);
+            case "SpotColor":
+                return col1.spot.name === col2.spot.name;
+            case "PatternColor":
+                return col1.pattern.name === col2.pattern.name;
+            case "GradientColor":
+                return col1.gradient.name === col2.gradient.name;
+        }
+    }
+    return compare_colors;
+}
+
+function check_spots(doc, color) {
+    var spots = _fp.make_array(doc.spots);
+    var included = spots.some(function (spot) {
+        var compare_colors = compare_wrapper(spot.color);
+        return compare_colors(color);
+    });
+    return included;
+}
+
+function create_spot_name(color) {
+    var values = [];
+    for (var key in color) {
+        if (Object.hasOwnProperty.call(color, key) && typeof color[key] == "number") {
+            values.push(key[0].toUpperCase() + "=" + color[key].toFixed(0));
+        }
+    }
+    var spotName = values.join(" ");
+    return spotName;
+}
+
+function create_spotColor(doc, color) {
+    var spot = doc.spots.add();
+    spot.name = create_spot_name(color);
+    spot.color = color;
+    spot.colorModel = ColorModel.PROCESS;
+
+    var spotColor = new SpotColor();
+    spotColor.spot = spot;
+    spotColor.tint = 100;
+    return spotColor;
+}
+
+function main() {
     var doc = app.activeDocument;
-    if(app.selection.length > 0) {
-        var sel = doc.selection;
+    var sel;
+    if (app.selection.length > 0) {
+        sel = _fp.make_array(doc.selection);
     } else {
-        var sel = doc.pathItems;
-    }
-    var i = sel.length-1;
-    do{
-        var pI = sel[i];
-        if(pI.filled && !check_swatches(doc, pI.fillColor)) create_swatch(doc, pI.fillColor);
-        if(pI.stroked && !check_swatches(doc, pI.strokeColor)) create_swatch(doc, pI.strokeColor);    	
-    }while(i--);
-}
-
-function check_swatches (doc, color) {
-	for (var i = 0; i < doc.swatches.length; i++) {
-		if(match_colors(doc.swatches[i].color, color)) return true;
-	}
-	return false;
-}
-
-function create_swatch (doc, color) {
-
-    // Create the new swatch using the above color
-    var swatch = doc.swatches.add();
-    swatch.color = color;
-    return swatch;
-}
-
-function match_colors(c1, c2) {
-	var class1 = c1.constructor.name;
-    if(class1 != c2.constructor.name) return false;
-    switch(class1) {
-		case 'RGBColor' : return match_RGBColors(c1,c2);
-		break;
-		case 'CMYKColor' : return match_CMYKColors(c1,c2);
-		break;
-		case 'GrayColor' : return match_GrayColors(c1,c2);
-		break;
+        sel = _fp.make_array(doc.pathItems);
     }
 
-	return false;
-}
-
-function match_RGBColors(c1, c2) {
-    return (
-        c1.red.toFixed(0) == c2.red.toFixed(0) &&
-        c1.green.toFixed(0) == c2.green.toFixed(0) &&
-        c1.blue.toFixed(0) == c2.blue.toFixed(0)
-    )
-}
-
-function match_CMYKColors(c1, c2) {
-    return (  
-        c1.cyan.toFixed(0) == c2.cyan.toFixed(0) &&
-        c1.magenta.toFixed(0) == c2.magenta.toFixed(0) &&
-        c1.yellow.toFixed(0) == c2.yellow.toFixed(0) &&
-        c1.black.toFixed(0) == c2.black.toFixed(0)
-    ) 
-}
-
-function match_GrayColors(c1, c2) {
-    return (
-        c1.gray.toFixed(0) == c2.gray.toFixed(0)
-    )
+    sel.forEach(function (pI) {
+        var myColor, spotColor;
+        if (pI.filled) {
+            myColor = pI.fillColor;
+            if (!check_spots(doc, myColor)) {
+                spotColor = create_spotColor(doc, myColor);
+                pI.fillColor = spotColor;
+            }
+        }
+        if (pI.stroked) {
+            myColor = pI.strokeColor;
+            if (!check_spots(doc, myColor)) {
+                spotColor = create_spotColor(doc, myColor);
+                pI.strokeColor = spotColor;
+            }
+        }
+    });
 }
 
 main();

@@ -20,14 +20,9 @@ exports.load_json = function (jobNr) {
     }
 
     if (jsonFiles.length === 1) {
-        jsonFile = jsonFiles[0];
+        var jsonFile = jsonFiles[0];
     } else {
-        var result = typeahead.show_dialog(
-            jsonFiles,
-            "displayName",
-            false,
-            "Auftrag wählen:"
-        );
+        var result = typeahead.show_dialog(jsonFiles, "displayName", false, "Auftrag wählen:");
         if (!result || result.length < 1) return;
         jsonFile = result[0];
     }

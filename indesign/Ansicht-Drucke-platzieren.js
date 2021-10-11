@@ -15,9 +15,9 @@ function main() {
 
     var MonoMockup = require("MonoMockup");
 
-    job.set_nfo(app.activeDocument, false);
-    paths.set_nfo(job.nfo);
-    jobFolder.set_folder(job.nfo.folder);
+    var jobNfo = job.get_jobNfo(app.activeDocument, false);
+    paths.set_nfo(jobNfo);
+    jobFolder.set_folder(jobNfo.folder);
 
     var mockup = new MonoMockup();
     mockup.init();
