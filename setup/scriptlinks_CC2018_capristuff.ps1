@@ -3,5 +3,6 @@ New-Item -Path "C:\Program Files\Adobe\Adobe Photoshop CC 2018\Presets\Scripts\s
 New-Item -Path "C:\Program Files\Adobe\Adobe Illustrator CC 2018\Presets\de_DE\Skripten\scripts" -ItemType SymbolicLink -Value  "c:/capristuff/adobeScripts/illustrator" -Force
 
 [System.Environment]::SetEnvironmentVariable('csroot','\\cs-server16\CapriShare',[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('pcroot','c:\capristuff\',[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('pcroot','c:\capristuff',[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adobeScripts','c:\capristuff\adobescripts',[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('JSINCLUDE','c:\capristuff\adobescripts\includes',[System.EnvironmentVariableTarget]::Machine)

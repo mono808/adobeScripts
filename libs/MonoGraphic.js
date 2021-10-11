@@ -3,6 +3,7 @@ var MonoFilm = require("MonoFilm");
 var MonoTextil = require("MonoTextil");
 var rE = require("rE");
 var bridgeTalker = require("BridgeTalker");
+var adobeScripts = Folder($.getenv("adobeScripts")).fullName;
 
 function MonoGraphic(myGraphic) {
     if (!myGraphic) return;
@@ -261,7 +262,7 @@ function MonoGraphic(myGraphic) {
                 case "FLX":
                     return bridgeTalker(
                         "illustrator",
-                        new File("/c/monodev/adobescripts/illustrator/get-doc-colors.js"),
+                        new File(adobeScripts + "/illustrator/get-doc-colors.js"),
                         {
                             file: new File(monoPrint.print),
                             layers: activeLayers
@@ -277,7 +278,7 @@ function MonoGraphic(myGraphic) {
                 case "STK":
                     return bridgeTalker(
                         "illustrator",
-                        new File("/c/monodev/adobescripts/illustrator/get-doc-colors.js"),
+                        new File(adobeScripts + "/illustrator/get-doc-colors.js"),
                         {
                             file: new File(monoPrint.print),
                             layers: activeLayers
@@ -310,14 +311,14 @@ function MonoGraphic(myGraphic) {
                         case ".tif":
                             result = bridgeTalker(
                                 "photoshop-120.064",
-                                new File("/c/monodev/adobescripts/photoshop/get-doc-infos.js"),
+                                new File(adobeScripts + "/photoshop/get-doc-infos.js"),
                                 new File(monoPrint.print)
                             );
                             break;
                         case ".ai":
                             result = bridgeTalker(
                                 "illustrator",
-                                new File("/c/monodev/adobescripts/illustrator/get-doc-infos.js"),
+                                new File(adobeScripts + "/illustrator/get-doc-infos.js"),
                                 new File(monoPrint.print)
                             );
                             break;
