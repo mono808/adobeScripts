@@ -51,10 +51,7 @@ $.level = 1;
         if (!require._cache.hasOwnProperty(filename)) {
             // Remember the directory we're loading this module from
             var olddir = require._current_module_dir;
-            require._current_module_dir = id.substring(
-                0,
-                id.lastIndexOf("/") + 1
-            );
+            require._current_module_dir = id.substring(0, id.lastIndexOf("/") + 1);
 
             try {
                 var f; // The function that defines the module
@@ -117,16 +114,9 @@ $.level = 1;
 
             for (var i = 0; i < require._path.length; i++) {
                 files.push(require._path[i] + "/" + id + require._ext);
+                files.push(require._path[i] + "/" + id + "/index" + require._ext);
                 files.push(
-                    require._path[i] + "/" + id + "/index" + require._ext
-                );
-                files.push(
-                    require._path[i] +
-                        "/" +
-                        require._current_module_dir +
-                        "/" +
-                        id +
-                        require._ext
+                    require._path[i] + "/" + require._current_module_dir + "/" + id + require._ext
                 );
             }
 
@@ -157,12 +147,8 @@ $.level = 1;
             function up(dir) {
                 // Return the parent directory of dir
                 if (dir == "") throw "Can't go up from ''";
-                if (dir.charAt(dir.length - 1) != "/")
-                    throw "dir doesn't end in /";
-                return dir.substring(
-                    0,
-                    dir.lastIndexOf("/", dir.length - 2) + 1
-                );
+                if (dir.charAt(dir.length - 1) != "/") throw "dir doesn't end in /";
+                return dir.substring(0, dir.lastIndexOf("/", dir.length - 2) + 1);
             }
         }
     });
@@ -171,7 +157,7 @@ $.level = 1;
     // loaded.  Items must be an empty string or a string that ends with "/".
     // Will also include the PHOTOSHOP_PATH env var.
     // This is never replaced or destroyed
-    require.path = ["/c/monodev/adobescripts/libs/"];
+    require.path = ["/c/capristuff/adobescripts/libs/"];
     // Flag to build the path array or not
     require.isPathBuilt = false;
 
