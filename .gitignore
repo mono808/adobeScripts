@@ -7,5 +7,3 @@ tests/output/**
 node_modules/**
 templates/
 
-*.code-workspace
-

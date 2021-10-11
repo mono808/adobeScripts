@@ -11,6 +11,7 @@ var druckdatenSD;
 var monoPrints = [];
 
 function get_jobFolder(fld) {
+    if(!fld) return null;
     if (fld.constructor.name == 'Folder' && fld.displayName.match(jobRE)) {
        return fld;            
     } else if (fld.parent) {
