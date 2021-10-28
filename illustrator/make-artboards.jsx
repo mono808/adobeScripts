@@ -9,7 +9,7 @@ function make_artboard(bounds) {
 (function () {
     var _fp = require('_fp');
     var doc = app.activeDocument;
-    var gIs = make_array(app.selection);
+    var gIs = _fp.make_array(app.selection);
 
     gIs.forEach(function(gi) {
         make_artboard(gi.visibleBounds);
