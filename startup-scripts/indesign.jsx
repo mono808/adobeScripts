@@ -1,4 +1,6 @@
-﻿//@target indesign
+﻿// alert("hello from indesign");
+
+//@target indesign
 //@targetengine "session"
 //@include "require.js"
 

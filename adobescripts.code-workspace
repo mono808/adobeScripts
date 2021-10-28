@@ -1,11 +1,14 @@
 {
-  "folders": [
-	{
-		"path": "."
-	},
-	{
-		"path": "\\\\cs-server16\\caprishare\\wawiscript\\auftraginfos"
-	}
-],
-  "settings": {}
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "\\\\cs-server16\\caprishare\\wawiscript\\auftraginfos"
+        },
+        {
+            "path": "..\\adobeSampleScripts"
+        }
+    ],
+    "settings": {}
 }
