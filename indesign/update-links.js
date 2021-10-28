@@ -20,14 +20,6 @@ function modify_collection(collection, modify) {
     return collection;
 }
 
-var doc = app.activeDocument;
-var docFolder = app.activeDocument.filePath;
-
-var jobFiles = ioFile.get_files(docFolder.parent);
-var inddFiles = jobFiles.filter(function (file) {
-    return file.displayName.indexOf(".indd") > -1;
-});
-
 function create_path_msg(aFile) {
     var arr = aFile.fsName.split("\\");
     var msg = arr.pop();
@@ -37,12 +29,21 @@ function create_path_msg(aFile) {
     return msg;
 }
 
+var doc = app.activeDocument;
+var startFile = doc.fullName;
+var docFolder = app.activeDocument.filePath;
+
+var jobFiles = ioFile.get_files(docFolder.parent);
+var inddFiles = jobFiles.filter(function (file) {
+    return file.displayName.indexOf(".indd") > -1;
+});
+
 inddFiles.forEach(function (inddFile) {
     var msg = "Do you want to update the links in:\n\n";
     msg += create_path_msg(inddFile);
 
     if (!Window.confirm(msg)) return;
-    var myDoc = app.open(inddFile);
+    var myDoc = app.open(inddFile, false);
     var myLinks = make_array(myDoc.links);
 
     myLinks.forEach(function (link) {
@@ -62,3 +63,5 @@ inddFiles.forEach(function (inddFile) {
     myDoc.save();
     myDoc.close();
 });
+
+app.open(startFile);
