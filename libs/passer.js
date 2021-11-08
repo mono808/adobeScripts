@@ -8,10 +8,10 @@ var centerPasserSettings = {
 };
 
 var sidePasserSettings = {
-    stroke1: 0.25,
-    stroke2: 0.25,
-    circle: 2.5,
-    diameter: 6,
+    stroke1: 0.4,
+    stroke2: 0.4,
+    circle: 3.75,
+    diameter: 9,
     distance: 12
 };
 
