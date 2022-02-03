@@ -7,5 +7,5 @@ passer.add_passer();
 
 var paths = require("paths");
 var scriptName = "indesign/Film-zuschneiden.js";
-var scriptFile = new File(paths.pcroot + "/adobescripts/" + scriptName);
+var scriptFile = new File($.getenv("adobeScripts") + "/" + scriptName);
 app.doScript(scriptFile);

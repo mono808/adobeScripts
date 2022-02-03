@@ -41,8 +41,7 @@ $.level = 1;
 
         // If the module id is relative, convert it to a toplevel id
         // The normalize function is below.
-        if (id.substring(0, 2) == "./" || id.substring(0, 3) == "../")
-            id = normalize(require._current_module_dir, id);
+        if (id.substring(0, 2) == "./" || id.substring(0, 3) == "../") id = normalize(require._current_module_dir, id);
 
         // Search paths for module
         filename = searchModule(id);
@@ -99,9 +98,7 @@ $.level = 1;
         // Function to search through the .path array for modules
         // Will try the different flavors as defined in the CommonJS spec for Modules 1.1
         function searchModule(id) {
-            var current = new Folder(
-                new File($.fileName).parent + "/" + require._current_module_dir
-            );
+            var current = new Folder(new File($.fileName).parent + "/" + require._current_module_dir);
 
             if (!require.isPathBuilt) {
                 _buildPath(current);
@@ -115,9 +112,7 @@ $.level = 1;
             for (var i = 0; i < require._path.length; i++) {
                 files.push(require._path[i] + "/" + id + require._ext);
                 files.push(require._path[i] + "/" + id + "/index" + require._ext);
-                files.push(
-                    require._path[i] + "/" + require._current_module_dir + "/" + id + require._ext
-                );
+                files.push(require._path[i] + "/" + require._current_module_dir + "/" + id + require._ext);
             }
 
             for (i = 0; i < files.length; i++) {
@@ -157,7 +152,8 @@ $.level = 1;
     // loaded.  Items must be an empty string or a string that ends with "/".
     // Will also include the PHOTOSHOP_PATH env var.
     // This is never replaced or destroyed
-    require.path = ["/c/capristuff/adobescripts/libs/"];
+    var adobeScripts = $.getenv("adobeScripts");
+    require.path = [adobeScripts + "/libs/"];
     // Flag to build the path array or not
     require.isPathBuilt = false;
 

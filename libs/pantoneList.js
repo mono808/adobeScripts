@@ -5,9 +5,7 @@ var pantoneFile = new File("~/documents/adobeScripts/pantoneList.txt");
 var pantoneList = import_pantoneList();
 
 exports.import_pantoneList_legacy = function () {
-    var pantoneFileLegacy = new File(
-        $.getenv("pcroot") + "/adobescripts/pantones.txt"
-    );
+    var pantoneFileLegacy = new File($.getenv("adobeScripts") + "/pantones.txt");
     var pF = pantoneFileLegacy;
     var fileContent = ioFile.read_file(pF);
 
@@ -116,12 +114,7 @@ function create_colored_blob(color) {
         size = 500 / zf;
         $.writeln("Illu PARMED, again... =/");
     }
-    var blob = doc.pathItems.ellipse(
-        cP[1] + size / 2,
-        cP[0] - size / 2,
-        size,
-        size
-    );
+    var blob = doc.pathItems.ellipse(cP[1] + size / 2, cP[0] - size / 2, size, size);
 
     //tempColor.spot = spotColor;
     blob.fillColor = color;

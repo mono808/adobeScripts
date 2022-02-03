@@ -1,4 +1,5 @@
 $scriptsPath = "$env:USERPROFILE\monodev\adobeScripts"
+# $scriptsPath = "d:\mono808\monodev\adobeScripts"
 # $scriptsPath = "c:\capristuff\adobeScripts"
 
 # CC 2018

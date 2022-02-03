@@ -1,4 +1,5 @@
 ﻿var pcroot = Folder($.getenv("pcroot"));
+var adobeScripts = $.getenv("adobeScripts");
 var names = require("names");
 var f_id = require("f_id");
 var typeahead = require("typeahead");
@@ -13,17 +14,17 @@ function MonoMockup(initDoc) {
     this.templates = [
         {
             type: "bags",
-            file: File(pcroot.fullName + "/adobeScripts/templates/Ansicht_Taschen_Master.indd"),
+            file: File(adobeScripts + "/templates/Ansicht_Taschen_Master.indd"),
             scale: 4.5
         },
         {
             type: "shirts",
-            file: File(pcroot.fullName + "/adobeScripts/templates/Ansicht_Shirt_Master.indd"),
+            file: File(adobeScripts + "/templates/Ansicht_Shirt_Master.indd"),
             scale: 6.5
         },
         {
             type: "accessoires",
-            file: File(pcroot.fullName + "/adobeScripts/templates/Ansicht_Accessoires_Master.indd"),
+            file: File(adobeScripts + "/templates/Ansicht_Accessoires_Master.indd"),
             scale: 3
         }
     ];
@@ -98,10 +99,8 @@ MonoMockup.prototype.createDocPresetFromMaster = function () {
             myDPreset = app.documentPresets.add({ name: "MockupMasterPreset" });
         }
 
-        app.viewPreferences.horizontalMeasurementUnits =
-            myDoc.viewPreferences.horizontalMeasurementUnits;
-        app.viewPreferences.verticalMeasurementUnits =
-            myDoc.viewPreferences.verticalMeasurementUnits;
+        app.viewPreferences.horizontalMeasurementUnits = myDoc.viewPreferences.horizontalMeasurementUnits;
+        app.viewPreferences.verticalMeasurementUnits = myDoc.viewPreferences.verticalMeasurementUnits;
 
         var myDPrefs = myDoc.documentPreferences;
         var myMPrefs = app.activeDocument.marginPreferences;
@@ -656,25 +655,15 @@ MonoMockup.prototype.add_stand_listener = function (turnOn) {
     var doc = app.activeDocument;
 
     var includesFolder = $.getenv("JSINCLUDE");
-    doc.removeEventListener(
-        "afterSelectionAttributeChanged",
-        new File(includesFolder + "/myStandListener.jsx")
-    );
-    if (turnOn)
-        doc.addEventListener(
-            "afterSelectionAttributeChanged",
-            new File(includesFolder + "/myStandListener.jsx")
-        );
+    doc.removeEventListener("afterSelectionAttributeChanged", new File(includesFolder + "/myStandListener.jsx"));
+    if (turnOn) doc.addEventListener("afterSelectionAttributeChanged", new File(includesFolder + "/myStandListener.jsx"));
 };
 
 MonoMockup.prototype.remove_stand_listener = function () {
     var doc = app.activeDocument;
 
     var includesFolder = $.getenv("JSINCLUDE");
-    doc.removeEventListener(
-        "afterSelectionAttributeChanged",
-        new File(includesFolder + "/myStandListener.jsx")
-    );
+    doc.removeEventListener("afterSelectionAttributeChanged", new File(includesFolder + "/myStandListener.jsx"));
 };
 
 MonoMockup.prototype.copyStyles = function (source, dest) {
@@ -771,32 +760,13 @@ MonoMockup.prototype.split_frame = function (myFrame) {
         if (win.show()) {
             var myNumberOfRows = rowCount.text;
             var myNumberOfColumns = columnCount.text;
-            mySplitFrames(
-                myObjectList,
-                myNumberOfRows,
-                myNumberOfColumns,
-                0,
-                0,
-                ContentType.graphicType,
-                true,
-                true
-            );
+            mySplitFrames(myObjectList, myNumberOfRows, myNumberOfColumns, 0, 0, ContentType.graphicType, true, true);
         }
     }
-    function mySplitFrames(
-        myObjectList,
-        myNumberOfRows,
-        myNumberOfColumns,
-        myRowGutter,
-        myColumnGutter,
-        myFrameType,
-        myRetainFormatting,
-        myDeleteObject
-    ) {
+    function mySplitFrames(myObjectList, myNumberOfRows, myNumberOfColumns, myRowGutter, myColumnGutter, myFrameType, myRetainFormatting, myDeleteObject) {
         var myOldXUnits = app.activeDocument.viewPreferences.horizontalMeasurementUnits;
         var myOldYUnits = app.activeDocument.viewPreferences.verticalMeasurementUnits;
-        app.activeDocument.viewPreferences.horizontalMeasurementUnits =
-            MeasurementUnits.millimeters;
+        app.activeDocument.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.millimeters;
         app.activeDocument.viewPreferences.verticalMeasurementUnits = MeasurementUnits.millimeters;
         for (var myCounter = 0; myCounter < myObjectList.length; myCounter++) {
             mySplitFrame(
@@ -813,55 +783,30 @@ MonoMockup.prototype.split_frame = function (myFrame) {
         app.activeDocument.viewPreferences.horizontalMeasurementUnits = myOldXUnits;
         app.activeDocument.viewPreferences.verticalMeasurementUnits = myOldYUnits;
     }
-    function mySplitFrame(
-        myObject,
-        myNumberOfRows,
-        myNumberOfColumns,
-        myRowGutter,
-        myColumnGutter,
-        myFrameType,
-        myRetainFormatting,
-        myDeleteObject
-    ) {
+    function mySplitFrame(myObject, myNumberOfRows, myNumberOfColumns, myRowGutter, myColumnGutter, myFrameType, myRetainFormatting, myDeleteObject) {
         var myX1, myY1, myX2, myY2, myNewObject;
         var myBounds = myObject.geometricBounds;
         var myWidth = myBounds[3] - myBounds[1];
         var myHeight = myBounds[2] - myBounds[0];
         //Don't bother making the frames if the width/height of the frame is too small
         //to accomodate the row/column gutter values.
-        if (
-            myRowGutter * (myNumberOfRows - 1) < myHeight &&
-            myColumnGutter * (myNumberOfColumns - 1) < myWidth
-        ) {
-            var myColumnWidth =
-                (myWidth - myColumnGutter * (myNumberOfColumns - 1)) / myNumberOfColumns;
+        if (myRowGutter * (myNumberOfRows - 1) < myHeight && myColumnGutter * (myNumberOfColumns - 1) < myWidth) {
+            var myColumnWidth = (myWidth - myColumnGutter * (myNumberOfColumns - 1)) / myNumberOfColumns;
             var myRowHeight = (myHeight - myRowGutter * (myNumberOfRows - 1)) / myNumberOfRows;
             for (var myRowCounter = 0; myRowCounter < myNumberOfRows; myRowCounter++) {
                 myY1 = myBounds[0] + myRowHeight * myRowCounter + myRowGutter * myRowCounter;
                 myY2 = myY1 + myRowHeight;
-                for (
-                    var myColumnCounter = 0;
-                    myColumnCounter < myNumberOfColumns;
-                    myColumnCounter++
-                ) {
-                    myX1 =
-                        myBounds[1] +
-                        myColumnWidth * myColumnCounter +
-                        myColumnGutter * myColumnCounter;
+                for (var myColumnCounter = 0; myColumnCounter < myNumberOfColumns; myColumnCounter++) {
+                    myX1 = myBounds[1] + myColumnWidth * myColumnCounter + myColumnGutter * myColumnCounter;
                     myX2 = myX1 + myColumnWidth;
                     if (myRetainFormatting == true) {
                         myNewObject = myObject.duplicate();
                         myNewObject.geometricBounds = [myY1, myX1, myY2, myX2];
                     } else {
-                        myNewObject = myObject.parent.rectangles.add(
-                            undefined,
-                            undefined,
-                            undefined,
-                            {
-                                geometricBounds: [myY1, myX1, myY2, myX2],
-                                contentType: myFrameType
-                            }
-                        );
+                        myNewObject = myObject.parent.rectangles.add(undefined, undefined, undefined, {
+                            geometricBounds: [myY1, myX1, myY2, myX2],
+                            contentType: myFrameType
+                        });
                     }
                     if (myRetainFormatting == false) {
                         myNewObject.contentType = myFrameType;

@@ -2,6 +2,7 @@
 
 var csroot = Folder($.getenv("csroot")).fullName;
 var pcroot = Folder($.getenv("pcroot")).fullName;
+var adobeScripts = $.getenv("adobeScripts");
 var nfo = {
     jobNr: "0000A17-014",
     jobName: "JohnDoe",
@@ -25,13 +26,13 @@ paths.rolleIn = pcroot + "/distiller/filmrollen/in/";
 paths.rolleOut = pcroot + "/distiller/filmrollen/out/";
 paths.rolleSaved = pcroot + "/distiller/filmrollen/saved/";
 
-paths.sc = pcroot + "/adobescripts/";
-paths.scriptsBT = pcroot + "/adobescripts/bridgeTalk/";
-paths.scriptsInc = pcroot + "/adobescripts/includes/";
-paths.scriptsIllu = pcroot + "/adobescripts/illustrator/";
-paths.scriptsIndd = pcroot + "/adobescripts/indesign/";
-paths.pantones = pcroot + "/adobescripts/pantones.txt";
-paths.scriptsPs = pcroot + "/adobescripts/photoshop/";
+paths.sc = adobeScripts + "/";
+paths.scriptsBT = adobeScripts + "/bridgeTalk/";
+paths.scriptsInc = adobeScripts + "/includes/";
+paths.scriptsIllu = adobeScripts + "/illustrator/";
+paths.scriptsIndd = adobeScripts + "/indesign/";
+paths.pantones = adobeScripts + "/pantones.txt";
+paths.scriptsPs = adobeScripts + "/photoshop/";
 
 paths.kd = csroot + "/kundendaten/";
 paths.b2b = csroot + "/kundendaten/B2B/";
@@ -42,10 +43,8 @@ paths.rollenplanerCS = paths.dv + "/filmrollenplaner/";
 paths.templates = paths.dv + "/scriptVorlagen/filme/";
 paths.vorlagen = paths.dv + "/scriptVorlagen/filme/";
 paths.mock = paths.dv + "/scriptVorlagen/ansicht/";
-paths.mockShirtMaster =
-    paths.dv + "/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master_cc2018.indd";
-paths.mockBagMaster =
-    paths.dv + "/scriptVorlagen/ansicht/taschen/Ansicht_Taschen_Master_cc2018.indd";
+paths.mockShirtMaster = paths.dv + "/scriptVorlagen/ansicht/shirts/Ansicht_Shirt_Master_cc2018.indd";
+paths.mockBagMaster = paths.dv + "/scriptVorlagen/ansicht/taschen/Ansicht_Taschen_Master_cc2018.indd";
 
 paths.client_folder = "../";
 paths.job_folder = "./";
@@ -72,9 +71,7 @@ function set_paths(nfo) {
     // Filetags
     p.printTag = nfo.printId + "_" + nfo.tech;
 
-    p.docTag = nfo.jobNr
-        ? nfo.jobNr + "_" + nfo.jobName
-        : Window.prompt("Please enter a descriptive Jobname");
+    p.docTag = nfo.jobNr ? nfo.jobNr + "_" + nfo.jobName : Window.prompt("Please enter a descriptive Jobname");
 
     // workingfiles
     p.workingAi = p.working + p.printTag + "_Working.ai";
