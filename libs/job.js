@@ -3,7 +3,7 @@ var refTool = require("refTool");
 var jobJson = require("jobJson");
 var recentFolders = require("recentFolders");
 var rE = require("rE");
-var csroot = Folder($.getenv("csroot")).fullName;
+var csroot = Folder(CSROOT).fullName;
 
 // TODO when starting without document, show list of available json files
 // TODO start with jsonfile, then only ask when job folder is not found
@@ -16,8 +16,8 @@ exports.get_jobNfo = function (doc) {
         jobNfo = exports.get_jobNfo_from_json();
         //jobNfo = exports.get_jobNfo_from_recentFolders();
     }
-    if(!jobNfo) return null;
-    
+    if (!jobNfo) return null;
+
     if (jobNfo.folder) {
         recentFolders.add(jobNfo.folder);
     }
@@ -76,17 +76,15 @@ exports.get_jobNfo_from_recentFolders = function () {
 
 exports.get_jobNfo_from_json = function (jobNr) {
     var jsonNfo = jobJson.load_json(jobNr);
-    
+
     if (!jsonNfo) return null;
 
     var nfo = {};
     nfo.jobNr = jsonNfo.auftragsnummer;
     nfo.jobName = jsonNfo.jobname;
-    nfo.client = jsonNfo.kunde.firma
-        ? jsonNfo.kunde.firma
-        : jsonNfo.kunde.name + " " + jsonNfo.kunde.vorname;
-    
-    var match = jsonNfo.auftragsnummer.match(/^\d{1,5}(a|cs|cn|eh|mt|wm)(21)(-\d\d\d)?/i);
+    nfo.client = jsonNfo.kunde.firma ? jsonNfo.kunde.firma : jsonNfo.kunde.name + " " + jsonNfo.kunde.vorname;
+
+    var match = jsonNfo.auftragsnummer.match(/^\d{1,5}(a|cs|cn|eh|mt|wm)(21|22)(-\d\d\d)?/i);
     var year = Number(20 + match[2]);
 
     if (!jsonNfo.referenzauftrag && year >= 2021) {

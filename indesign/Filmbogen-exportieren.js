@@ -50,7 +50,7 @@ function main() {
     }
 
     function remove_pdfs(pdfs) {
-        var pcroot = new Folder($.getenv("pcroot"));
+        var pcroot = new Folder(PCROOT);
         var removedCounter = 0,
             filmOutRE = new RegExp(f_all.escapeRegExp(pcroot + "/distiller/filme/out"), "i");
 

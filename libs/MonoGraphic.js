@@ -3,14 +3,13 @@ var MonoFilm = require("MonoFilm");
 var MonoTextil = require("MonoTextil");
 var rE = require("rE");
 var bridgeTalker = require("BridgeTalker");
-var adobeScripts = Folder($.getenv("adobeScripts")).fullName;
 
 function MonoGraphic(myGraphic) {
     if (!myGraphic) return;
     var check_folder = function (fldr) {
         var jobFolder;
         if (!fldr) return null;
-        if (!fldr instanceof Folder) return null;
+        if (!(fldr instanceof Folder)) return null;
         if (fldr.displayName.match(rE.jobNr)) {
             jobFolder = fldr;
         } else {
@@ -95,12 +94,7 @@ function MonoGraphic(myGraphic) {
                 var textil = layer.allGraphics[i];
                 var link = textil.itemLink ? textil.itemLink : textil;
                 if (link && textil.parentPage === page) {
-                    if (
-                        check_if_geoBounds1_within_geoBounds2(
-                            ref.geometricBounds,
-                            textil.geometricBounds
-                        )
-                    ) {
+                    if (check_if_geoBounds1_within_geoBounds2(ref.geometricBounds, textil.geometricBounds)) {
                         return link;
                     }
                 }
@@ -177,11 +171,7 @@ function MonoGraphic(myGraphic) {
         get_file: function (fileType) {
             if (!jobFolder) jobFolder = check_folder(myFolder);
             if (!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
-            if (
-                monoPrint.hasOwnProperty(fileType) &&
-                monoPrint[fileType] &&
-                monoPrint[fileType] instanceof File
-            ) {
+            if (monoPrint.hasOwnProperty(fileType) && monoPrint[fileType] && monoPrint[fileType] instanceof File) {
                 return monoPrint[fileType];
             } else {
                 return null;
@@ -226,8 +216,7 @@ function MonoGraphic(myGraphic) {
             }
 
             //if the whole graphic is above the necklines, measure distance from the bottom of the graphic : otherwise measure from the top
-            var graphicY =
-                ref.geometricBounds[2] < y ? ref.geometricBounds[2] : ref.geometricBounds[0];
+            var graphicY = ref.geometricBounds[2] < y ? ref.geometricBounds[2] : ref.geometricBounds[0];
 
             var virtualStand = graphicY - y;
             if (virtualStand > 0 && docScale == 6.5 && compensate) {
@@ -260,14 +249,10 @@ function MonoGraphic(myGraphic) {
 
                 case "FLO":
                 case "FLX":
-                    return bridgeTalker(
-                        "illustrator",
-                        new File(adobeScripts + "/illustrator/get-doc-colors.js"),
-                        {
-                            file: new File(monoPrint.print),
-                            layers: activeLayers
-                        }
-                    );
+                    return bridgeTalker("illustrator", new File(ADOBESCRIPTS + "/illustrator/get-doc-colors.js"), {
+                        file: new File(monoPrint.print),
+                        layers: activeLayers
+                    });
 
                 case "SUB":
                     return ["CYMK"];
@@ -276,14 +261,10 @@ function MonoGraphic(myGraphic) {
                     return ["CMYK"];
 
                 case "STK":
-                    return bridgeTalker(
-                        "illustrator",
-                        new File(adobeScripts + "/illustrator/get-doc-colors.js"),
-                        {
-                            file: new File(monoPrint.print),
-                            layers: activeLayers
-                        }
-                    );
+                    return bridgeTalker("illustrator", new File(ADOBESCRIPTS + "/illustrator/get-doc-colors.js"), {
+                        file: new File(monoPrint.print),
+                        layers: activeLayers
+                    });
 
                 default:
                     return ["nach Abbildung"];
@@ -309,18 +290,10 @@ function MonoGraphic(myGraphic) {
                     switch (fileExtension) {
                         case ".psd":
                         case ".tif":
-                            result = bridgeTalker(
-                                "photoshop-120.064",
-                                new File(adobeScripts + "/photoshop/get-doc-infos.js"),
-                                new File(monoPrint.print)
-                            );
+                            result = bridgeTalker("photoshop-120.064", new File(ADOBESCRIPTS + "/photoshop/get-doc-infos.js"), new File(monoPrint.print));
                             break;
                         case ".ai":
-                            result = bridgeTalker(
-                                "illustrator",
-                                new File(adobeScripts + "/illustrator/get-doc-infos.js"),
-                                new File(monoPrint.print)
-                            );
+                            result = bridgeTalker("illustrator", new File(ADOBESCRIPTS + "/illustrator/get-doc-infos.js"), new File(monoPrint.print));
                             break;
                     }
             }

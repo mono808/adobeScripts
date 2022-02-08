@@ -45,9 +45,8 @@
 
     //monoFilm.save(jobNfo, true, false);
 
-    var paths = require("paths");
     var scriptName = "indesign/Passer-erstellen.js";
-    var scriptFile = new File(paths.pcroot + "/adobescripts/" + scriptName);
+    var scriptFile = new File(ADOBESCRIPTS + "/" + scriptName);
     app.doScript(scriptFile);
 
     if (motivLayer.isValid) {

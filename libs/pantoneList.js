@@ -5,7 +5,7 @@ var pantoneFile = new File("~/documents/adobeScripts/pantoneList.txt");
 var pantoneList = import_pantoneList();
 
 exports.import_pantoneList_legacy = function () {
-    var pantoneFileLegacy = new File($.getenv("adobeScripts") + "/pantones.txt");
+    var pantoneFileLegacy = new File(ADOBESCRIPTS + "/pantones.txt");
     var pF = pantoneFileLegacy;
     var fileContent = ioFile.read_file(pF);
 

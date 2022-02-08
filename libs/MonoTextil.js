@@ -1,6 +1,5 @@
 ﻿function MonoTextil() {
-    var csroot = $.getenv("csroot");
-    var texRoot = new Folder(csroot + "/Produktion/Druckvorstufe/textilien");
+    var texRoot = new Folder(CSROOT + "/Produktion/Druckvorstufe/textilien");
     var doc;
     var fixedLayers = /(Shirt|Front|Back|Naht|Tasche|Beutel)$/i;
 
@@ -55,11 +54,7 @@
         place_files_on_page: function (myFiles) {
             var images = [];
             for (var i = 0; i < myFiles.length; i++) {
-                var retval = doc.layoutWindows[0].activePage.place(
-                    myFiles[i],
-                    undefined,
-                    doc.activeLayer
-                );
+                var retval = doc.layoutWindows[0].activePage.place(myFiles[i], undefined, doc.activeLayer);
                 if (retval && retval.length > 0) images.push(retval[0]);
             }
             return images;
@@ -71,8 +66,7 @@
                 var myImage = myImages[i];
 
                 // filter out graphic files unsuitable for activating graphic layers
-                if (myImage.imageTypeName != "Photoshop" && myImage.imageTypeName != "Adobe PDF")
-                    continue;
+                if (myImage.imageTypeName != "Photoshop" && myImage.imageTypeName != "Adobe PDF") continue;
 
                 // get ref to the parent object, otherwise the script will fuckup ...
                 var rect = myImage.parent;

@@ -27,7 +27,7 @@ recentFiles = recentFiles.filter(function (elem) {
     return File(elem).exists;
 });
 
-var csroot = new Folder($.getenv("csroot")).fullName;
+var csroot = new Folder(CSROOT).fullName;
 var primaryScreen = get_primary_screen();
 var maxDialogRowes = 100;
 var maxRecentFolders = 200;
@@ -163,25 +163,17 @@ function show_dialog() {
 
     manualGrp.add("button", undefined, "Cancel");
 
-    var maxLength =
-        recentFiles.length < maxDialogRowes
-            ? recentFiles.length
-            : maxDialogRowes;
+    var maxLength = recentFiles.length < maxDialogRowes ? recentFiles.length : maxDialogRowes;
     var aFullName, aFileName, aFilePath, upstreamTree;
     for (var i = 0; i < maxLength; i++) {
         var fileRow = filesPnl.add("group");
         fileRow.margins = [0, 0, 0, 0];
         aFullName = recentFiles[i];
-        aFileName = aFullName.substring(
-            aFullName.lastIndexOf("/") + 1,
-            aFullName.length
-        );
+        aFileName = aFullName.substring(aFullName.lastIndexOf("/") + 1, aFullName.length);
         aFilePath = aFullName.substring(0, aFullName.lastIndexOf("/"));
         upstreamTree = aFilePath.split("/").slice(-3).join("  /  ");
 
-        var parentTxt = (fileRow["parentTxt"] = fileRow.add(
-            'statictext {justify:"right"}'
-        ));
+        var parentTxt = (fileRow["parentTxt"] = fileRow.add('statictext {justify:"right"}'));
         parentTxt.preferredSize.width = 350;
         parentTxt.text = upstreamTree;
         parentTxt.alignment = "center";

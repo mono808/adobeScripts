@@ -6,8 +6,7 @@ BaseDoc.prototype.get_width_and_height = function () {
     var dimensions = {};
     dimensions.width = this.doc.width.as("mm");
     dimensions.height = this.doc.height.as("mm");
-    dimensions.wxh =
-        dimensions.width.toFixed(0) + "x" + dimensions.height.toFixed(0);
+    dimensions.wxh = dimensions.width.toFixed(0) + "x" + dimensions.height.toFixed(0);
     return dimensions;
 };
 
@@ -73,20 +72,11 @@ BaseDoc.prototype.change_filename = function (sourceFile, addString, ext) {
     return newFile;
 };
 
-BaseDoc.prototype.get_saveName = function (
-    sourceFile,
-    searchFor,
-    replaceWith,
-    extension
-) {
-    if (sourceFile.constructor.name != "File")
-        throw new Error('sourceFile not of type "File"');
+BaseDoc.prototype.get_saveName = function (sourceFile, searchFor, replaceWith, extension) {
+    if (sourceFile.constructor.name != "File") throw new Error('sourceFile not of type "File"');
 
     var oldName = sourceFile.name;
-    var oldExtension = oldName.substring(
-        oldName.lastIndexOf(".") + 1,
-        oldName.length
-    );
+    var oldExtension = oldName.substring(oldName.lastIndexOf(".") + 1, oldName.length);
     var newName = oldName.substring(0, oldName.lastIndexOf("."));
 
     if (newName.search(replaceWith) != -1) {
@@ -121,10 +111,8 @@ BaseDoc.prototype.get_totalArea = function () {
 BaseDoc.prototype.place_on_film = function (sepFile, pos) {
     var bt_position_sep_on_film = function (serializedmyArgs) {
         function centerOnPage(itemRef) {
-            var iWidth =
-                itemRef.geometricBounds[3] - itemRef.geometricBounds[1];
-            var iHeight =
-                itemRef.geometricBounds[2] - itemRef.geometricBounds[0];
+            var iWidth = itemRef.geometricBounds[3] - itemRef.geometricBounds[1];
+            var iHeight = itemRef.geometricBounds[2] - itemRef.geometricBounds[0];
             var myDoc = app.activeDocument;
             var pWidth = myDoc.documentPreferences.pageWidth;
             var pHeight = myDoc.documentPreferences.pageHeight;
@@ -143,10 +131,7 @@ BaseDoc.prototype.place_on_film = function (sepFile, pos) {
         }
 
         var myArgs = eval(serializedmyArgs);
-        if (app.documents.length < 1)
-            throw new Error(
-                "keine Filmvorlage geöffnet, Separation kann nicht platziert werden"
-            );
+        if (app.documents.length < 1) throw new Error("keine Filmvorlage geöffnet, Separation kann nicht platziert werden");
         var iDoc = app.activeDocument;
         var myPage = iDoc.pages[0];
         var sepLayer = iDoc.layers.item("motivEbene");
@@ -164,13 +149,8 @@ BaseDoc.prototype.place_on_film = function (sepFile, pos) {
         }
     };
 
-    var pcroot = $.getenv("pcroot");
-    var blankoFilmScript = File(
-        pcroot + "/adobeScripts/indesign/Film-Vorlage-erstellen.js"
-    );
-    var finalizeScript = File(
-        pcroot + "/adobeScripts/indesign/Film-finalisieren.js"
-    );
+    var blankoFilmScript = File(ADOBESCRIPTS + "/indesign/Film-Vorlage-erstellen.js");
+    var finalizeScript = File(ADOBESCRIPTS + "/indesign/Film-finalisieren.js");
 
     indesign.executeScriptFile(blankoFilmScript);
 
@@ -181,8 +161,7 @@ BaseDoc.prototype.place_on_film = function (sepFile, pos) {
 
     var bt = new BridgeTalk();
     bt.target = "Indesign";
-    bt.body =
-        bt_position_sep_on_film.toSource() + "(" + myArgs.toSource() + ");";
+    bt.body = bt_position_sep_on_film.toSource() + "(" + myArgs.toSource() + ");";
     bt.onResult = function (inBT) {
         $.writeln(inBT.body);
     };

@@ -12,7 +12,7 @@ lastFolders = lastFolders.filter(function (fld) {
     return fld.exists;
 });
 
-var csroot = new Folder($.getenv("csroot")).fullName;
+var csroot = new Folder(CSROOT).fullName;
 var screen = get_primary_screen();
 // for (var i in screen) {
 //     $.writeln("screen."+ i + " = " + screen[i]);
@@ -206,19 +206,11 @@ function show_dialog(get_folder, get_file) {
         }
 
         if (!get_file) {
-            var browseFolderBtn = (row["browseFolderBtn"] = row.add(
-                "button",
-                undefined,
-                "Verzeichnis suchen"
-            ));
+            var browseFolderBtn = (row["browseFolderBtn"] = row.add("button", undefined, "Verzeichnis suchen"));
             browseFolderBtn.onClick = browse_Helper_folder(aFolder.fullName);
         }
         if (get_file) {
-            var browseFileBtn = (row["browseFileBtn"] = row.add(
-                "button",
-                undefined,
-                "Datei suchen"
-            ));
+            var browseFileBtn = (row["browseFileBtn"] = row.add("button", undefined, "Datei suchen"));
             browseFileBtn.onClick = browse_Helper_file(aFolder.fullName);
         }
 

@@ -28,11 +28,16 @@
 //@include "json2.jsxinc"
 //@include "es5.jsxinc"
 //@include "es6_mono808.jsxinc"
+
 /*
  * //@include "es6.jsxinc"
  */
 
 $.level = 1;
+ADOBESCRIPTS = $.getenv("adobeScripts");
+JSINCLUDE = $.getenv("JSINCLUDE");
+CSROOT = $.getenv("csroot");
+PCROOT = $.getenv("pcroot");
 
 (function (root) {
     var require = (root.require = function require(id) {
@@ -152,8 +157,8 @@ $.level = 1;
     // loaded.  Items must be an empty string or a string that ends with "/".
     // Will also include the PHOTOSHOP_PATH env var.
     // This is never replaced or destroyed
-    var adobeScripts = $.getenv("adobeScripts");
-    require.path = [adobeScripts + "/libs/"];
+
+    require.path = [ADOBESCRIPTS + "/libs/"];
     // Flag to build the path array or not
     require.isPathBuilt = false;
 

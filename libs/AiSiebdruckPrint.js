@@ -1,12 +1,12 @@
 ﻿var AiSiebdruck = require("AiSiebdruck");
 var pantoneList = require("pantoneList");
-var MonoSpot = require("MonoSpot");
-var saveOptions = require("saveOptions");
+//var MonoSpot = require("MonoSpot");
+//var saveOptions = require("saveOptions");
 
 function AiSiebdruckPrint(initDoc) {
     AiSiebdruck.call(this, initDoc);
 
-    this.pantoneTxt = new File($.getenv("pcroot") + "/adobescripts/pantones.txt");
+    this.pantoneTxt = new File(ADOBESCRIPTS + "/pantones.txt");
 }
 AiSiebdruckPrint.prototype = Object.create(AiSiebdruck.prototype);
 AiSiebdruckPrint.prototype.constructor = AiSiebdruckPrint;
@@ -19,8 +19,7 @@ AiSiebdruckPrint.prototype.check = function (items) {
         spotStrokes: []
     };
 
-    if (this.pathItems.length < 1 && this.rasterItems.length < 1 && this.pageItems.length < 1)
-        return false;
+    if (this.pathItems.length < 1 && this.rasterItems.length < 1 && this.pageItems.length < 1) return false;
 
     if (this.pathItems.length > 0) {
         var i = this.pathItems.length - 1;
@@ -41,11 +40,7 @@ AiSiebdruckPrint.prototype.check = function (items) {
                 case "SpotColor":
                     // if pI has a stroke and is filled with sth. other than underbase spotcolor
                     // check the stroke too
-                    if (
-                        pI.stroked &&
-                        pI.strokeColor.constructor.name !== "NoColor" &&
-                        !this.ubRegEx.test(pI.fillColor.spot.name)
-                    ) {
+                    if (pI.stroked && pI.strokeColor.constructor.name !== "NoColor" && !this.ubRegEx.test(pI.fillColor.spot.name)) {
                         if (pI.strokeColor.constructor.name === "SpotColor") {
                             suspItems.spotStrokes.push(pI);
                         } else {
@@ -57,12 +52,7 @@ AiSiebdruckPrint.prototype.check = function (items) {
         } while (i--);
     }
 
-    if (
-        suspItems.nonSpotFills.length == 0 &&
-        suspItems.nonSpotStrokes.length == 0 &&
-        suspItems.spotStrokes.length == 0
-    )
-        return true;
+    if (suspItems.nonSpotFills.length == 0 && suspItems.nonSpotStrokes.length == 0 && suspItems.spotStrokes.length == 0) return true;
 
     var confirmer = function (suspItems) {
         for (var key in suspItems) {
@@ -71,8 +61,7 @@ AiSiebdruckPrint.prototype.check = function (items) {
                 if (items.length == 0) continue;
                 app.selection = items;
                 app.redraw();
-                if (!Window.confirm("selected items contain " + key + "\n\nContinue?"))
-                    return false;
+                if (!Window.confirm("selected items contain " + key + "\n\nContinue?")) return false;
             }
         }
 
@@ -122,7 +111,7 @@ AiSiebdruckPrint.prototype.change_fillColor = function (itemsToCheck, oldSpot, n
         remainingItems = [];
 
     do {
-        var pI = itemsToCheck[i];
+        pI = itemsToCheck[i];
         if (pI.fillColor.spot === oldSpot) {
             tintValue = pI.fillColor.tint;
             pI.fillColor = tempColor;

@@ -1,8 +1,5 @@
 ﻿var f_all = require("f_all");
 
-var csroot = Folder($.getenv("csroot")).fullName;
-var pcroot = Folder($.getenv("pcroot")).fullName;
-var adobeScripts = $.getenv("adobeScripts");
 var nfo = {
     jobNr: "0000A17-014",
     jobName: "JohnDoe",
@@ -14,31 +11,31 @@ var nfo = {
 var varsSet = false;
 
 var paths = {};
-paths.ansichtIn = pcroot + "/distiller/ansicht/in/";
-paths.ansichtOut = pcroot + "/distiller/ansicht/out/";
-paths.ansichtHQIn = pcroot + "/distiller/ansichtHQ/in/";
-paths.ansichtHQOut = pcroot + "/distiller/ansichtHQ/out/";
-paths.ansichtPxIn = pcroot + "/distiller/ansichtPixel/in/";
-paths.ansichtPxOut = pcroot + "/distiller/ansichtPixel/out/";
-paths.filmIn = pcroot + "/distiller/filme/in/";
-paths.filmOut = pcroot + "/distiller/filme/out/";
-paths.rolleIn = pcroot + "/distiller/filmrollen/in/";
-paths.rolleOut = pcroot + "/distiller/filmrollen/out/";
-paths.rolleSaved = pcroot + "/distiller/filmrollen/saved/";
+paths.ansichtIn = PCROOT + "/distiller/ansicht/in/";
+paths.ansichtOut = PCROOT + "/distiller/ansicht/out/";
+paths.ansichtHQIn = PCROOT + "/distiller/ansichtHQ/in/";
+paths.ansichtHQOut = PCROOT + "/distiller/ansichtHQ/out/";
+paths.ansichtPxIn = PCROOT + "/distiller/ansichtPixel/in/";
+paths.ansichtPxOut = PCROOT + "/distiller/ansichtPixel/out/";
+paths.filmIn = PCROOT + "/distiller/filme/in/";
+paths.filmOut = PCROOT + "/distiller/filme/out/";
+paths.rolleIn = PCROOT + "/distiller/filmrollen/in/";
+paths.rolleOut = PCROOT + "/distiller/filmrollen/out/";
+paths.rolleSaved = PCROOT + "/distiller/filmrollen/saved/";
 
-paths.sc = adobeScripts + "/";
-paths.scriptsBT = adobeScripts + "/bridgeTalk/";
-paths.scriptsInc = adobeScripts + "/includes/";
-paths.scriptsIllu = adobeScripts + "/illustrator/";
-paths.scriptsIndd = adobeScripts + "/indesign/";
-paths.pantones = adobeScripts + "/pantones.txt";
-paths.scriptsPs = adobeScripts + "/photoshop/";
+paths.sc = ADOBESCRIPTS + "/";
+paths.scriptsBT = ADOBESCRIPTS + "/bridgeTalk/";
+paths.scriptsInc = ADOBESCRIPTS + "/includes/";
+paths.scriptsIllu = ADOBESCRIPTS + "/illustrator/";
+paths.scriptsIndd = ADOBESCRIPTS + "/indesign/";
+paths.pantones = ADOBESCRIPTS + "/pantones.txt";
+paths.scriptsPs = ADOBESCRIPTS + "/photoshop/";
 
-paths.kd = csroot + "/kundendaten/";
-paths.b2b = csroot + "/kundendaten/B2B/";
-paths.b2c = csroot + "/kundendaten/B2C/";
+paths.kd = CSROOT + "/kundendaten/";
+paths.b2b = CSROOT + "/kundendaten/B2B/";
+paths.b2c = CSROOT + "/kundendaten/B2C/";
 
-paths.dv = csroot + "/produktion/druckvorstufe/";
+paths.dv = CSROOT + "/produktion/druckvorstufe/";
 paths.rollenplanerCS = paths.dv + "/filmrollenplaner/";
 paths.templates = paths.dv + "/scriptVorlagen/filme/";
 paths.vorlagen = paths.dv + "/scriptVorlagen/filme/";
@@ -169,5 +166,5 @@ exports.folder = folder;
 exports.path = path;
 exports.file = file;
 exports.set_nfo = set_nfo;
-exports.pcroot = pcroot;
-exports.csroot = csroot;
+exports.pcroot = PCROOT;
+exports.csroot = CSROOT;

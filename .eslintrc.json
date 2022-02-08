@@ -9,10 +9,16 @@
         "extendscript/photoshop": true, // Photoshop globals
         "extendscript/illustrator": true // Illustrator globals
     },
-    "extends": ["eslint:recommended", "prettier"],
+    "extends": ["eslint:recommended"],
     "plugins": ["extendscript"],
     "parserOptions": {
         "ecmaVersion": 3
     },
-    "rules": {}
+    "rules": {},
+    "globals": {
+        "ADOBESCRIPTS": "writable",
+        "CSROOT": "writable",
+        "PCROOT": "writable",
+        "JSINCLUDE": "writable"
+    }
 }

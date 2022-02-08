@@ -26,11 +26,7 @@ PsBase.prototype.choose_saveFile = function (myDoc) {
         var check = myDoc.fullName;
         return myDoc.fullName;
     } catch (e) {
-        var saveFile = new Folder(
-            $.getenv("csroot") + "\\kundendaten"
-        ).selectDlg(
-            "Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen"
-        );
+        var saveFile = new Folder(CSROOT + "\\kundendaten").selectDlg("Dokument wurde noch nicht gespeichert, bitte Auftragsordner wählen");
         return saveFile;
     }
 };
@@ -41,10 +37,7 @@ PsBase.prototype.remove_alpha_channels = function (keepThoseChannels) {
     do {
         chan = this.doc.channels[i];
         if (keepThoseChannels && chan.name.match(keepThoseChannels)) continue;
-        if (
-            chan.kind === ChannelType.MASKEDAREA ||
-            chan.kind === ChannelType.SELECTEDAREA
-        ) {
+        if (chan.kind === ChannelType.MASKEDAREA || chan.kind === ChannelType.SELECTEDAREA) {
             chan.remove();
         }
     } while (i--);
@@ -186,17 +179,9 @@ PsBase.prototype.make_layer_mask = function (maskType) {
     var desc140 = new ActionDescriptor();
     desc140.putClass(charIDToTypeID("Nw  "), charIDToTypeID("Chnl"));
     var ref51 = new ActionReference();
-    ref51.putEnumerated(
-        charIDToTypeID("Chnl"),
-        charIDToTypeID("Chnl"),
-        charIDToTypeID("Msk ")
-    );
+    ref51.putEnumerated(charIDToTypeID("Chnl"), charIDToTypeID("Chnl"), charIDToTypeID("Msk "));
     desc140.putReference(charIDToTypeID("At  "), ref51);
-    desc140.putEnumerated(
-        charIDToTypeID("Usng"),
-        charIDToTypeID("UsrM"),
-        charIDToTypeID(maskType)
-    );
+    desc140.putEnumerated(charIDToTypeID("Usng"), charIDToTypeID("UsrM"), charIDToTypeID(maskType));
     executeAction(charIDToTypeID("Mk  "), desc140, DialogModes.NO);
 };
 
@@ -238,20 +223,15 @@ PsBase.prototype.get_guide_location = function () {
             }
         }
 
-        var info =
-            "Dokument enthält Hilfslinien. Sollen diese zur Platzierung verwenden werden?";
-        info +=
-            "\n\nBenötigt wird genau eine vertikale Hilflinie zur Markierung der Shirt-/ Beutelmitte.";
-        info +=
-            "Optional ist eine zweite waagerechte HL zur Markierung der Kragennaht / Taschenkante";
+        var info = "Dokument enthält Hilfslinien. Sollen diese zur Platzierung verwenden werden?";
+        info += "\n\nBenötigt wird genau eine vertikale Hilflinie zur Markierung der Shirt-/ Beutelmitte.";
+        info += "Optional ist eine zweite waagerechte HL zur Markierung der Kragennaht / Taschenkante";
         if (hasVerticalGuide && Window.confirm(info)) {
             guidePos.y = guidePos.y || defaultPos.y;
             return guidePos;
         }
     } else {
-        alert(
-            "Dokument enthält keine oder zu viele Hilfslinien, Motiv wird mittig platziert!"
-        );
+        alert("Dokument enthält keine oder zu viele Hilfslinien, Motiv wird mittig platziert!");
         return defaultPos;
     }
 };
@@ -269,10 +249,7 @@ PsBase.prototype.checkBitsPerChannel = function (requiredValues) {
     if (!requiredValues.includes(oldValue)) {
         var msg = "Aktuelle Bittiefe ist " + shortNames[oldValue.toString()];
         msg += "\r\rBenötigt wird " + requiredValues.join(" oder ");
-        msg +=
-            "\r\rMotiv wird zu " +
-            shortNames[requiredValues[0].toString()] +
-            " umgewandelt";
+        msg += "\r\rMotiv wird zu " + shortNames[requiredValues[0].toString()] + " umgewandelt";
         alert(msg);
         this.doc.bitsPerChannel = requiredValues[0];
         app.refresh();

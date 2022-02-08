@@ -2,7 +2,7 @@
 var _id = require("f_id");
 var ioFile = require("ioFile");
 
-var csroot = Folder($.getenv("csroot")).fullName;
+var csroot = Folder(CSROOT).fullName;
 var ignoreBridge = /^(?!.*(\.bridge)).*$/i;
 var fixedLayerNames = ["Shirt", "Naht", "Tasche", "Beutel", "Hintergrund"];
 var listAlways = "front|back|left|right|side";
@@ -23,12 +23,7 @@ function select_textile(args) {
     texFiles.sort(function (a, b) {
         return a.displayName.toLowerCase() > b.displayName.toLowerCase();
     });
-    var texResult = typeahead.show_dialog(
-        texFiles,
-        "displayName",
-        args.multiselect,
-        "Textilien wählen"
-    );
+    var texResult = typeahead.show_dialog(texFiles, "displayName", args.multiselect, "Textilien wählen");
     if (!texResult || texResult.length === 0) {
         alert("Script cancelled, no textiles selected!");
         return null;
@@ -164,12 +159,7 @@ function reactivate_jpg(texRect) {
         selectedTex = foundTex[0];
     } else {
         var multiselect = false;
-        selectedTex = typeahead.show_dialog(
-            foundTex,
-            "displayName",
-            multiselect,
-            "Textilien wählen"
-        );
+        selectedTex = typeahead.show_dialog(foundTex, "displayName", multiselect, "Textilien wählen");
     }
     replace_graphic(texRect, selectedTex);
     return texRect;
@@ -202,17 +192,9 @@ function choose_object_layers(texRect) {
     var graphicLayerNames = get_graphicLayerNames(texGraphic, false, true);
 
     //inputElements, propertyToList, multiselect, dialogTitle, listAlways
-    var selectedLayerNames = typeahead.show_dialog(
-        graphicLayerNames,
-        undefined,
-        true,
-        undefined,
-        listAlways
-    );
+    var selectedLayerNames = typeahead.show_dialog(graphicLayerNames, undefined, true, undefined, listAlways);
 
-    var visibleLayerNames = selectedLayerNames
-        ? selectedLayerNames.concat(fixedLayerNames)
-        : fixedLayerNames;
+    var visibleLayerNames = selectedLayerNames ? selectedLayerNames.concat(fixedLayerNames) : fixedLayerNames;
 
     return visibleLayerNames;
 }
@@ -249,10 +231,7 @@ function add_tex_rect() {
         strokeColor: "None",
         fillColor: "None"
     });
-    var delta = _id.get_center_delta_from_bounds(
-        app.activeWindow.activePage.bounds,
-        rect.geometricBounds
-    );
+    var delta = _id.get_center_delta_from_bounds(app.activeWindow.activePage.bounds, rect.geometricBounds);
     rect.move(undefined, [delta.x, delta.y]);
     return rect;
 }

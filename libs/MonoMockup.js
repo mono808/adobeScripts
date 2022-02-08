@@ -1,6 +1,4 @@
-﻿var pcroot = Folder($.getenv("pcroot"));
-var adobeScripts = $.getenv("adobeScripts");
-var names = require("names");
+﻿var names = require("names");
 var f_id = require("f_id");
 var typeahead = require("typeahead");
 //var texTool = require("textilTool");
@@ -14,17 +12,17 @@ function MonoMockup(initDoc) {
     this.templates = [
         {
             type: "bags",
-            file: File(adobeScripts + "/templates/Ansicht_Taschen_Master.indd"),
+            file: File(ADOBESCRIPTS + "/templates/Ansicht_Taschen_Master.indd"),
             scale: 4.5
         },
         {
             type: "shirts",
-            file: File(adobeScripts + "/templates/Ansicht_Shirt_Master.indd"),
+            file: File(ADOBESCRIPTS + "/templates/Ansicht_Shirt_Master.indd"),
             scale: 6.5
         },
         {
             type: "accessoires",
-            file: File(adobeScripts + "/templates/Ansicht_Accessoires_Master.indd"),
+            file: File(ADOBESCRIPTS + "/templates/Ansicht_Accessoires_Master.indd"),
             scale: 3
         }
     ];
@@ -654,16 +652,14 @@ MonoMockup.prototype.add_hinweis = function () {
 MonoMockup.prototype.add_stand_listener = function (turnOn) {
     var doc = app.activeDocument;
 
-    var includesFolder = $.getenv("JSINCLUDE");
-    doc.removeEventListener("afterSelectionAttributeChanged", new File(includesFolder + "/myStandListener.jsx"));
-    if (turnOn) doc.addEventListener("afterSelectionAttributeChanged", new File(includesFolder + "/myStandListener.jsx"));
+    doc.removeEventListener("afterSelectionAttributeChanged", new File(JSINCLUDE + "/myStandListener.jsx"));
+    if (turnOn) doc.addEventListener("afterSelectionAttributeChanged", new File(JSINCLUDE + "/myStandListener.jsx"));
 };
 
 MonoMockup.prototype.remove_stand_listener = function () {
     var doc = app.activeDocument;
 
-    var includesFolder = $.getenv("JSINCLUDE");
-    doc.removeEventListener("afterSelectionAttributeChanged", new File(includesFolder + "/myStandListener.jsx"));
+    doc.removeEventListener("afterSelectionAttributeChanged", new File(JSINCLUDE + "/myStandListener.jsx"));
 };
 
 MonoMockup.prototype.copyStyles = function (source, dest) {
