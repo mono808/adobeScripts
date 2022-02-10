@@ -8,6 +8,9 @@
         },
         {
             "path": "..\\adobeSampleScripts"
+        },
+        {
+            "path": "..\\adobePanels"
         }
     ],
     "settings": {}
