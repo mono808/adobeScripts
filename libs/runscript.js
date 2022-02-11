@@ -4,22 +4,21 @@
 // to work in illustrator and photoshop
 // store history in documents/adobeScripts/
 
-function runscript () {
-
-    var appName = BridgeTalk.appName
+function runscript() {
+    var appName = BridgeTalk.appName;
     var runscript = {};
     var scriptFile = File($.fileName);
     var scriptBase = scriptFile.parent.parent;
-    var script_dir = scriptBase.fullName + '/' + appName + '/';
+    var script_dir = scriptBase.fullName + "/" + appName + "/";
 
     runscript.script_dir = decodeURI(script_dir);
     runscript.historyFile = {
-        'illustrator' : '~/documents/adobeScripts/runscript-ai.txt',
-        'photoshop' : '~/documents/adobeScripts/runscript-ps.txt',
-        'indesign' : '~/documents/adobeScripts/runscript-id.txt'
-    }
+        illustrator: "~/documents/adobeScripts/runscript-ai.txt",
+        photoshop: "~/documents/adobeScripts/runscript-ps.txt",
+        indesign: "~/documents/adobeScripts/runscript-id.txt"
+    };
     runscript.history = get_history();
-    runscript.history.recentScripts = removeDeletedItems (runscript.history.recentScripts);
+    runscript.history.recentScripts = removeDeletedItems(runscript.history.recentScripts);
 
     //---------------------------------------------------------
     // Get the directory that the script is run from
@@ -27,7 +26,7 @@ function runscript () {
     function scriptPath() {
         try {
             return app.activeScript;
-        } catch(e) {
+        } catch (e) {
             return File(e.fileName);
         }
     }
@@ -35,16 +34,18 @@ function runscript () {
     //----------------------------------------------------------
     // Get all scripts -- .js, .jsx, .jsxbin
 
-    function get_scripts (dir, list, level) {
-        var f = dir.getFiles ('*.*');
+    function get_scripts(dir, list, level) {
+        var f = dir.getFiles("*.*");
+        var item;
         for (var i = 0; i < f.length; i++) {
-            if (f[i] instanceof Folder && !/^\./.test(f[i].name)) {
-                get_scripts (f[i], list, level+1);
-            } else if (/\.jsx?(bin)?/.test(f[i])) {
+            item = f[i];
+            if (item instanceof Folder && !/^\./.test(item.name)) {
+                get_scripts(item, list, level + 1);
+            } else if (/\.jsx?(bin)?/.test(item)) {
                 //$.bp(f[i].name === 'index_show.jsx')
-                //prefix = level > 1 ? f[i].parent.name.replace(/^.+\//,'/') : '';
-                prefix = level > 1 ? f[i].parent.name + '/' : '';
-                list.push (decodeURI (prefix + f[i].name));
+                //prefix = level > 1 ? item.parent.name.replace(/^.+\//,'/') : '';
+                //prefix = level > 1 ? item.parent.name + '/' : '';
+                list.push(item.fullName.replace(script_dir, ""));
             }
         }
         return list;
@@ -53,36 +54,36 @@ function runscript () {
     //----------------------------------------------------------
     // Read the settings file
 
-    function get_history () {
+    function get_history() {
         var f = File(runscript.historyFile[appName]);
         if (f.exists) {
-            return $.evalFile (f);
+            return $.evalFile(f);
         } else {
             return {
-                lastScript: '',
+                lastScript: "",
                 filter: true,
                 applyFilterOnNextRun: false,
                 filter_check: false,
                 recentScripts: []
-            }
+            };
         }
     }
 
     //-----------------------------------------------------------
     // Write the settings file
 
-    function store_history (obj) {
+    function store_history(obj) {
         var f = File(runscript.historyFile[appName]);
-        obj.recentScripts = insert_item (obj.lastScript, runscript.history.recentScripts);
-        f.open ('w');
-        f.write (obj.toSource());
-        f.close ();
+        obj.recentScripts = insert_item(obj.lastScript, runscript.history.recentScripts);
+        f.open("w");
+        f.write(obj.toSource());
+        f.close();
     }
 
     //-------------------------------------------------------
     // Update the recent-scripts list
-    
-    function insert_item (new_item, list) {
+
+    function insert_item(new_item, list) {
         // If we ran the first script again, nothing to do
         if (list[0] === new_item) {
             return list;
@@ -91,7 +92,7 @@ function runscript () {
         var n = list.length < 15 ? list.length : 15;
         for (var i = 0; i < n; i++) {
             if (list[i] !== new_item) {
-                new_list.push (list[i]);
+                new_list.push(list[i]);
             }
         }
         return new_list;
@@ -99,12 +100,12 @@ function runscript () {
 
     //---------------------------------------------------------------------------
     // Filter deleted scripts from the recentScripts list
-    
-    function removeDeletedItems (list) {
+
+    function removeDeletedItems(list) {
         var arr = [];
         for (var i = 0; i < list.length; i++) {
-            if (File(runscript.script_dir + '/' + list[i]).exists) {
-                arr.push (list[i]);
+            if (File(runscript.script_dir + "/" + list[i]).exists) {
+                arr.push(list[i]);
             }
         }
         return arr;
@@ -112,199 +113,194 @@ function runscript () {
 
     //---------------------------------------------------------------------------
     // Combine the history list with the contents of the script folder
-    
-    function getDropdownList () {
+
+    function getDropdownList() {
         var droplist;
         //var scripts = get_scripts (runscript.script_dir);
-        var scripts = get_scripts (Folder (runscript.script_dir), [], 1);
+        var scripts = get_scripts(Folder(runscript.script_dir), [], 1);
         if (runscript.history.recentScripts.length === 0) {
             droplist = scripts;
         } else {
-            droplist = runscript.history.recentScripts.concat ('----------------------------------------------').concat(scripts);
+            droplist = runscript.history.recentScripts.concat("----------------------------------------------").concat(scripts);
         }
         return droplist;
     }
 
-
-    function get_a_script () {
+    function get_a_script() {
         var i = 0;
-        var filter = '';
-        var filterRE = '';
+        var filter = "";
+        var filterRE = "";
         var droplist = getDropdownList();
         var listLength = droplist.length;
         var list;
-        var w = new Window ('dialog', 'Script launcher', undefined, {closeButton: false});
-            w.orientation = 'row';
-            w.alignChildren = 'top';
-            
-            w.main = w.add ('group {orientation: "column"}');
-                var entry = w.main.add ('edittext', undefined, droplist[0]);
-                    entry.minimumSize.width = 300;
-                list = w.main.add ('listbox', undefined, droplist);
-                    list.preferredSize = [300, 350];
-                    list.selection = 0;
-                
-                var options = w.main.add ('group {alignment: "left"}');
-                var filter_check = options.add ('checkbox {text: "Filter list"}');
-                var applyFilterOnNextRun = options.add ('checkbox {text: "Apply filter on next run"}');
+        var w = new Window("dialog", "Script launcher", undefined, { closeButton: false });
+        w.orientation = "row";
+        w.alignChildren = "top";
 
-            w.buttons = w.add ('group {orientation: "column", alignChildren: "fill"}');
-                w.buttons.add ('button', undefined, 'Run', {name: 'OK'});
-                w.edit_button = w.buttons.add ('button', undefined, 'Edit');
-                w.buttons.add ('button', undefined, 'Cancel', {name: 'cancel'});
-                w.buttons.add ('panel');
-                w.show_folder = w.buttons.add ('button', undefined, 'Folder');
-                w.delete_button = w.buttons.add ('button', undefined, 'Delete');
+        w.main = w.add('group {orientation: "column"}');
+        var entry = w.main.add("edittext", undefined, droplist[0]);
+        entry.minimumSize.width = 300;
+        list = w.main.add("listbox", undefined, droplist);
+        list.preferredSize = [300, 350];
+        list.selection = 0;
 
-            applyFilterOnNextRun.value = runscript.history.applyFilterOnNextRun;
-            filter_check.value = runscript.history.filter_check;
-            
-            w.show_folder.onClick = function () {
-                Folder(runscript.script_dir).execute();
-            }
+        var options = w.main.add('group {alignment: "left"}');
+        var filter_check = options.add('checkbox {text: "Filter list"}');
+        var applyFilterOnNextRun = options.add('checkbox {text: "Apply filter on next run"}');
 
-            w.edit_button.onClick = function() {
-                File(runscript.script_dir+'/'+list.selection.text).execute();
-            }
-        
-            w.delete_button.onClick = function() {
-                try {
-                    File(runscript.script_dir+'/'+list.selection.text).remove();
-                } catch(_){
-                };
-                var temp = deleteScriptName (list.selection.text);
-                replace_list (temp);
-            }
-        
-            function deleteScriptName (str) {
-                var ret = [];
-                var le = droplist.length;
-                for (var i = 0; i < le; i++) {
-                    if (droplist[i] !== str) {
-                        ret.push (droplist[i]);
-                    }
-                }
-                return ret;
-            }
-                
-            entry.onChanging = filter_list;
+        w.buttons = w.add('group {orientation: "column", alignChildren: "fill"}');
+        w.buttons.add("button", undefined, "Run", { name: "OK" });
+        w.edit_button = w.buttons.add("button", undefined, "Edit");
+        w.buttons.add("button", undefined, "Cancel", { name: "cancel" });
+        w.buttons.add("panel");
+        w.show_folder = w.buttons.add("button", undefined, "Folder");
+        w.delete_button = w.buttons.add("button", undefined, "Delete");
 
-            function replace_list (temp) {
-                // To change the dropdown, we replace the list object 
-                // rather than the items in the list. Much quicker.
-                var templist = w.main.add ('listbox', list.bounds, temp);
-                w.main.remove (list);
-                list = templist;
-                list.addEventListener('click', d_click);
-                list.items[0].text.slice(0,3) == '---' ? list.selection = 1 : list.selection = 0;
-            }
+        applyFilterOnNextRun.value = runscript.history.applyFilterOnNextRun;
+        filter_check.value = runscript.history.filter_check;
 
-            function filter_list () {
-                // If filter_check is true, we show only the scripts whose names contain what we type 
-                // by creating a new list on every keypress.
-                // If filter_check is false, we leave the list for what it is and select the first entry 
-                // in the list that matches what we type
-                filter = entry.text;
-                filterRE = RegExp (filter, 'i')
-                if (filter_check.value) {
-                    var temp = [];
-                    for (i = 0; i < droplist.length; i++) {
-                        //if (droplist[i].toLowerCase().indexOf (filter.toLowerCase()) > -1 || droplist[i].slice (0,3) === '---') {
-                        if (filterRE.test (droplist[i])) {
-                            temp.push (droplist[i]);
-                        }
-                    }
-                    replace_list (temp);
-                } else {
-                    i = 0;
-                    // Look for the first match
-                    while (i < listLength && list.items[i].text.toLowerCase().indexOf (filter.toLowerCase()) < 0) {
-                        ++i;
-                    }
-                    if (list.items[i].text.toLowerCase().indexOf (filter.toLowerCase()) > -1) {
-                        list.selection = i;  // select it
-                    }
-                }
-            } // filter_list
+        w.show_folder.onClick = function () {
+            Folder(runscript.script_dir).execute();
+        };
 
-            list.addEventListener('click', d_click);
-            
-            function d_click (event) {
-                if (event.detail == 2 /*if double-click*/) { // Doesn't work in CC
-                    w.close (1);
+        w.edit_button.onClick = function () {
+            File(runscript.script_dir + "/" + list.selection.text).execute();
+        };
+
+        w.delete_button.onClick = function () {
+            try {
+                File(runscript.script_dir + "/" + list.selection.text).remove();
+            } catch (_) {}
+            var temp = deleteScriptName(list.selection.text);
+            replace_list(temp);
+        };
+
+        function deleteScriptName(str) {
+            var ret = [];
+            var le = droplist.length;
+            for (var i = 0; i < le; i++) {
+                if (droplist[i] !== str) {
+                    ret.push(droplist[i]);
                 }
             }
+            return ret;
+        }
 
-            w.onShow = function () {
-                //w.layout.layout();  // Is this necessary?
-                entry.active = true;
-                if (runscript.history.applyFilterOnNextRun && runscript.history.filter !== '') {
-                    entry.text = runscript.history.filter;
-                    filter_list();
+        entry.onChanging = filter_list;
+
+        function replace_list(temp) {
+            // To change the dropdown, we replace the list object
+            // rather than the items in the list. Much quicker.
+            var templist = w.main.add("listbox", list.bounds, temp);
+            w.main.remove(list);
+            list = templist;
+            list.addEventListener("click", d_click);
+            list.items[0].text.slice(0, 3) == "---" ? (list.selection = 1) : (list.selection = 0);
+        }
+
+        function filter_list() {
+            // If filter_check is true, we show only the scripts whose names contain what we type
+            // by creating a new list on every keypress.
+            // If filter_check is false, we leave the list for what it is and select the first entry
+            // in the list that matches what we type
+            filter = entry.text;
+            filterRE = RegExp(filter, "i");
+            if (filter_check.value) {
+                var temp = [];
+                for (i = 0; i < droplist.length; i++) {
+                    //if (droplist[i].toLowerCase().indexOf (filter.toLowerCase()) > -1 || droplist[i].slice (0,3) === '---') {
+                    if (filterRE.test(droplist[i])) {
+                        temp.push(droplist[i]);
+                    }
                 }
-                w.location = runscript.history.location;
-                list.revealItem(i);
+                replace_list(temp);
+            } else {
+                i = 0;
+                // Look for the first match
+                while (i < listLength && list.items[i].text.toLowerCase().indexOf(filter.toLowerCase()) < 0) {
+                    ++i;
+                }
+                if (list.items[i].text.toLowerCase().indexOf(filter.toLowerCase()) > -1) {
+                    list.selection = i; // select it
+                }
             }
-            
-            if (w.show() == 2) {
-                w.close();
-								return null;
-                //exit();
-            }
+        } // filter_list
 
-            var script = list.selection.text;
-            var obj = {
-                location: [w.location.x, w.location.y],
-                lastScript: script,
-                filter: filter,
-                applyFilterOnNextRun: applyFilterOnNextRun.value,
-                filter_check: filter_check.value
+        list.addEventListener("click", d_click);
+
+        function d_click(event) {
+            if (event.detail == 2 /*if double-click*/) {
+                // Doesn't work in CC
+                w.close(1);
             }
-            store_history (obj);
-            return File (runscript.script_dir + '/' + script);
+        }
+
+        w.onShow = function () {
+            //w.layout.layout();  // Is this necessary?
+            entry.active = true;
+            if (runscript.history.applyFilterOnNextRun && runscript.history.filter !== "") {
+                entry.text = runscript.history.filter;
+                filter_list();
+            }
+            w.location = runscript.history.location;
+            list.revealItem(i);
+        };
+
+        if (w.show() == 2) {
+            w.close();
+            return null;
+        }
+
+        var script = list.selection.text;
+        var obj = {
+            location: [w.location.x, w.location.y],
+            lastScript: script,
+            filter: filter,
+            applyFilterOnNextRun: applyFilterOnNextRun.value,
+            filter_check: filter_check.value
+        };
+        store_history(obj);
+        return File(runscript.script_dir + "/" + script);
     } // dialog
 
-    function read_file(aFile) {     
-        if(aFile && aFile instanceof File && aFile.exists) {
-            aFile.open('r', undefined, undefined);
-            aFile.encoding = "UTF-8";      
+    function read_file(aFile) {
+        if (aFile && aFile instanceof File && aFile.exists) {
+            aFile.open("r", undefined, undefined);
+            aFile.encoding = "UTF-8";
             aFile.lineFeed = "Windows";
             var success = aFile.read();
             aFile.close();
             return success;
-        }
-        else {
-            alert(aFile + 'could not be read');
+        } else {
+            alert(aFile + "could not be read");
         }
     }
 
     try {
         var script = get_a_script();
-            if(!script) return;
-        
+        if (!script) return;
+
         switch (app.name) {
-            case 'Adobe Illustrator' :
+            case "Adobe Illustrator":
                 var scriptString = read_file(script);
-                if(!scriptString) return
+                if (!scriptString) return;
                 illustrator.executeScript(scriptString);
-            break;
-            
-            case 'Adobe InDesign' :                
-                app.doScript (script);
+                break;
+
+            case "Adobe InDesign":
+                app.doScript(script);
                 app.activate();
-            break;
+                break;
 
-            case 'Adobe Photoshop' :
+            case "Adobe Photoshop":
                 var scriptString = read_file(script);
-                if(!scriptString) return
-                photoshop.executeScript (scriptString);
-            break;
+                if (!scriptString) return;
+                photoshop.executeScript(scriptString);
+                break;
         }
-        
     } catch (e) {
-		alert (e.message  + "\rin file " + e.fileName + "\rin line " + e.line);
+        alert(e.message + "\rin file " + e.fileName + "\rin line " + e.line);
     }
-
-};
+}
 
 exports = module.exports = runscript;
