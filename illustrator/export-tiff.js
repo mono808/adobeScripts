@@ -54,7 +54,7 @@
     statictext2.text = "Color Space";
     statictext2.preferredSize.width = 80;
 
-    var dropdown2_array = ["CMYK", "RGB", "GrayScale", "Separation"];
+    var dropdown2_array = ["CMYK", "RGB", "GrayScale"];
     var dropdown2 = group2.add("dropdownlist", undefined, undefined, { name: "dropdown2", items: dropdown2_array });
     dropdown2.selection = 0;
     dropdown2.preferredSize.width = 150;
@@ -63,17 +63,30 @@
     // ======
     var group3 = panel1.add("group", undefined, { name: "group3" });
     group3.orientation = "row";
-    group3.alignChildren = ["left", "center"];
+    group3.alignChildren = ["left", "top"];
     group3.spacing = 10;
     group3.margins = 0;
+    group3.alignment = ["fill", "top"];
 
-    var statictext3 = group3.add("statictext", undefined, undefined, { name: "statictext3" });
-    statictext3.text = "Resolution";
-    statictext3.preferredSize.width = 80;
+    var slider2 = group3.add("slider", undefined, undefined, undefined, undefined, { name: "slider2" });
+    slider2.helpTip = "Scale";
+    slider2.minvalue = 16;
+    slider2.maxvalue = 512;
+    slider2.value = 160;
+    slider2.preferredSize.width = 190;
+    slider2.alignment = ["left", "fill"];
 
-    var edittext1 = group3.add('edittext {properties: {name: "edittext1"}}');
-    edittext1.text = "150";
-    edittext1.preferredSize.width = 150;
+    var edittext2 = group3.add('edittext {properties: {name: "edittext2"}}');
+    edittext2.text = "160";
+    edittext2.preferredSize.width = 40;
+
+    slider2.addEventListener("changing", function (e) {
+        var rounded = Math.round(e.target.value / 16) * 16;
+        edittext2.text = slider2.value = rounded;
+    });
+    edittext2.addEventListener("keyup", function (e) {
+        slider2.value = Math.round(Number(e.target.text));
+    });
 
     // PANEL1
     // ======
@@ -114,7 +127,7 @@
     e.antiAliasing = eval("AntiAliasingMethod." + dropdown1.selection.text);
     e.embedICCProfile = checkbox1.value;
     e.imageColorSpace = eval("ImageColorSpace." + dropdown2.selection.text);
-    e.resolution = Number(edittext1.text);
+    e.resolution = Number(edittext2.text);
     e.IZWCompression = checkbox3.value;
     e.saveMultipleArtboards = checkbox2.value;
 
