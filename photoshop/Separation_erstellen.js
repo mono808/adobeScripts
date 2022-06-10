@@ -1,49 +1,69 @@
-﻿#target photoshop
-function main () {
+﻿////@target photoshop
 
-     
-    #include 'SepDocPS.jsx'
-    #include 'Job.jsx'
-    #include 'JobFolder.jsx'
-    #include 'Pathmaker.jsx'
-    #include 'MonoNamer.jsx'
-    #include 'InteractSwitch.jsx'
-    #include 'ButtonList.jsx'
+function main() {
+    //@include "require.js"
 
-    var job = new Job(app.activeDocument, true);
-    var pm = new Pathmaker(job.nfo);
+    var job = require("job");
+    var print = require("print");
+    var paths = require("paths");
+    var saveOptions = require("saveOptions");
+    var iaSwitch = require("interactionSwitch");
+    var PsSiebdruckPrint = require("PsSiebdruckPrint");
 
-    var iaSwitch = new InteractSwitch();
-    iaSwitch.set('none');
+    if (!app.activeDocument) return false;
 
-    var saveFile = pm.file('sepPs');
-    var sepObj = Object.create(sepDocPS)
-    sepObj.startDoc = app.activeDocument;
-    sepObj.make(saveFile);
-    app.refresh();
-    //if(Window.confirm ('Doc ok?', false, 'Check Document')) sep.doc.close();
-    app.activeDocument = sepObj.startDoc;
+    //make some checks to verify that the script can run
+    var printDoc = new PsSiebdruckPrint(app.activeDocument);
 
-    // var styles = ['merged', 'layered'];
+    var pantoneChannels = printDoc.check_for_pantone();
+    if (pantoneChannels.length > 0) {
+        var alertStr = "";
+        alertStr += "Dokument enthält Pantone-Farben in folgenden Kanälen:\n\n";
+        alertStr += pantoneChannels.join("\n");
+        alertStr += "\n\nBitte erst in RGB Farben wandeln!";
+        alert(alertStr);
+        return false;
+    }
 
-    // var infoText = 'Please choose the style of the PreviewFile:\r\r';
-    // infoText += 'Layered -> SpotChannels are displayed as Layers, all colors are 100% opaque\r\r';
-    // infoText += 'Merged  -> SpotChannels are merged to flat RGB File, better opacity simulation';
-    // var style = new ButtonList('Choose Preview Style', infoText).show_dialog(styles);
+    if (printDoc.get_spot_channels().length < 1) {
+        alert("Document contains no SpotColor Channels, script cancelled");
+        return false;
+    }
 
-    // var saveFile = pm.file('previewPs');
-    // var preview = new PreviewDocPS(app.activeDocument, style, saveFile);
-    // app.refresh();
-    //if(Window.confirm ('Doc ok?', false, 'Check Document')) preview.doc.close();
-    //app.activeDocument = baseDoc.doc;
+    var jobNfo = job.get_jobNfo_from_doc(app.activeDocument);
+    var printNfo = print.get_printNfo(jobNfo.file);
+    paths.set_nfo(jobNfo);
+    paths.set_nfo(printNfo);
 
-    //var saveFile = pm.file('previewPs');
-    //var preview = new PreviewDocPS(app.activeDocument, 'layered');
-    //app.refresh();
-    //if(Window.confirm ('Doc ok?', false, 'Check Document')) preview.doc.close();
-    //app.activeDocument = baseDoc.doc;
+    //---------------------------------------------------------------------
+    // create the separation file
+
+    var originalRulerUnits = app.preferences.rulerUnits;
+    app.preferences.rulerUnits = Units.MM;
+
+    iaSwitch.set("none");
+
+    var sepFormat = printDoc.get_sep_format();
+    var saveFile, saveOpts;
+    switch (sepFormat) {
+        case "PSD":
+            saveFile = paths.file("sdPrintPsd");
+            saveOpts = saveOptions.sdPrintPsPsd();
+            break;
+        case "EPS":
+            saveFile = paths.file("sdPrintEps");
+            saveOpts = saveOptions.sdPrintPsEps();
+            break;
+    }
+
+    printDoc.make(saveFile, saveOpts);
+
+    // var guidesLocation = printDoc.get_guide_location();
+    // printDoc.place_on_film(saveFile, guidesLocation);
+
+    app.activeDocument = printDoc.sourceDoc;
 
     iaSwitch.reset();
-
 }
+
 main();
