@@ -23,9 +23,7 @@
         filesPnl.margins = [10, 25, 10, 10];
 
         for (var i = 0; i < arrayOfFiles.length; i++) {
-            checkBoxes.push(
-                filesPnl.add("checkbox", undefined, "\u00A0" + arrayOfFiles[i].displayName)
-            );
+            checkBoxes.push(filesPnl.add("checkbox", undefined, "\u00A0" + arrayOfFiles[i].displayName));
         }
 
         var optsPnl = w.add("panel", undefined, "Ausgabe-Optionen");
@@ -94,8 +92,7 @@
         texString += rowContent.printId; // Druckposi
 
         wawiString = "Produktionsdetails: ";
-        wawiString +=
-            rowContent.tech == "Siebdruck" ? "Druckfarben (~ Pantone C): " : "Druckfarben: ";
+        wawiString += rowContent.tech == "Siebdruck" ? "Druckfarben (~ Pantone C): " : "Druckfarben: ";
         wawiString += rowContent.colors;
         wawiString += " - Druckbreite: ca. ";
         wawiString += rowContent.width / 10;
@@ -110,9 +107,7 @@
     var show_wawi_string_dialog = function (rowContents, jobNfo, copyToClipboard) {
         var dialogTitle;
         dialogTitle = "WaWi Infos nachtragen zu ->  ";
-        dialogTitle += jobNfo
-            ? jobNfo.jobNr + " - " + jobNfo.client
-            : "irgendeinem bekloppten Auftrag";
+        dialogTitle += jobNfo ? jobNfo.jobNr + " - " + jobNfo.client : "irgendeinem bekloppten Auftrag";
 
         var win = new Window("dialog", dialogTitle);
         win.alignChildren = "right";
@@ -128,11 +123,7 @@
             aPnl.wawiGroup.alignChildren = "fill";
             aPnl.wawiGroup.wawiText = aPnl.wawiGroup.add("edittext", undefined, rowStrings.wawi);
             aPnl.wawiGroup.wawiText.preferredSize = [500, 25];
-            aPnl.wawiGroup.copyButton = aPnl.wawiGroup.add(
-                "button",
-                undefined,
-                "copy to clipboard"
-            );
+            aPnl.wawiGroup.copyButton = aPnl.wawiGroup.add("button", undefined, "copy to clipboard");
             aPnl.wawiGroup.copyButton.onClick = function () {
                 copyToClipboard(this.parent.wawiText.text);
             };
@@ -146,8 +137,8 @@
     var job = require("job");
     var jobFolder = require("jobFolder");
     var paths = require("paths");
-    var f_all = require("f_all");
-    var f_id = require("f_id");
+    var _ = require("_");
+    var _id = require("_id");
 
     var MonoMockup = require("MonoMockup");
     var MonoTable = require("MonoTable");
@@ -178,7 +169,7 @@
     for (i = 0, len = result.files.length; i < len; i++) {
         var myFile = result.files[i];
         var monoMockup = new MonoMockup(app.open(myFile, true));
-        var layerToggle = f_id.layerToggle(["Intern"]);
+        var layerToggle = _id.layerToggle(["Intern"]);
         layerToggle.show();
         for (var j = 0; j < monoMockup.doc.pages.length; j++) {
             var monoTable = new MonoTable(monoMockup.doc.pages[j]);
@@ -193,11 +184,7 @@
         for (var k = 0; k < monoGraphics.length; k++) {
             var mG = monoGraphics[k];
             var checkResult = mG.check_size();
-            if (
-                Math.abs(checkResult.sizeDif) > 2 ||
-                Math.abs(checkResult.posDif) > 1.5 ||
-                Math.abs(checkResult.placedDif) > 1
-            ) {
+            if (Math.abs(checkResult.sizeDif) > 2 || Math.abs(checkResult.posDif) > 1.5 || Math.abs(checkResult.placedDif) > 1) {
                 errors.push({ mG: mG, result: checkResult });
             }
         }
@@ -261,6 +248,6 @@
     interactSwitch.set("all");
 
     if (rowContents.length > 0) {
-        show_wawi_string_dialog(rowContents, jobNfo, f_all.copyToClipboard);
+        show_wawi_string_dialog(rowContents, jobNfo, _.copyToClipboard);
     }
 })();

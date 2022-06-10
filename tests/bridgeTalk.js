@@ -1,6 +1,6 @@
 ﻿//@include "require.js"
 
-var f_all = require("f_all");
+var _ = require("_");
 
 function testBT(myString) {
     $.writeln(BridgeTalk.appName + " says: " + myString);
@@ -13,4 +13,4 @@ function myCallBack(resObj) {
     $.writeln(BridgeTalk.appName + " calculates: " + resVal * 3);
 }
 
-f_all.BT_send_script("illustrator", testBT, "Shalalala", 0, myCallBack);
+_.BT_send_script("illustrator", testBT, "Shalalala", 0, myCallBack);

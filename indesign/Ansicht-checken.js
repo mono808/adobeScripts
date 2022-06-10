@@ -4,7 +4,7 @@
 (function () {
     var job = require("job");
     var jobFolder = require("jobFolder");
-    var f_id = require("f_id");
+    var _id = require("_id");
 
     var MonoMockup = require("MonoMockup");
 
@@ -23,7 +23,7 @@
     var errors = [];
 
     var monoMockup = new MonoMockup(app.activeDocument);
-    var layerToggle = f_id.layerToggle(["Intern"]);
+    var layerToggle = _id.layerToggle(["Intern"]);
     layerToggle.show();
 
     var monoGraphics = monoMockup.get_all_monoGraphics();
@@ -31,10 +31,7 @@
     var get_diff = function (fileInfos, previewInfos) {
         var difference = {};
         for (var key in fileInfos) {
-            if (
-                Object.hasOwnProperty.call(fileInfos, key) &&
-                Object.hasOwnProperty.call(previewInfos, key)
-            ) {
+            if (Object.hasOwnProperty.call(fileInfos, key) && Object.hasOwnProperty.call(previewInfos, key)) {
                 difference[key] = (previewInfos[key] - fileInfos[key]).toFixed(0);
             }
         }

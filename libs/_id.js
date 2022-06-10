@@ -1,4 +1,31 @@
 ﻿var _id = {
+    /**
+     * Gets the layer names of currently active layers.
+     * @param {object} myGraphic - Ref to an graphicItem in the document
+     * @param {boolean} skipHiddenLayers
+     * @param {boolean} skipFixedLayers - Skip Layers the are currently fixed
+     * @param {Array.string} fixedLayerNames - layers that always should be treated as fixed, identified by name
+     * @returns {Array} - all layers names that fit the parameters
+     */
+    get_graphicLayerNames: function (myGraphic, skipHiddenL, skipFixedL, fixedLayerNames) {
+        // get ref to the parent object, otherwise the script will fuckup ...
+        var graphicLayers = myGraphic.graphicLayerOptions.graphicLayers;
+        var layerNames = [];
+        var gL;
+
+        for (var j = 0, lenJ = graphicLayers.length; j < lenJ; j++) {
+            gL = graphicLayers[j];
+            var name = gL.name;
+            if (skipHiddenL && gL.currentVisibility !== true) continue;
+
+            if (skipFixedL && fixedLayerNames.includes(name)) continue;
+
+            layerNames.push(name);
+        }
+
+        return layerNames;
+    },
+
     add_cmyk_color: function (colorValues) {
         var doc = app.activeDocument;
         var name = "C=" + colorValues[0];
@@ -196,14 +223,8 @@
             }
         }
 
-        var topLeft = rec.resolve(
-                AnchorPoint.TOP_LEFT_ANCHOR,
-                CoordinateSpaces.SPREAD_COORDINATES
-            )[0],
-            bottomRight = rec.resolve(
-                AnchorPoint.BOTTOM_RIGHT_ANCHOR,
-                CoordinateSpaces.SPREAD_COORDINATES
-            )[0],
+        var topLeft = rec.resolve(AnchorPoint.TOP_LEFT_ANCHOR, CoordinateSpaces.SPREAD_COORDINATES)[0],
+            bottomRight = rec.resolve(AnchorPoint.BOTTOM_RIGHT_ANCHOR, CoordinateSpaces.SPREAD_COORDINATES)[0],
             corners = [topLeft, bottomRight];
 
         rec.remove();
@@ -211,10 +232,7 @@
         item.reframe(CoordinateSpaces.SPREAD_COORDINATES, corners);
     },
     print2PS: function (targetFile, printPreset) {
-        var myPPreset =
-                printPreset.constructor.name == "PrinterPreset"
-                    ? printPreset
-                    : app.printerPresets.item(printPreset),
+        var myPPreset = printPreset.constructor.name == "PrinterPreset" ? printPreset : app.printerPresets.item(printPreset),
             f = targetFile instanceof File ? targetFile : new File(targetFile),
             doc = app.activeDocument,
             myDPPref = doc.printPreferences;
@@ -364,10 +382,8 @@
                 });
             }
 
-            app.viewPreferences.horizontalMeasurementUnits =
-                myDoc.viewPreferences.horizontalMeasurementUnits;
-            app.viewPreferences.verticalMeasurementUnits =
-                myDoc.viewPreferences.verticalMeasurementUnits;
+            app.viewPreferences.horizontalMeasurementUnits = myDoc.viewPreferences.horizontalMeasurementUnits;
+            app.viewPreferences.verticalMeasurementUnits = myDoc.viewPreferences.verticalMeasurementUnits;
 
             var myDPrefs = myDoc.documentPreferences;
             var myMPrefs = app.activeDocument.marginPreferences;
@@ -381,8 +397,7 @@
             myDPreset.documentBleedBottomOffset = myDPrefs.documentBleedBottomOffset;
             myDPreset.documentBleedTopOffset = myDPrefs.documentBleedTopOffset;
             myDPreset.documentBleedInsideOrLeftOffset = myDPrefs.documentBleedInsideOrLeftOffset;
-            myDPreset.documentBleedOutsideOrRightOffset =
-                myDPrefs.documentBleedOutsideOrRightOffset;
+            myDPreset.documentBleedOutsideOrRightOffset = myDPrefs.documentBleedOutsideOrRightOffset;
             myDPreset.facingPages = myDPrefs.facingPages;
             myDPreset.pageHeight = myDPrefs.pageHeight;
             myDPreset.pageWidth = myDPrefs.pageWidth;

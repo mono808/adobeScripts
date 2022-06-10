@@ -1,5 +1,5 @@
 ﻿var names = require("names");
-var f_id = require("f_id");
+var _id = require("_id");
 var typeahead = require("typeahead");
 //var texTool = require("textilTool");
 
@@ -219,7 +219,7 @@ MonoMockup.prototype.fill_job_infos = function (nfo) {
         };
     }
 
-    jobString = "Auftraggeber:\r";
+    jobString = "Kunde:\r";
     jobString += nfo.client;
     jobString += "\rAuftragsnummer:\r";
     jobString += nfo.jobNr;
@@ -605,7 +605,7 @@ MonoMockup.prototype.add_hinweis = function () {
     var myLayer, textStyle;
     if (dialogResult.intern) {
         var internStyleProps = Object.assign({}, hinweisStyleProps);
-        internStyleProps.fillColor = f_id.add_cmyk_color([100, 0, 0, 0]);
+        internStyleProps.fillColor = _id.add_cmyk_color([100, 0, 0, 0]);
         internStyleProps.name = "internTextStyle";
 
         var internStyle = this.update_style("paragraphStyles", internStyleProps);
@@ -613,7 +613,7 @@ MonoMockup.prototype.add_hinweis = function () {
         textStyle = internStyle;
     } else {
         var externStyleProps = Object.assign({}, hinweisStyleProps);
-        externStyleProps.fillColor = f_id.add_cmyk_color([0, 100, 0, 0]);
+        externStyleProps.fillColor = _id.add_cmyk_color([0, 100, 0, 0]);
         externStyleProps.name = "hinweisTextStyle";
 
         var externStyle = this.update_style("paragraphStyles", externStyleProps);

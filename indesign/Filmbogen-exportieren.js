@@ -2,8 +2,8 @@
 //@include "require.js"
 function main() {
     var paths = require("paths");
-    var f_all = require("f_all");
-    var f_id = require("f_id");
+    var _ = require("_");
+    var _id = require("_id");
     var rE = require("rE");
 
     var myDoc = app.activeDocument;
@@ -52,7 +52,7 @@ function main() {
     function remove_pdfs(pdfs) {
         var pcroot = new Folder(PCROOT);
         var removedCounter = 0,
-            filmOutRE = new RegExp(f_all.escapeRegExp(pcroot + "/distiller/filme/out"), "i");
+            filmOutRE = new RegExp(_.escapeRegExp(pcroot + "/distiller/filme/out"), "i");
 
         var i, pdf, pdfFile;
 
@@ -60,7 +60,7 @@ function main() {
             pdf = pdfs[i];
             pdfFile = new File(pdf);
             if (pdfFile.exists && filmOutRE.test(pdfFile.path)) {
-                f_all.copy_file_via_bridgeTalk(pdf, saveFolder, true);
+                _.copy_file_via_bridgeTalk(pdf, saveFolder, true);
                 removedCounter += 1;
             }
         }
@@ -72,7 +72,7 @@ function main() {
     do {
         myPage = myDoc.pages[i];
         if (myPage.pageItems.length > 0) {
-            f_id.fit_page_to_art(myPage, true, true);
+            _id.fit_page_to_art(myPage, true, true);
         } else {
             myPage.remove();
         }
@@ -89,9 +89,9 @@ function main() {
     var saveFolder = paths.folder("rolleSaved");
     var saveFile = new File(saveFolder.fullName + "/" + saveName + ".indd");
 
-    f_all.saveFile(saveFile, undefined, false);
+    _.saveFile(saveFile, undefined, false);
 
-    f_id.print2PS(psFile, "monoRolle");
+    _id.print2PS(psFile, "monoRolle");
 
     myDoc.close();
     $.sleep(0000);

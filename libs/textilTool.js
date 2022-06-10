@@ -1,5 +1,5 @@
-﻿var typeahead = require("typeahead");
-var _id = require("f_id");
+var typeahead = require("typeahead");
+var _id = require("_id");
 var ioFile = require("ioFile");
 
 var csroot = Folder(CSROOT).fullName;

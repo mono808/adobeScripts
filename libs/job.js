@@ -1,26 +1,38 @@
-﻿var f_all = require("f_all");
+﻿var _ = require("_");
 var refTool = require("refTool");
 var jobJson = require("jobJson");
+var jobNfoDialog = require("jobNfoDialog");
 var recentFolders = require("recentFolders");
 var rE = require("rE");
 var csroot = Folder(CSROOT).fullName;
 
-// TODO when starting without document, show list of available json files
 // TODO start with jsonfile, then only ask when job folder is not found
 
 exports.get_jobNfo = function (doc) {
-    var jobNfo;
-    if (doc) {
-        jobNfo = exports.get_jobNfo_from_doc(doc);
-    } else {
-        jobNfo = exports.get_jobNfo_from_json();
-        //jobNfo = exports.get_jobNfo_from_recentFolders();
+    var jobNfo = {};
+    var result;
+
+    //extract all infos that from filename and filepath
+    result = exports.get_jobNfo_from_doc(doc);
+    if (result) {
+        jobNfo = _.copy_props(jobNfo, result, true);
     }
-    if (!jobNfo) return null;
+
+    // extract all infos from the json file
+    result = exports.get_jobNfo_from_json(jobNfo.jobNr);
+    if (result) {
+        jobNfo = _.copy_props(jobNfo, result, true);
+    }
+
+    // let the user check the infos
+    result = jobNfoDialog.show_dialog(jobNfo);
+    if (!result) throw "Script Cancelled by YOU MOTHERFUCKER";
+    jobNfo = _.copy_props(jobNfo, result, true);
 
     if (jobNfo.folder) {
         recentFolders.add(jobNfo.folder);
     }
+
     return jobNfo;
 };
 
@@ -39,15 +51,10 @@ exports.get_jobNfo_from_doc = function (doc) {
     if (!refFile || refFile.constructor.name != "File") return null;
 
     result = get_jobNfo_from_file(refFile);
-    jobNfo = f_all.copy_props(jobNfo, result, true);
+    jobNfo = _.copy_props(jobNfo, result, true);
 
     if (!jobNfo.jobNr && jobNfo.refNr) {
         jobNfo.jobNr = jobNfo.refNr;
-    }
-
-    if (!jobNfo.client) {
-        result = exports.get_jobNfo_from_json(jobNfo.jobNr);
-        jobNfo = f_all.copy_props(jobNfo, result, true);
     }
 
     return jobNfo;
@@ -63,12 +70,12 @@ exports.get_jobNfo_from_recentFolders = function () {
     if (!recentFolder.exists) return null;
 
     result = get_jobNfo_from_file(recentFolder);
-    jobNfo = f_all.copy_props(jobNfo, result, true);
+    jobNfo = _.copy_props(jobNfo, result, true);
 
     if (!jobNfo.client) {
         // if starting with a recentFolder, the current jobNr cant reliably be obtained
         result = exports.get_jobNfo_from_json();
-        jobNfo = f_all.copy_props(jobNfo, result, true);
+        jobNfo = _.copy_props(jobNfo, result, true);
     }
 
     return jobNfo;
@@ -93,22 +100,6 @@ exports.get_jobNfo_from_json = function (jobNr) {
     }
     return nfo;
 };
-
-function get_job_folder() {
-    if (!ref) {
-        var ref = refTool.get_ref();
-    }
-    switch (ref.constructor.name) {
-        case "File":
-            return get_jobBaseFolder(ref.parent);
-
-        case "Folder":
-            return get_jobBaseFolder(ref);
-
-        case "Document":
-            return get_jobBaseFolder(ref.fullName.parent);
-    }
-}
 
 function get_jobNfo_from_file(aFile) {
     var jobNfo = {};
@@ -137,10 +128,10 @@ function get_jobNfo_from_file(aFile) {
     var result;
     if (rE.jobNr2021.test(jobFolder.displayName)) {
         result = get_jobNfo_from_filepath_2021(jobFolder);
-        jobNfo = f_all.copy_props(jobNfo, result, true);
+        jobNfo = _.copy_props(jobNfo, result, true);
     } else {
         result = get_jobNfo_from_filepath_pre2021(jobFolder);
-        jobNfo = f_all.copy_props(jobNfo, result, true);
+        jobNfo = _.copy_props(jobNfo, result, true);
     }
 
     return jobNfo;

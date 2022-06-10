@@ -1,23 +1,32 @@
 ﻿var rE = require("rE");
-var f_all = require("f_all");
+var _ = require("_");
 var names = require("names");
 var print = {};
 
 print.get_printNfo = function (target) {
-    var printNfo = this.get_printNfo_from_filename(target);
-    //if (!printNfo.printId || !printNfo.tech || !printNfo.jobName) {
+    var printNfo = {};
+    var result = this.get_printNfo_from_filename(target);
+    if (result) {
+        printNfo = _.copy_props(printNfo, result, true);
+    }
+
     if (!printNfo.printId || !printNfo.tech) {
         var missingProps = [];
         if (!printNfo.printId) missingProps.push("printId");
         if (!printNfo.tech) missingProps.push("tech");
         //if (!printNfo.jobName) missingProps.push("jobName");
-        var result = print.get_printNfo_from_user(missingProps);
-        printNfo = f_all.copy_props(printNfo, result, true);
+        result = print.get_printNfo_from_user(missingProps);
+        if (!result) throw "its time for the cancellator!";
+        if (result) {
+            printNfo = _.copy_props(printNfo, result, true);
+        }
     }
+
     return printNfo;
 };
 
 print.get_printNfo_from_filename = function (target) {
+    if (!target) return null;
     var printNfo = {};
     if (target.constructor.name === "File") {
         printNfo.file = target;
@@ -47,7 +56,6 @@ print.get_printNfo_from_user = function (propNames) {
 
     var techs = n.get_array("tech", true),
         ids = n.get_array("printId", true);
-    //jobNames = get_jobNames(nfo.folder);
 
     var win = new Window("dialog", "monos Print Id Dialog");
     win.orientation = "column";
@@ -66,14 +74,11 @@ print.get_printNfo_from_user = function (propNames) {
             if (this.value) {
                 var value;
                 if (this.parent.text == "Print_id") {
-                    value = f_all.validateString(this.parent.opts[b]);
+                    value = _.validateString(this.parent.opts[b]);
                     nfo.printId = value;
                 } else if (this.parent.text == "Technique") {
-                    value = f_all.validateString(this.parent.opts[b]);
+                    value = _.validateString(this.parent.opts[b]);
                     nfo.tech = value;
-                } else if (this.parent.text == "jobNames") {
-                    value = f_all.validateString(this.parent.opts[b]);
-                    add_nfo("jobName", value, true);
                 }
             }
         };
@@ -88,11 +93,7 @@ print.get_printNfo_from_user = function (propNames) {
         idpnl.opts = ids;
 
         for (var i = 0, maxI = ids.length; i < maxI; i += 1) {
-            idpnl["rad_" + i] = idpnl.add(
-                "radiobutton",
-                undefined,
-                n.name("printId", ids[i])
-            );
+            idpnl["rad_" + i] = idpnl.add("radiobutton", undefined, n.name("printId", ids[i]));
 
             if (nfo.printId == ids[i]) {
                 idpnl["rad_" + i].value = true;
@@ -115,43 +116,9 @@ print.get_printNfo_from_user = function (propNames) {
         techpnl.opts = techs;
 
         for (var j = 0, maxJ = techs.length; j < maxJ; j += 1) {
-            techpnl["rad_" + j] = techpnl.add(
-                "radiobutton",
-                undefined,
-                n.name("tech", techs[j])
-            );
+            techpnl["rad_" + j] = techpnl.add("radiobutton", undefined, n.name("tech", techs[j]));
             techpnl["rad_" + j].onClick = helper(j);
         }
-    }
-
-    if (propNames.includes("jobName")) {
-        /////////////////////////////////////
-        // add jobName panel with radio buttons and edittext
-        win.pgrp.jobNamepnl = win.pgrp.add("panel", undefined, "jobNames");
-        var jobNamepnl = win.pgrp.jobNamepnl;
-        jobNamepnl.alignChildren = "fill";
-        jobNamepnl.opts = jobNames;
-
-        for (var i = 0, maxI = jobNames.length; i < maxI; i += 1) {
-            jobNamepnl["rad_" + i] = jobNamepnl.add(
-                "radiobutton",
-                undefined,
-                jobNames[i]
-            );
-            if (nfo.jobName == jobNames[i]) {
-                jobNamepnl["rad_" + i].value = true;
-            }
-            jobNamepnl["rad_" + i].onClick = helper(i);
-        }
-
-        jobNamepnl.newjobName = jobNamepnl.add(
-            "edittext",
-            undefined,
-            "New jobName:"
-        );
-        jobNamepnl.newjobName.onChange = function () {
-            add_nfo("jobName", this.text, true);
-        };
     }
 
     /////////////////////////////////////

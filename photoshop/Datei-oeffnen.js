@@ -2,7 +2,7 @@
 //@include "require.js"
 
 (function () {
-    var f_all = require("f_all");
+    var _ = require("_");
     var recentFolders = require("recentFolders");
     var myFile = recentFolders.get_file();
 
@@ -13,6 +13,6 @@
     try {
         app.open(myFile);
     } catch (e) {
-        f_all.alert_error(e);
+        _.alert_error(e);
     }
 })();

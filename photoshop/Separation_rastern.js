@@ -2,18 +2,14 @@
 //@include "require.js"
 
 var PsBase = require("PsBase");
-var f_all = require("f_all");
+var _ = require("_");
 
 var remove_component_channels = function () {
     var doc = activeDocument,
         i,
         chan;
 
-    if (
-        doc.mode == DocumentMode.CMYK ||
-        doc.mode == DocumentMode.RGB ||
-        doc.mode == DocumentMode.GRAYSCALE
-    ) {
+    if (doc.mode == DocumentMode.CMYK || doc.mode == DocumentMode.RGB || doc.mode == DocumentMode.GRAYSCALE) {
         doc.activeChannels = doc.componentChannels;
         for (i = doc.componentChannels.length - 1; i >= 0; i -= 1) {
             chan = doc.channels[i];
@@ -272,21 +268,13 @@ function rastern() {
         win.setPnl.res = win.setPnl.add("group", [5, 130, 225, 165]);
         win.setPnl.dot = win.setPnl.add("group", [5, 170, 225, 205]);
 
-        win.setPnl.lpi.txt = win.setPnl.lpi.add(
-            "statictext",
-            [5, 5, 130, 25],
-            "LPI (Linien pro Zoll):"
-        );
+        win.setPnl.lpi.txt = win.setPnl.lpi.add("statictext", [5, 5, 130, 25], "LPI (Linien pro Zoll):");
         win.setPnl.lpi.set = win.setPnl.lpi.add("dropdownlist", [135, 5, 210, 25], 55);
 
         win.setPnl.wnkl.txt = win.setPnl.wnkl.add("statictext", [5, 5, 160, 25], "Rasterwinkel:");
         win.setPnl.wnkl.set = win.setPnl.wnkl.add("edittext", [165, 5, 210, 25], 162);
 
-        win.setPnl.wnklK.txt = win.setPnl.wnklK.add(
-            "statictext",
-            [5, 5, 160, 25],
-            "Rasterwinkel sisBlack:"
-        );
+        win.setPnl.wnklK.txt = win.setPnl.wnklK.add("statictext", [5, 5, 160, 25], "Rasterwinkel sisBlack:");
         win.setPnl.wnklK.set = win.setPnl.wnklK.add("edittext", [165, 5, 210, 25], 12);
 
         win.setPnl.res.txt = win.setPnl.res.add("statictext", [5, 5, 130, 25], "Auflösung:");
@@ -316,10 +304,7 @@ function rastern() {
         win.setPnl.dot.set.selection = win.setPnl.dot.set.items[2];
 
         win.okGrp.yes.onClick = function () {
-            if (
-                f_all.is_number(win.setPnl.wnkl.set.text) &&
-                f_all.is_number(win.setPnl.wnklK.set.text)
-            ) {
+            if (_.is_number(win.setPnl.wnkl.set.text) && _.is_number(win.setPnl.wnklK.set.text)) {
                 result.wnkl = Number(win.setPnl.wnkl.set.text);
                 result.wnklK = Number(win.setPnl.wnklK.set.text);
             } else {

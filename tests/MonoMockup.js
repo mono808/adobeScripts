@@ -9,7 +9,7 @@ function setup() {
 }
 
 function main(modjsx) {
-    var f_all = require("f_all");
+    var _ = require("_");
 
     var job = require("job");
     var jobFolder = require("jobFolder");

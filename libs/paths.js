@@ -1,4 +1,4 @@
-﻿var f_all = require("f_all");
+﻿var _ = require("_");
 
 var nfo = {
     jobNr: "0000A17-014",
@@ -130,7 +130,7 @@ function set_nfo(input) {
         Folder.current = input.folder;
     }
 
-    nfo = f_all.copy_props(nfo, input, true);
+    nfo = _.copy_props(nfo, input, true);
 
     set_paths(nfo);
 }

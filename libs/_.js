@@ -6,9 +6,7 @@
             "use strict";
             if (target == null) {
                 // TypeError if undefined or null
-                throw new TypeError(
-                    "Cannot convert undefined or null to object"
-                );
+                throw new TypeError("Cannot convert undefined or null to object");
             }
 
             var to = Object(target);
@@ -20,12 +18,7 @@
                     // Skip over if undefined or null
                     for (var nextKey in nextSource) {
                         // Avoid bugs when hasOwnProperty is shadowed
-                        if (
-                            Object.prototype.hasOwnProperty.call(
-                                nextSource,
-                                nextKey
-                            )
-                        ) {
+                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
                             to[nextKey] = nextSource[nextKey];
                         }
                     }
@@ -39,8 +32,7 @@
 }
 
 exports.copy_props = function (targetObj, sourceObj, overwrite) {
-    if (!targetObj || !sourceObj)
-        throw new Error("provide two objects to copy properties");
+    if (!targetObj || !sourceObj) throw new Error("provide two objects to copy properties");
 
     var targetCopy = Object.assign({}, targetObj);
 
@@ -99,13 +91,7 @@ exports.alert_error = function (e) {
     alert(msg);
 };
 
-exports.BT_send_script = function (
-    targetApp,
-    script,
-    scriptArgs,
-    waitSec,
-    callBack
-) {
+exports.BT_send_script = function (targetApp, script, scriptArgs, waitSec, callBack) {
     var retval = true;
 
     // Create the message object
@@ -113,10 +99,7 @@ exports.BT_send_script = function (
 
     bt.target = targetApp;
     if (scriptArgs) {
-        bt.body =
-            "var SnpSentMessage = {}; SnpSentMessage.main = " +
-            script.toString() +
-            ";";
+        bt.body = "var SnpSentMessage = {}; SnpSentMessage.main = " + script.toString() + ";";
         bt.body += "var retval = SnpSentMessage.main(";
         bt.body += scriptArgs.toSource();
         $.writeln(scriptArgs.toSource());
@@ -204,9 +187,7 @@ exports.get_kuerzel = function () {
 
     if (username.indexOf(".") > 0) {
         // if username contains . make kuerzel from username jan.untiedt -> JU
-        return (
-            username.split(".")[0][0] + username.split(".")[1][0]
-        ).toUpperCase();
+        return (username.split(".")[0][0] + username.split(".")[1][0]).toUpperCase();
     } else {
         return username;
     }
@@ -252,12 +233,8 @@ exports.saveFile = function (dest, saveOps, close, showDialog) {
 };
 
 exports.startDistiller = function () {
-    var dist10 = File(
-            "/c/Program Files (x86)/Adobe/Acrobat 10.0/Acrobat/acrodist.exe"
-        ),
-        dist11 = File(
-            "/c/Program Files (x86)/Adobe/Acrobat 11.0/Acrobat/acrodist.exe"
-        );
+    var dist10 = File("/c/Program Files (x86)/Adobe/Acrobat 10.0/Acrobat/acrodist.exe"),
+        dist11 = File("/c/Program Files (x86)/Adobe/Acrobat 11.0/Acrobat/acrodist.exe");
 
     var secsWaited = 0,
         distApp;
@@ -324,10 +301,7 @@ exports.duplicateFolder = function (wf, destination, newName, refFile) {
     } else if (wf.fullName === refFile.path) {
         for (var i = 0, maxI = FilesFolders.length; i < maxI; i += 1) {
             var FileFolder = FilesFolders[i];
-            if (
-                FileFolder instanceof File &&
-                FileFolder.fullName === refFile.fullName
-            ) {
+            if (FileFolder instanceof File && FileFolder.fullName === refFile.fullName) {
                 files2move.push(FileFolder);
             } else if (FileFolder instanceof Folder) {
                 folders2move.push(FileFolder);
@@ -352,7 +326,7 @@ exports.duplicateFolder = function (wf, destination, newName, refFile) {
     // recursive duplicate the selected folders
     for (var i = 0, maxI = folders2move.length; i < maxI; i += 1) {
         var myFolder = folders2move[i];
-        f_all.duplicateFolder(myFolder, dupedFolder, myFolder.name, refFile);
+        _.duplicateFolder(myFolder, dupedFolder, myFolder.name, refFile);
     }
 
     //if all contained files copied fine and nothing left in the directory, delete it
@@ -362,17 +336,11 @@ exports.duplicateFolder = function (wf, destination, newName, refFile) {
     } else if (wf.getFiles("*.*").length > 0) {
         $.writeln(wf.name + " still contains files, folder not removed");
     } else if (!filesCool) {
-        $.writeln(
-            "Sth went wrong moving the files, " + wf.name + " was not removed"
-        );
+        $.writeln("Sth went wrong moving the files, " + wf.name + " was not removed");
     }
 };
 
-exports.copy_file_via_bridgeTalk = function (
-    sourceFile,
-    destFolder,
-    deleteSource
-) {
+exports.copy_file_via_bridgeTalk = function (sourceFile, destFolder, deleteSource) {
     function done(err, data) {
         if (err) {
             alert(data);
@@ -393,24 +361,16 @@ exports.copy_file_via_bridgeTalk = function (
             $.sleep(3000);
             secsWaited += 3;
             if (!args.src.exists && secsWaited > 20) {
-                if (
-                    Window.confirm(
-                        "Out-PDF konnte nicht gefunden werden, bitte Filmrechner / Distiller prüfen! Kopieren jetzt nochmal probieren?"
-                    )
-                ) {
+                if (Window.confirm("Out-PDF konnte nicht gefunden werden, bitte Filmrechner / Distiller prüfen! Kopieren jetzt nochmal probieren?")) {
                     secsWaited = 0;
                     continue waitLoop;
                 } else {
-                    return (
-                        args.src.displayName +
-                        "  konnte nicht gefunden werden. Ist der Filmrechner wirklich an? 8/"
-                    );
+                    return args.src.displayName + "  konnte nicht gefunden werden. Ist der Filmrechner wirklich an? 8/";
                 }
             }
         }
 
-        destString =
-            decodeURI(args.dest.fullName) + "/" + decodeURI(args.src.name);
+        destString = decodeURI(args.dest.fullName) + "/" + decodeURI(args.src.name);
         destFile = new File(destString);
         if (!args.dest.exists) {
             args.dest.create();
@@ -419,11 +379,7 @@ exports.copy_file_via_bridgeTalk = function (
         var tries = 0;
         while (!args.src.copy(destFile)) {
             if (tries > 5) {
-                return (
-                    "Datei : " +
-                    destFile.displayName +
-                    " ist da, konnte aber nicht kopiert werden. Ist die Datei am Zielort evtl. noch geöffnet?"
-                );
+                return "Datei : " + destFile.displayName + " ist da, konnte aber nicht kopiert werden. Ist die Datei am Zielort evtl. noch geöffnet?";
             }
             tries += 1;
             $.sleep(3000);
@@ -432,17 +388,9 @@ exports.copy_file_via_bridgeTalk = function (
         if (args.delsource) {
             args.src.remove();
             args.src = null;
-            return (
-                "Datei : " +
-                destFile.displayName +
-                " wurde erfolgreich verschoben . --> 0"
-            );
+            return "Datei : " + destFile.displayName + " wurde erfolgreich verschoben . --> 0";
         } else {
-            return (
-                "Datei : " +
-                destFile.displayName +
-                " wurde erfolgreich kopiert 0 --> 0"
-            );
+            return "Datei : " + destFile.displayName + " wurde erfolgreich kopiert 0 --> 0";
         }
     }
 
@@ -490,4 +438,18 @@ exports.copy_file_via_bridgeTalk = function (
 
 exports.escapeRegExp = function (str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+};
+
+exports.validate_file_ref = function (ref) {
+    if (!ref) {
+        return false;
+    }
+    if (typeof ref === "string") {
+        ref = new File(ref);
+    }
+    if (ref instanceof File && ref.exists) {
+        return ref;
+    }
+
+    return false;
 };
