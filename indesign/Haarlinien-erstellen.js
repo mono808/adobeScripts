@@ -92,8 +92,12 @@ function myDialog() {
     var horizontalBtn = orientationGroup.add("Button", undefined, "horizontal");
     var bothBtn = orientationGroup.add("Button", undefined, "both");
 
-    editTextGroup.add("statictext", undefined, "Distance (mm):");
-    var editText = editTextGroup.add("edittext", undefined, "5mm");
+    // editTextGroup.add("statictext", undefined, "Distance (mm):");
+    // var editText = editTextGroup.add("edittext", undefined, "15");
+    // editText.characters = 10;
+
+    editTextGroup.add("statictext", undefined, "max Druckbreite (mm):");
+    var editText = editTextGroup.add("edittext", undefined, "420");
     editText.characters = 10;
 
     verticalBtn.onClick = function () {
@@ -135,7 +139,13 @@ function myDialog() {
 
     var settings = myDialog();
 
-    var distance = UnitValue(settings.distance);
+    // var distance = UnitValue(settings.distance, "mm");
+    var printSize = UnitValue(settings.distance, "mm");
+    var selectionSize = settings.orientation === "vertical" ? selectionBounds[3] - selectionBounds[1] : selectionBounds[2] - selectionBounds[0];
+
+    var distance = (printSize - selectionSize) / 2;
+    distance = new UnitValue(distance, "mm");
+
     var linePoints = get_points(selectionBounds, settings.orientation, distance.as("mm"));
 
     var lineOptions = {
