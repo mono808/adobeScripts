@@ -12,6 +12,7 @@
         return;
     }
 
+    var _ = require("_");
     var job = require("job");
     var print = require("print");
     var paths = require("paths");
@@ -22,25 +23,23 @@
 
     for (var i = 0; i < myDoc.selection.length; i++) {
         var monoGraphic = new MonoGraphic(myDoc.selection[i].graphics[0]);
-        var jobNfo = job.get_jobNfo_from_doc(monoGraphic.get_file("print"));
+        var jobNfo = job.get_jobNfo(monoGraphic.get_file("print"));
         var printNfo = print.get_printNfo(jobNfo.file);
         paths.set_nfo(jobNfo);
         paths.set_nfo(printNfo);
 
-        var monoFilm = new MonoFilm();
-        monoFilm.create_template();
-        var sepFile = monoGraphic.get_file("print");
-        var sepPos = monoGraphic.get_placement();
+        var filmFile = monoGraphic.get_file("film");
 
-        monoFilm.place_sep(sepFile, sepPos.width, sepPos.height, sepPos.deltaX, sepPos.rotation);
-        monoFilm.get_sep_type();
-        monoFilm.add_centermarks();
-        monoFilm.add_pictogram();
-        monoFilm.add_spotInfo_numbered();
-        monoFilm.add_jobInfo(jobNfo, printNfo);
-        monoFilm.position_textFrames();
-        monoFilm.resize_page();
-        monoFilm.save(jobNfo, true, false);
+        if (!_.validate_file_ref(filmFile)) {
+            alert("Film File not found");
+            return;
+        }
+        //Application.open (from:varies, showingWindow: Boolean , openOption: OpenOptions ):varies
+        var filmDoc = app.open(filmFile, false);
+        var monoFilm = new MonoFilm(filmDoc);
+
         monoFilm.print(paths.path("filmIn"), paths.path("filmOut"));
+
+        filmDoc.close();
     }
 })();
