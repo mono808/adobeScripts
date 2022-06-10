@@ -2,7 +2,6 @@
 //@include "require.js"
 
 (function () {
-    
     if (app.documents.length < 1) {
         alert("Please open a document first");
         return;
@@ -35,7 +34,8 @@
 
     var printFile = paths.file("sdPrintAi");
     var printSaveOpts = saveOptions.sdPrintAi();
-    printDoc.make(printFile, printSaveOpts);
+    printDoc.make();
+    printDoc.save_doc(printFile, printSaveOpts, false);
     printDoc.place_on_film(printFile, printDoc.get_sep_coordinates());
 
     if (!Window.confirm("PreviewDatei erstellen?")) return;
@@ -43,5 +43,6 @@
     var previewDoc = new AiSiebdruckPreview(app.activeDocument);
     var previewFile = paths.file("previewAi");
     var previewSaveOpts = saveOptions.previewAi();
-    previewDoc.make(previewFile, previewSaveOpts);
-})()
+    previewDoc.make();
+    previewDoc.save_doc(previewFile, previewSaveOpts);
+})();

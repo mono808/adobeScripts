@@ -23,10 +23,7 @@ AiSiebdruckPreview.prototype.delete_underbase = function () {
 AiSiebdruckPreview.prototype.get_swatch = function (mySpot) {
     for (var i = 0; i < this.doc.swatches.length; i++) {
         var swatch = this.doc.swatches[i];
-        if (
-            swatch.color.typename == "SpotColor" &&
-            mySpot.name == swatch.color.spot.name
-        ) {
+        if (swatch.color.typename == "SpotColor" && mySpot.name == swatch.color.spot.name) {
             return swatch;
         }
     }
@@ -64,7 +61,7 @@ AiSiebdruckPreview.prototype.change_spot_to_process_colors = function () {
     }
 };
 
-AiSiebdruckPreview.prototype.make = function (saveFile, saveOptions) {
+AiSiebdruckPreview.prototype.make = function () {
     this.sort_by_spotColor(this.pathItems);
 
     this.fit_artboard_to_art("Motiv");
@@ -79,7 +76,7 @@ AiSiebdruckPreview.prototype.make = function (saveFile, saveOptions) {
 
     app.doScript("Delete Fluff", "Separation");
 
-    this.save_doc(saveFile, saveOptions, false);
+    // this.save_doc(saveFile, saveOptions, false);
 };
 
 module.exports = AiSiebdruckPreview;

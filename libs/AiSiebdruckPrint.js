@@ -135,7 +135,7 @@ AiSiebdruckPrint.prototype.rename_pantone_colors = function () {
     }
 };
 
-AiSiebdruckPrint.prototype.make = function (saveFile, saveOptions) {
+AiSiebdruckPrint.prototype.make = function () {
     this.sort_by_spotColor(this.pathItems);
 
     this.fit_artboard_to_art("Motiv");
@@ -146,8 +146,6 @@ AiSiebdruckPrint.prototype.make = function (saveFile, saveOptions) {
 
     // delete fluff and save final separation for film output
     app.doScript("Delete Fluff", "Separation");
-
-    this.save_doc(saveFile, saveOptions, false);
 };
 
 module.exports = AiSiebdruckPrint;
