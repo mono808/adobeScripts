@@ -11,7 +11,9 @@ $.level = 1;
     var texTool = require("textilTool");
 
     //texTool.add_textile();
+    //
     texTool.reactivate_jpg(app.selection);
+    texTool.reactivate_layers(app.selection);
 
     // var msg = "Textil als JPG einbetten?";
     // var flatten = Window.confirm(msg, true, "Einbetten?");

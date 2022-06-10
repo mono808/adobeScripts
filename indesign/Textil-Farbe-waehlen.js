@@ -4,7 +4,7 @@ $.level = 1;
 
 (function () {
     if (app.selection.length < 1) {
-        alert("Please open a document first");
+        alert("Please select an rectangle / graphic first");
         return;
     }
 

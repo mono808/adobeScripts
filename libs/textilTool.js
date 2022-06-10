@@ -1,4 +1,4 @@
-var typeahead = require("typeahead");
+﻿var typeahead = require("typeahead");
 var _id = require("_id");
 var ioFile = require("ioFile");
 
@@ -130,6 +130,8 @@ function flatten_textile(texRect) {
         return;
     }
 
+    // get_graphicLayerNames(myImage, skipHiddenLayers, skipFixedLayers)
+    var activeLayers = get_graphicLayerNames(texGraphic, true, false);
     var sourcePath = get_sourcePath(texGraphic);
     var jpgFilename = get_filename_from_path(sourcePath);
     jpgFilename += ".jpg";
@@ -138,30 +140,65 @@ function flatten_textile(texRect) {
     texGraphic.exportFile(ExportFormat.JPG, jpgFile, false);
     replace_graphic(texRect, jpgFile);
     texRect.allGraphics[0].itemLink.unlink();
+    //store path to source file in custom label, so the sourcefile can be relinked later
+    texRect.insertLabel("sourcePath", sourcePath);
+    //store active graphicLayers, so the displayed state of graphic can be rebuild after relinking
+    texRect.insertLabel("activeLayers", activeLayers.join("_-_"));
     jpgFile.remove();
     return texRect;
 }
 
-function reactivate_jpg(texRect) {
+function find_source_in_library(texRect) {
     var texGraphic = get_tex_graphic(texRect);
     var sourcePath = get_sourcePath(texGraphic);
     var sourceFilename = get_filename_from_path(sourcePath);
     var searchPattern = new RegExp(sourceFilename, "ig");
-    var foundTex = ioFile.get_files(texRoot, searchPattern);
-    foundTex.sort(function (a, b) {
+    var matches = ioFile.get_files(texRoot, searchPattern);
+    matches.sort(function (a, b) {
         return a.displayName.toLowerCase() > b.displayName.toLowerCase();
     });
 
-    if (!foundTex || foundTex.length === 0) return;
+    if (!matches || matches.length === 0) return;
 
-    var selectedTex;
-    if (foundTex.length == 1) {
-        selectedTex = foundTex[0];
+    var sourceFile;
+    if (matches.length == 1) {
+        sourceFile = matches[0];
     } else {
         var multiselect = false;
-        selectedTex = typeahead.show_dialog(foundTex, "displayName", multiselect, "Textilien wählen");
+        sourceFile = typeahead.show_dialog(matches, "displayName", multiselect, "Vorlage wählen")[0];
     }
-    replace_graphic(texRect, selectedTex);
+
+    return sourceFile.exists ? sourceFile : null;
+}
+
+function find_source_from_label(texRect) {
+    var sourcePath = texRect.extractLabel("sourcePath");
+    if (sourcePath == "") return null;
+    var sourceFile = new File(sourcePath);
+    return sourceFile.exists ? sourceFile : null;
+}
+
+function get_active_layers_from_label(texRect) {
+    var activeLayersString = texRect.extractLabel("activeLayers");
+    if (activeLayersString === "") return null;
+    return activeLayersString.split("_-_");
+}
+
+function reactivate_jpg(texRect) {
+    var sourceFile = find_source_from_label(texRect) || find_source_in_library(texRect);
+    if (!sourceFile) {
+        sourceFile = File(texRoot).openDlg("kuggst du selber wo ist datei");
+    }
+    if (!sourceFile) throw new Error("cant find a sourceFile to replace the jpg");
+    replace_graphic(texRect, sourceFile);
+    return texRect;
+}
+
+function reactivate_layers(texRect) {
+    var activeLayers = get_active_layers_from_label(texRect);
+    if (activeLayers && activeLayers.length > 0) {
+        toggle_graphicLayers(texRect, activeLayers);
+    }
     return texRect;
 }
 
@@ -236,24 +273,6 @@ function add_tex_rect() {
     return rect;
 }
 
-function Textil(rect) {
-    var msg = "Textil als JPG einbetten?";
-
-    this.rect = rect || add_tex_rect();
-
-    var placedImage;
-    if (this.rect.allGraphics.length === 0) {
-        placedImage = place_textile_graphic(this.rect);
-    } else {
-        placedImage = this.rect.allGraphics[0];
-    }
-    if (!placedImage) return null;
-
-    this.textil = this.rect.allGraphics[0];
-    this.layers = choose_object_layers(this.rect);
-    this.flatten = Window.confirm(msg, true, "Textil als JPG einbetten?");
-}
-
 function apply_settings(textil) {
     if (textil.layers && textil.layers.length > 0) {
         toggle_graphicLayers(textil.rect, textil.layers);
@@ -292,6 +311,24 @@ function init_textils(selection) {
     return textils;
 }
 
+function Textil(rect) {
+    this.rect = rect || add_tex_rect();
+
+    var placedImage;
+    if (this.rect.allGraphics.length === 0) {
+        placedImage = place_textile_graphic(this.rect);
+    } else {
+        placedImage = this.rect.allGraphics[0];
+    }
+    if (!placedImage) return null;
+
+    this.textil = this.rect.allGraphics[0];
+    this.layers = choose_object_layers(this.rect);
+    placedImage = this.rect.allGraphics[0];
+    var msg = placedImage.properties.itemLink.name + " als JPG einbetten?";
+    this.flatten = Window.confirm(msg, true);
+}
+
 exports.add_textile_old = function (selection) {
     if (selection && selection.length > 0) {
         handleSelection(selection, place_textile_graphic);
@@ -319,4 +356,8 @@ exports.flatten_textile = function (selection) {
 };
 exports.reactivate_jpg = function (selection) {
     handleSelection(selection, reactivate_jpg);
+};
+
+exports.reactivate_layers = function (selection) {
+    handleSelection(selection, reactivate_layers);
 };
