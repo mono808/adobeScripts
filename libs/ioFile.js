@@ -13,18 +13,23 @@ ioFile.read_file = function (aFile) {
     }
 };
 
-ioFile.write_file = function (aFile, str) {
-    if (!(aFile instanceof File)) return false;
+ioFile.write_file = function (f, strng) {
+    if (!(f instanceof File)) return false;
 
-    aFile.close();
+    f.close();
 
-    if (!aFile.parent.exists) aFile.parent.create();
+    if (!f.parent.exists) f.parent.create();
 
-    var out = aFile.open("w", undefined, undefined);
-    aFile.encoding = "UTF-8";
-    aFile.lineFeed = "Windows";
-    var success = aFile.write(str);
-    aFile.close();
+    var success;
+    success = f.open("w", undefined, undefined);
+    if (!success) throw "Could not open file " + f.displayName;
+
+    f.encoding = "UTF-8";
+    f.lineFeed = "Windows";
+    success = f.write(strng);
+    if (!success) throw "Could not write to file " + f.displayName;
+
+    f.close();
     return success;
 };
 
@@ -35,7 +40,7 @@ ioFile.import_json = function (jsonFile) {
     }
 
     var fileContent = this.read_file(jsonFile);
-    var jsonObj = eval(fileContent);
+    var jsonObj = JSON.parse(fileContent);
     if (typeof jsonObj !== "object") return {};
     $.writeln("jsonFile " + jsonFile.displayName + "parsed");
     return jsonObj;
@@ -49,8 +54,7 @@ function find_files_sub(dir, array, filter) {
     var f = Folder(dir).getFiles("*.*");
     for (var i = 0; i < f.length; i++) {
         if (f[i] instanceof Folder) find_files_sub(f[i], array, filter);
-        else if (f[i] instanceof File && f[i].displayName.search(filter) > -1)
-            array.push(f[i]);
+        else if (f[i] instanceof File && f[i].displayName.search(filter) > -1) array.push(f[i]);
     }
     return array;
 }
