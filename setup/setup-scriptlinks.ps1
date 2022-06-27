@@ -15,6 +15,7 @@ $aiTag="Adobe Illustrator CC 2018"
 #Scripts Path
 New-Item -Path "$env:USERPROFILE\AppData\Roaming\Adobe\InDesign\$idTag\de_DE\Scripts\Scripts Panel\scripts" -ItemType SymbolicLink -Value "$scriptsPath\indesign" -Force
 New-Item -Path "$Env:Programfiles\Adobe\$psTag\Presets\Scripts\scripts" -ItemType SymbolicLink -Value  "$scriptsPath\photoshop" -Force
+New-Item -Path "$Env:Programfiles\Adobe\Adobe Photoshop CC 2017\Presets\Scripts\scripts" -ItemType SymbolicLink -Value  "$scriptsPath\photoshop" -Force
 New-Item -Path "$Env:Programfiles\Adobe\$aiTag\Presets\de_DE\Skripten\scripts" -ItemType SymbolicLink -Value  "$scriptsPath\illustrator" -Force
 
 #Startup Scripts
