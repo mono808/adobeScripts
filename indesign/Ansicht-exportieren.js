@@ -40,8 +40,8 @@ function setPdfExportPreferences(resolution) {
     // });
 
     var pEP = app.pdfExportPreferences;
-    pEP.acrobatCompatibility = AcrobatCompatibility.ACROBAT_4;
-    pEP.appliedFlattenerPreset = flattenerPreset;
+    pEP.acrobatCompatibility = AcrobatCompatibility.ACROBAT_7;
+    //pEP.appliedFlattenerPreset = flattenerPreset;
     pEP.cropImagesToFrames = true;
     pEP.exportGuidesAndGrids = false;
     pEP.exportLayers = false;
@@ -85,9 +85,7 @@ function setJpgExportPreferences(resolution) {
 }
 
 function main() {
-    var job = require("job");
-    var paths = require("paths");
-    var f_id = require("f_id");
+    var _id = require("_id");
 
     //~     var jobNfo = job.get_jobNfo(app.activeDocument);
     //~     paths.set_nfo(jobNfo);
@@ -97,7 +95,7 @@ function main() {
     var saveName = myDoc.name.substring(0, myDoc.name.lastIndexOf("."));
     var savePath = myFolder + "/" + saveName;
     var docScale = myDoc.documentPreferences.pageWidth / 297;
-    var resolution = docScale > 4.5 ? 36 : 54;
+    var resolution = docScale > 4.5 ? 54 : 72;
 
     var exportStyleDialog = function () {
         var returnValue = {
@@ -153,14 +151,14 @@ function main() {
     if (!exportStyle) return;
 
     //if (exportStyle.saveFile.exists)
-    var layerToggle = f_id.layerToggle(["Intern", "HL"]);
+    var layerToggle = _id.layerToggle(["Intern", "HL"]);
     layerToggle.hide();
 
     if (exportStyle) {
         exportStyle.setPreferences(resolution);
         if (exportStyle.neutral) {
             var pageItemsToHide = ["csLogo", "wmeLogo", "jobFrame"];
-            var pIToggle = f_id.smartPageItemsVisibilityToggle();
+            var pIToggle = _id.smartPageItemsVisibilityToggle();
             pIToggle.set(pageItemsToHide, false);
         }
     }
