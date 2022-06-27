@@ -2,7 +2,7 @@
 //@include "require.js"
 
 (function () {
-    if (!app.activeDocument) {
+    if (app.documents.length == 0 || !app.activeDocument) {
         alert("Bitte Filmdatei zuerst öffnen");
         return;
     }

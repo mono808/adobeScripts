@@ -30,7 +30,7 @@
 
     interactSwitch.set("all");
 
-    var open_mockup = function () {
+    function open_mockup() {
         var job = require("job");
         var paths = require("paths");
 
@@ -44,5 +44,5 @@
         } else {
             return null;
         }
-    };
+    }
 })();

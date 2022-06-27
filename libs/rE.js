@@ -20,7 +20,7 @@ var rE = {
     printTag2: /([a-z0-9äüöß-]+)(_|-)(sd|flx|flo|dtax|dtak|dtg|stk|sub)(_|-)(working|print|preview|druck|entwurf)/i,
     print_full: /(\d{1,5}(wme|wm|ang|cs|cn|a)\d\d-0\d\d)(_|-)([a-z0-9äüöß-]+)(_|-)([a-z0-9äüöß-]+)/i,
     jobNr: /(\d{1,5}(wme|wm|ang|cs|cn|a)\d\d)(-0\d\d)?/i,
-    jobNr2021: /^(\d{1,5}(wme|wm|ang|cs|cn|a)21)(-018)?/i,
+    jobNr2021: /^(\d{1,5}(wme|wm|ang|cs|cn|a)(21|22))(-018)?/i,
     jobNrShort: /\d{1,5}(wme|wm|ang|cs|cn|a)\d\d/i,
     jobNrVeryShort: /\d{1,5}(W|A|C)/i,
     jobNameNew: /(\d{1,5}(wme|wm|ang|cs|cn|a)\d\d-0\d\d)_(.*)/i,

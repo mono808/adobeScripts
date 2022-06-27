@@ -1,6 +1,6 @@
 ﻿var names = require("names");
 var MonoSep = require("MonoSep");
-var passer = require("passer");
+//var passer = require("passer");
 var RegmarkTool = require("RegmarkTool");
 
 function MonoFilm(initObj, hidden) {
@@ -71,7 +71,9 @@ MonoFilm.prototype.init = function (initDoc) {
         //$.writeln(hL.name);
         hL.label = hL.name = "hLine";
         this.hLine = hL;
-    } catch (e) {}
+    } catch (e) {
+        $.writeln("error while creating hline & vline");
+    }
 
     // set layers
     this.layers.guides = this.check_create_layer("hilfsLayer", "guides");
@@ -85,9 +87,7 @@ MonoFilm.prototype.init = function (initDoc) {
 
 MonoFilm.prototype.create_template = function () {
     var myDocPreset = app.documentPresets.item("filmShirtPreset");
-    try {
-        var myPresetName = myDocPreset.name;
-    } catch (myError) {
+    if (!myDocPreset.isValid) {
         myDocPreset = app.documentPresets.add({ name: "filmShirtPreset" });
     }
 
@@ -108,12 +108,7 @@ MonoFilm.prototype.create_template = function () {
     // remove default Swatches
     for (var i = newDoc.swatches.length - 1; i >= 0; i -= 1) {
         var swatch = newDoc.swatches[i];
-        if (
-            swatch.name != "Registration" &&
-            swatch.name != "None" &&
-            swatch.name != "Paper" &&
-            swatch.name != "Black"
-        ) {
+        if (swatch.name != "Registration" && swatch.name != "None" && swatch.name != "Paper" && swatch.name != "Black") {
             swatch.remove();
         }
     }
@@ -124,27 +119,27 @@ MonoFilm.prototype.create_template = function () {
     guidesLayer.visible = true;
     guidesLayer.locked = false;
 
-    var vLine = {
+    var vLineSettings = {
         name: "vLine",
         orientation: HorizontalOrVertical.vertical,
         location: this.filmWidth / 2,
         fitToPage: false
     };
-    var hLine = {
+    var hLineSettings = {
         name: "hLine",
         orientation: HorizontalOrVertical.horizontal,
         location: 100,
         fitToPage: false
     };
 
-    var vLine = newDoc.guides.add(undefined, vLine);
-    var hLine = newDoc.guides.add(undefined, hLine);
+    newDoc.guides.add(undefined, vLineSettings);
+    newDoc.guides.add(undefined, hLineSettings);
 
     this.init(newDoc);
 
     // create guide objects and a colored background
-    for (var i = 0, maxI = this.guideRecs.length; i < maxI; i += 1) {
-        this.create_guide_rectangles(this.guideRecs[i]);
+    for (var j = 0, maxI = this.guideRecs.length; j < maxI; j += 1) {
+        this.create_guide_rectangles(this.guideRecs[j]);
     }
 
     // lock the guidesLayer so it does not interfer when manually placing a graphicfile
@@ -178,7 +173,9 @@ MonoFilm.prototype.get_layer = function (/*...*/) {
                 var l = this.filmDoc.layers.itemByName(name);
                 //$.writeln(l.name);
                 return l;
-            } catch (e) {}
+            } catch (e) {
+                $.writeln("cant find layer: " + name);
+            }
         }
     }
     return null;
@@ -218,9 +215,7 @@ MonoFilm.prototype.create_guide_rectangles = function (guideRec) {
         geometricBounds: myBounds,
         locked: true
     });
-    rec.fillColor = guideRec.fillColor
-        ? this.filmDoc.colors.itemByName(guideRec.fillColor)
-        : this.filmDoc.swatches.itemByName("None");
+    rec.fillColor = guideRec.fillColor ? this.filmDoc.colors.itemByName(guideRec.fillColor) : this.filmDoc.swatches.itemByName("None");
     return rec;
 };
 
@@ -252,8 +247,7 @@ MonoFilm.prototype.place_sep = function (graphicFile, width, height, deltaX, rot
         centerCoor.x = pWidth / 2 - iWidth / 2;
         centerCoor.y = pHeight / 2 - iHeight / 2;
         this.sep.rect.move([centerCoor.x, centerCoor.y]);
-        if (!this.hidden)
-            alert("keine Platzierungsinfo erhalten, zentriere Separation auf dem Film");
+        if (!this.hidden) alert("keine Platzierungsinfo erhalten, zentriere Separation auf dem Film");
     }
 };
 
@@ -329,12 +323,10 @@ MonoFilm.prototype.create_pictogram = function (type) {
             pictogram.strokeColor = this.colors.reg;
             pictogram.strokeWeight = 0.5;
 
-            pictogram.resize(
-                CoordinateSpaces.innerCoordinates,
-                AnchorPoint.centerAnchor,
-                ResizeMethods.multiplyingCurrentDimensionsBy,
-                [this.pictoScale, this.pictoScale]
-            );
+            pictogram.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [
+                this.pictoScale,
+                this.pictoScale
+            ]);
             break;
 
         case "Shirts":
@@ -353,12 +345,10 @@ MonoFilm.prototype.create_pictogram = function (type) {
             pictogram.fillColor = this.colors.none;
             pictogram.strokeColor = this.colors.reg;
             pictogram.strokeWeight = 0.5;
-            pictogram.resize(
-                CoordinateSpaces.innerCoordinates,
-                AnchorPoint.centerAnchor,
-                ResizeMethods.multiplyingCurrentDimensionsBy,
-                [this.pictoScale, this.pictoScale]
-            );
+            pictogram.resize(CoordinateSpaces.innerCoordinates, AnchorPoint.centerAnchor, ResizeMethods.multiplyingCurrentDimensionsBy, [
+                this.pictoScale,
+                this.pictoScale
+            ]);
             break;
 
         default:
@@ -385,7 +375,7 @@ MonoFilm.prototype.add_spotInfo_numbered = function () {
     this.layers.info = this.check_create_layer("infoEbene", "job");
     this.filmDoc.activeLayer = this.layers.info;
 
-    var doc = this.filmDoc;
+    //var doc = this.filmDoc;
     var colorTF = this.create_text_frame(this.layers.info, "colorTextFrame");
     var colorText = colorTF.texts.item(0);
 
@@ -409,10 +399,7 @@ MonoFilm.prototype.add_spotInfo_numbered = function () {
         colorTF.contents += spotString;
         colorTF.contents += " ";
 
-        var spotChars = colorText.characters.itemByRange(
-            charIndex,
-            charIndex + spotString.length - 1
-        );
+        var spotChars = colorText.characters.itemByRange(charIndex, charIndex + spotString.length - 1);
         spotChars.fillColor = spot;
         charIndex += spotString.length + 1;
     }
@@ -426,7 +413,7 @@ MonoFilm.prototype.add_spotInfo2 = function () {
     this.layers.info = this.check_create_layer("infoEbene", "job");
     this.filmDoc.activeLayer = this.layers.info;
 
-    var doc = this.filmDoc;
+    // var doc = this.filmDoc;
     var colorTF = this.create_text_frame(this.layers.info, "colorTextFrame");
     var colorText = colorTF.texts.item(0);
 
@@ -444,19 +431,13 @@ MonoFilm.prototype.add_spotInfo2 = function () {
         var spotString = names.name("color", spot.name).replace(/\s/g, "\xa0");
 
         colorTF.contents += spotString;
-        var spotChars = colorText.characters.itemByRange(
-            charIndex,
-            charIndex + spotString.length - 1
-        );
+        var spotChars = colorText.characters.itemByRange(charIndex, charIndex + spotString.length - 1);
         spotChars.fillColor = spot;
         charIndex += spotString.length;
 
         if (i < spots.length - 1) {
             colorTF.contents += divString;
-            var regChars = colorText.characters.itemByRange(
-                charIndex,
-                charIndex + divString.length - 1
-            );
+            var regChars = colorText.characters.itemByRange(charIndex, charIndex + divString.length - 1);
             regChars.fillColor = this.colors.reg;
             charIndex += divString.length;
         }
@@ -538,13 +519,10 @@ MonoFilm.prototype.get_picto_type = function () {
         switch (pI.name) {
             case "pictoShirt":
                 return "Shirts";
-                break;
             case "pictoBags":
                 return "Bags";
-                break;
             case "pictoNull":
                 return "Null";
-                break;
         }
     }
     return this.choose_type();
@@ -574,27 +552,25 @@ MonoFilm.prototype.fit_frame_to_text = function (txtFrm) {
 };
 
 MonoFilm.prototype.reframe_item = function (item, newBounds) {
+    var rec;
     if (item.constructor.name === "Page") {
-        var rec = item.rectangles.add({
+        rec = item.rectangles.add({
             geometricBounds: [newBounds[0], newBounds[1], newBounds[2], newBounds[3]]
         });
     } else {
         if (item.parentPage) {
-            var rec = item.parentPage.rectangles.add({
+            rec = item.parentPage.rectangles.add({
                 geometricBounds: [newBounds[0], newBounds[1], newBounds[2], newBounds[3]]
             });
         } else {
-            var rec = item.parent.rectangles.add({
+            rec = item.parent.rectangles.add({
                 geometricBounds: [newBounds[0], newBounds[1], newBounds[2], newBounds[3]]
             });
         }
     }
 
     var topLeft = rec.resolve(AnchorPoint.TOP_LEFT_ANCHOR, CoordinateSpaces.SPREAD_COORDINATES)[0],
-        bottomRight = rec.resolve(
-            AnchorPoint.BOTTOM_RIGHT_ANCHOR,
-            CoordinateSpaces.SPREAD_COORDINATES
-        )[0],
+        bottomRight = rec.resolve(AnchorPoint.BOTTOM_RIGHT_ANCHOR, CoordinateSpaces.SPREAD_COORDINATES)[0],
         corners = [topLeft, bottomRight];
 
     rec.remove();
@@ -656,9 +632,10 @@ MonoFilm.prototype.get_bounds_of_selection = function (mySelection) {
     var selBounds = mySelection[0].visibleBounds,
         j;
 
-    maxI = mySelection.length;
+    var maxI = mySelection.length,
+        pI;
 
-    for (i = 0; i < maxI; i += 1) {
+    for (var i = 0; i < maxI; i += 1) {
         pI = mySelection[i];
         for (j = 0; j < pI.visibleBounds.length; j += 1) {
             if (j === 0 || j === 1) {
@@ -683,10 +660,7 @@ MonoFilm.prototype.reset = function () {
 };
 
 MonoFilm.prototype.print_to_postscript = function (myDoc, targetFile, printPreset) {
-    var myPPreset =
-        printPreset.constructor.name == "PrinterPreset"
-            ? printPreset
-            : app.printerPresets.item(printPreset);
+    var myPPreset = printPreset.constructor.name == "PrinterPreset" ? printPreset : app.printerPresets.item(printPreset);
     var f = targetFile instanceof File ? targetFile : new File(targetFile);
     var doc = myDoc && myDoc.constructor.name == "Document" ? myDoc : app.activeDocument;
 
@@ -763,9 +737,9 @@ MonoFilm.prototype.close = function (saveOpts) {
     }
 };
 
-MonoFilm.prototype.create_graphicLine = function (page, layer, p1, p2, strokeColor, strokeWeight) {
+MonoFilm.prototype.create_graphicLine = function (page, layer, p1, p2, strokeWeight) {
     var lineOpts = {
-        strokeWeight: strokeWeight.value,
+        strokeWeight: strokeWeight,
         fillColor: this.colors.none,
         strokeColor: this.colors.reg
     };
@@ -780,8 +754,8 @@ MonoFilm.prototype.add_hairLines = function () {
     var printSize = 424;
     var strokeWidth = new UnitValue(2, "pt");
     var bounds = this.filmPage.bounds;
-    var yCenter = bounds[0] + (bounds[2] - bounds[0]) / 2;
-    var xCenter = bounds[1] + (bounds[3] - bounds[1]) / 2;
+    // var yCenter = bounds[0] + (bounds[2] - bounds[0]) / 2;
+    // var xCenter = bounds[1] + (bounds[3] - bounds[1]) / 2;
     var l1x1, l1y1, l1x2, l1y2, l2x1, l2y1, l2x2, l2y2;
 
     if (height < 420 && height > width) {
@@ -789,7 +763,7 @@ MonoFilm.prototype.add_hairLines = function () {
         l1x1 = bounds[1];
         l1y1 = bounds[0] - 0.5 * (printSize - height);
         l1x2 = bounds[3];
-        l1y2 = l1y;
+        l1y2 = l1y1;
 
         l2x1 = bounds[1];
         l2y1 = bounds[2] + 0.5 * (printSize - height);
@@ -809,22 +783,8 @@ MonoFilm.prototype.add_hairLines = function () {
         l2y2 = bounds[2];
     }
 
-    this.create_graphicLine(
-        this.filmPage,
-        this.layers.info,
-        [l1x1, l1y1],
-        [l1x2, l1y2],
-        this.colors.reg,
-        strokeWidth
-    );
-    this.create_graphicLine(
-        this.filmPage,
-        this.layers.info,
-        [l2x1, l2y1],
-        [l2x2, l2y2],
-        this.colors.reg,
-        strokeWidth
-    );
+    this.create_graphicLine(this.filmPage, this.layers.info, [l1x1, l1y1], [l1x2, l1y2], this.colors.reg, strokeWidth);
+    this.create_graphicLine(this.filmPage, this.layers.info, [l2x1, l2y1], [l2x2, l2y2], this.colors.reg, strokeWidth);
 };
 
 MonoFilm.prototype.add_centermarks = function () {
@@ -836,7 +796,7 @@ MonoFilm.prototype.add_centermarks = function () {
 
 MonoFilm.prototype.add_pictogram = function () {
     var type = this.get_sep_type();
-    var pictogram = this.create_pictogram(type);
+    this.create_pictogram(type);
 };
 
 MonoFilm.prototype.add_jobInfo = function (jobNfo, printNfo) {
@@ -868,15 +828,7 @@ MonoFilm.prototype.add_jobInfo = function (jobNfo, printNfo) {
         ("0" + d.getHours()).slice(-2) +
         ":" +
         ("0" + d.getMinutes()).slice(-2);
-    jobString +=
-        " | " +
-        this.sep.get_width().toFixed(0) +
-        "x" +
-        this.sep.get_height().toFixed(0) +
-        "mm | " +
-        datestring +
-        " " +
-        this.get_kuerzel();
+    jobString += " | " + this.sep.get_width().toFixed(0) + "x" + this.sep.get_height().toFixed(0) + "mm | " + datestring + " " + this.get_kuerzel();
 
     infoTF.contents += jobString;
 
@@ -889,7 +841,7 @@ MonoFilm.prototype.add_spotInfo_numbered = function () {
     this.layers.info = this.check_create_layer("infoEbene", "job");
     this.filmDoc.activeLayer = this.layers.info;
 
-    var doc = this.filmDoc;
+    //var doc = this.filmDoc;
     var colorTF = this.create_text_frame(this.layers.info, "colorTextFrame");
     var colorText = colorTF.texts.item(0);
 
@@ -913,10 +865,7 @@ MonoFilm.prototype.add_spotInfo_numbered = function () {
         colorTF.contents += spotString;
         colorTF.contents += " ";
 
-        var spotChars = colorText.characters.itemByRange(
-            charIndex,
-            charIndex + spotString.length - 1
-        );
+        var spotChars = colorText.characters.itemByRange(charIndex, charIndex + spotString.length - 1);
         spotChars.fillColor = spot;
         charIndex += spotString.length + 1;
     }
@@ -932,10 +881,10 @@ MonoFilm.prototype.print = function (filmInPath, filmOutPath) {
         return;
     }
     var saveName = this.filmDoc.name.substring(0, this.filmDoc.name.lastIndexOf("."));
-    var saveFolder = this.filmDoc.fullName.parent;
+    // var saveFolder = this.filmDoc.fullName.parent;
 
-    var pdfName = saveName + ".pdf";
-    var pdfFile = new File(filmOutPath + pdfName);
+    // var pdfName = saveName + ".pdf";
+    // var pdfFile = new File(filmOutPath + pdfName);
 
     var psName = saveName + ".ps";
     var psFile = new File(filmInPath + psName);
@@ -944,25 +893,22 @@ MonoFilm.prototype.print = function (filmInPath, filmOutPath) {
 };
 
 MonoFilm.prototype.print_direct = function () {
-    if (!this.filmDoc.saved) {
-        alert("Film wurde noch nicht gespeichert, bitte erst abspeichern");
-        return;
-    }
-    var saveName = this.filmDoc.name.substring(0, this.filmDoc.name.lastIndexOf("."));
-    var saveFolder = this.filmDoc.fullName.parent;
-
-    var pdfName = saveName + ".pdf";
-    var pdfFile = new File(pm.path("filmOut") + pdfName);
-
-    var printerPreset = new PrinterPreset();
-    printerPreset.colorOutput = ColorOutputModes.SEPARATIONS;
-    printerPreset.allPrinterMarks = false;
-
-    this.print_to_postscript(this.filmDoc, psFile, "monoFilms");
+    // if (!this.filmDoc.saved) {
+    //     alert("Film wurde noch nicht gespeichert, bitte erst abspeichern");
+    //     return;
+    // }
+    // var saveName = this.filmDoc.name.substring(0, this.filmDoc.name.lastIndexOf("."));
+    // var saveFolder = this.filmDoc.fullName.parent;
+    // var pdfName = saveName + ".pdf";
+    // var pdfFile = new File(pm.path("filmOut") + pdfName);
+    // var printerPreset = new PrinterPreset();
+    // printerPreset.colorOutput = ColorOutputModes.SEPARATIONS;
+    // printerPreset.allPrinterMarks = false;
+    // this.print_to_postscript(this.filmDoc, psFile, "monoFilms");
 };
 
 MonoFilm.prototype.save = function (jobNfo, showDialog, close) {
-    var wxhRE = /\d{2,3}x\d{2,3}_/i;
+    // var wxhRE = /\d{2,3}x\d{2,3}_/i;
     var saveFolder = this.sep.folder;
     var saveName = this.sep.name.substring(0, this.sep.name.lastIndexOf("."));
 
@@ -981,7 +927,7 @@ MonoFilm.prototype.save = function (jobNfo, showDialog, close) {
     if (saveFile) this.filmDoc.save(saveFile);
     this.filmFile = this.filmDoc.fullName;
 
-    if (close) saveDoc.close();
+    if (close) this.filmDoc.close();
 };
 
 MonoFilm.prototype.resize_page = function () {
@@ -993,10 +939,7 @@ MonoFilm.prototype.resize_page = function () {
     });
 
     var topLeft = rec.resolve(AnchorPoint.TOP_LEFT_ANCHOR, CoordinateSpaces.SPREAD_COORDINATES)[0];
-    var bottomRight = rec.resolve(
-        AnchorPoint.BOTTOM_RIGHT_ANCHOR,
-        CoordinateSpaces.SPREAD_COORDINATES
-    )[0];
+    var bottomRight = rec.resolve(AnchorPoint.BOTTOM_RIGHT_ANCHOR, CoordinateSpaces.SPREAD_COORDINATES)[0];
     var corners = [topLeft, bottomRight];
 
     rec.remove();

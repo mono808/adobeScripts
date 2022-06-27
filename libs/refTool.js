@@ -115,7 +115,7 @@ function get_ref_from_ai_doc(doc) {
         }
 
         //if not, check if the whole filepath contains a jobnumber
-    } else if (is_valid_ref(doc.fullName)) {
+    } else if (doc.fullName.exists && is_valid_ref(doc.fullName)) {
         return new File(doc.fullName);
     }
 

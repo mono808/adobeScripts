@@ -15,7 +15,7 @@ exports.modify_collection = function (collection, modify) {
     return collection;
 };
 
-exports.save_push = function (array, elem) {
+exports.safe_push = function (array, elem) {
     var newArray = array.slice(0);
     newArray.push(elem);
     return newArray;

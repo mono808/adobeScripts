@@ -108,7 +108,7 @@ function createMeasure() {
     var mainLayerSet;
 
     var textSize = docRef.width;
-    textSize.value *= 0.025;
+    textSize.value *= 0.0185;
 
     var pixelLength, logicalUnits, logicalLength;
     var mS = docRef.measurementScale;
@@ -138,7 +138,7 @@ function createMeasure() {
     // Create Measurement LayerSet
     // =======================================================
     var layerSetRef = mainLayerSet.layerSets.add();
-    var linesLayerRef = layerSetRef.artLayers.add();
+    layerSetRef.artLayers.add();
 
     // =======================================================
     // Draw Lines
@@ -196,26 +196,12 @@ function createMeasure() {
         textItemRef.contents = logicalWidth + " " + logicalUnits;
         textItemRef.justification = Justification.CENTER;
 
-        textItemRef.position = find_good_offsets_horizontal(
-            docRef,
-            textLayerRef,
-            width,
-            textSize,
-            x1,
-            y1
-        );
+        textItemRef.position = find_good_offsets_horizontal(docRef, textLayerRef, width, textSize, x1, y1);
     } else {
         var logicalHeight = round_point5(heightpx * logicalRatio);
         textItemRef.contents = logicalHeight + " " + logicalUnits;
 
-        textItemRef.position = find_good_offset_vertical(
-            docRef,
-            textLayerRef,
-            height,
-            textSize,
-            x1,
-            y1
-        );
+        textItemRef.position = find_good_offset_vertical(docRef, textLayerRef, height, textSize, x1, y1);
     }
 
     layerSetRef.name = textItemRef.contents;
