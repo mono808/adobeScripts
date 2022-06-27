@@ -126,9 +126,7 @@ function createStyles(doc) {
 
     var colorsCStyle = checkCreateStyle("cell", "colorsCStyle");
     colorsCStyle.basedOn = defaultCStyle;
-    colorsCStyle.appliedParagraphStyle = doc.paragraphStyles.item(
-        "colorsPStyle"
-    );
+    colorsCStyle.appliedParagraphStyle = doc.paragraphStyles.item("colorsPStyle");
 
     var posCStyle = checkCreateStyle("cell", "posCStyle");
     posCStyle.basedOn = defaultCStyle;
@@ -144,8 +142,7 @@ function createStyles(doc) {
 }
 
 function createTable(doc) {
-    var tableTempString =
-        "Client1\tClient 2\tJobNr\tjobName\rPos1\tPos2\tPos3\tPos4\rColors1\tColors2\tColors3\tColors4\rimage1\timage2\timage3\timage4";
+    var tableTempString = "Client1\tClient 2\tJobNr\tjobName\rPos1\tPos2\tPos3\tPos4\rColors1\tColors2\tColors3\tColors4\rimage1\timage2\timage3\timage4";
 
     var myTF = createTextFrame(doc);
     myTF.contents = tableTempString;
@@ -194,8 +191,7 @@ function createFrame(cell) {
     gbs[3] = gbs[1] + cell.width - cell.rightInset;
     gbs[1] = gbs[1] + cell.leftInset;
     rect.geometricBounds = gbs;
-    rect.anchoredObjectSettings.anchoredPosition =
-        AnchorPosition.inlinePosition;
+    rect.anchoredObjectSettings.anchoredPosition = AnchorPosition.inlinePosition;
     rect.anchoredObjectSettings.anchorYoffset = cell.topInset - cell.height;
 
     return rect;
@@ -255,10 +251,7 @@ function fill_table_with_printNfo(monoPrints, myTable, names) {
         colorCell.contents = spotNames.join(", ");
     }
 
-    var tFHeight =
-        myTable.parent.geometricBounds[2] -
-        myTable.parent.geometricBounds[0] -
-        1;
+    var tFHeight = myTable.parent.geometricBounds[2] - myTable.parent.geometricBounds[0] - 1;
     var rowsHeight = jobRow.height + posRow.height + colorsRow.height;
 
     var imageRow = myTable.rows.item(3);
@@ -327,7 +320,7 @@ function main() {
 
     var job = require("job");
     var paths = require("paths");
-    var f_all = require("f_all");
+    var _ = require("_");
     var jobFolder = require("jobFolder");
     var names = require("names");
     var BaseDoc = require("BaseDoc");
@@ -347,9 +340,7 @@ function main() {
     var monoPrints = jobFolder.get_prints();
 
     if (monoPrints.length < 1) {
-        alert(
-            "Keine Siebdruck-Dateien gefunden, Filmhuelle wird nicht erstellt"
-        );
+        alert("Keine Siebdruck-Dateien gefunden, Filmhuelle wird nicht erstellt");
         doc.close(SaveOptions.NO);
         return;
     }

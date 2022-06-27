@@ -1,7 +1,7 @@
 ﻿function main() {
            
     #include 'augment_objects.jsx'
-    #include 'f_all.jsx'
+    #include '_.jsx'
     #include 'job_related.jsx'
     #include 'save_Options.jsx'
     
@@ -18,9 +18,9 @@
     if(job.nfo.tech) {
         var ddTag = "dd" + job.nfo.tech;
         executeAction( charIDToTypeID( "save" ), undefined, DialogModes.ALL );
-        // f_all.saveFile (mofi.file(job.nfo.tech.toLowerCase()), save_ops.backupPS(), false);
+        // _.saveFile (mofi.file(job.nfo.tech.toLowerCase()), save_ops.backupPS(), false);
     } else {
-        f_all.saveFile (mofi.file(job.nfo.tech.toLowerCase()), save_ops.backupPS(), false);
+        _.saveFile (mofi.file(job.nfo.tech.toLowerCase()), save_ops.backupPS(), false);
     }
     
     app.preferences.rulerUnits = originalRulerUnits; 
