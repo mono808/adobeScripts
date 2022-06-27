@@ -1,17 +1,16 @@
 ﻿// DESCRIPTION: Launch a script by typing its name or picking it from a recent-history list
 // Peter Kahrel
-// adapted by mono808
-// to work in illustrator and photoshop
-// store history in documents/adobeScripts/
+// adapted by mono808 to work in illustrator and photoshop
+// stores history in documents/adobeScripts/
 
-function runscript() {
-    var appName = BridgeTalk.appName;
-    var runscript = {};
-    var scriptFile = File($.fileName);
-    var scriptBase = scriptFile.parent.parent;
-    var script_dir = scriptBase.fullName + "/" + appName + "/";
+var appName = BridgeTalk.appName;
+var runscript = {};
+var scriptFile = File($.fileName);
+var scriptBase = scriptFile.parent.parent;
+var script_dir = scriptBase.fullName + "/" + appName + "/";
+runscript.script_dir = decodeURI(script_dir);
 
-    runscript.script_dir = decodeURI(script_dir);
+exports.run = function () {
     runscript.historyFile = {
         illustrator: "~/documents/adobeScripts/runscript-ai.txt",
         photoshop: "~/documents/adobeScripts/runscript-ps.txt",
@@ -19,16 +18,15 @@ function runscript() {
     };
     runscript.history = get_history();
     runscript.history.recentScripts = removeDeletedItems(runscript.history.recentScripts);
-
     //---------------------------------------------------------
     // Get the directory that the script is run from
 
-    function scriptPath() {
-        try {
-            return app.activeScript;
-        } catch (e) {
-            return File(e.fileName);
-        }
+    try {
+        var script = get_a_script();
+        if (!script) return;
+        exports.execScript(script);
+    } catch (e) {
+        alert(e.message + "\rin file " + e.fileName + "\rin line " + e.line);
     }
 
     //----------------------------------------------------------
@@ -262,45 +260,39 @@ function runscript() {
         store_history(obj);
         return File(runscript.script_dir + "/" + script);
     } // dialog
+};
 
-    function read_file(aFile) {
-        if (aFile && aFile instanceof File && aFile.exists) {
-            aFile.open("r", undefined, undefined);
-            aFile.encoding = "UTF-8";
-            aFile.lineFeed = "Windows";
-            var success = aFile.read();
-            aFile.close();
-            return success;
-        } else {
-            alert(aFile + "could not be read");
-        }
-    }
-
-    try {
-        var script = get_a_script();
-        if (!script) return;
-
-        switch (app.name) {
-            case "Adobe Illustrator":
-                var scriptString = read_file(script);
-                if (!scriptString) return;
-                illustrator.executeScript(scriptString);
-                break;
-
-            case "Adobe InDesign":
-                app.doScript(script);
-                app.activate();
-                break;
-
-            case "Adobe Photoshop":
-                var scriptString = read_file(script);
-                if (!scriptString) return;
-                photoshop.executeScript(scriptString);
-                break;
-        }
-    } catch (e) {
-        alert(e.message + "\rin file " + e.fileName + "\rin line " + e.line);
+function read_file(aFile) {
+    if (aFile && aFile instanceof File && aFile.exists) {
+        aFile.open("r", undefined, undefined);
+        aFile.encoding = "UTF-8";
+        aFile.lineFeed = "Windows";
+        var success = aFile.read();
+        aFile.close();
+        return success;
+    } else {
+        alert(aFile + "could not be read");
     }
 }
 
-exports = module.exports = runscript;
+exports.execScript = function (script) {
+    var scriptString;
+    switch (app.name) {
+        case "Adobe Illustrator":
+            scriptString = read_file(script);
+            if (!scriptString) return;
+            illustrator.executeScript(scriptString);
+            break;
+
+        case "Adobe InDesign":
+            app.doScript(script);
+            app.activate();
+            break;
+
+        case "Adobe Photoshop":
+            scriptString = read_file(script);
+            if (!scriptString) return;
+            photoshop.executeScript(scriptString);
+            break;
+    }
+};
