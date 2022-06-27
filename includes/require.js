@@ -52,7 +52,7 @@ PCROOT = $.getenv("pcroot");
         filename = searchModule(id);
 
         // Only load the module if it is not already cached.
-        if (!require._cache.hasOwnProperty(filename)) {
+        if (!Object.prototype.hasOwnProperty.call(require._cache, filename)) {
             // Remember the directory we're loading this module from
             var olddir = require._current_module_dir;
             require._current_module_dir = id.substring(0, id.lastIndexOf("/") + 1);

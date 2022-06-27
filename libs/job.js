@@ -26,7 +26,7 @@ exports.get_jobNfo = function (doc) {
 
     // let the user check the infos
     result = jobNfoDialog.show_dialog(jobNfo);
-    if (!result) throw "Script Cancelled by YOU MOTHERFUCKER";
+    if (!result) throw "Script Cancelled";
     jobNfo = _.copy_props(jobNfo, result, true);
 
     if (jobNfo.folder) {
