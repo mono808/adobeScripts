@@ -21,6 +21,7 @@ function show_dialog() {
     var win = new Window("dialog", "monos Passer-Script");
     win.setPnl = win.add("panel");
     win.setPnl.center = win.setPnl.add("button", undefined, "center");
+    win.setPnl.lr = win.setPnl.add("button", undefined, "links-rechts");
     win.setPnl.aussen = win.setPnl.add("button", undefined, "aussen");
     win.setPnl.quer = win.setPnl.add("button", undefined, "quer");
     win.setPnl.hoch = win.setPnl.add("button", undefined, "hoch");
@@ -28,6 +29,10 @@ function show_dialog() {
 
     win.setPnl.center.onClick = function () {
         result = "center";
+        win.close();
+    };
+    win.setPnl.lr.onClick = function () {
+        result = "links-rechts";
         win.close();
     };
     win.setPnl.aussen.onClick = function () {
@@ -80,6 +85,12 @@ function getPasserBounds(passerLayout, passerSettings) {
             bounds.bottom = sepRef.geometricBounds[2] + pS.distance;
             bounds.left = sepRef.geometricBounds[1] - pS.distance;
             bounds.right = sepRef.geometricBounds[3] + pS.distance;
+            break;
+        case "links-rechts":
+            bounds.top = sepRef.geometricBounds[0] + (sepRef.geometricBounds[2] - sepRef.geometricBounds[0]) / 2;
+            bounds.bottom = bounds.top;
+            bounds.left = sepRef.geometricBounds[1] - pS.distance;
+            bounds.right = sepRef.geometricBounds[3] + pS.distance;
     }
     return bounds;
 }
@@ -88,10 +99,15 @@ function initSidePasser(passerLayout, passerSettings) {
     var pB = getPasserBounds(passerLayout, passerSettings);
 
     var passerArray = [];
-    passerArray.push(new Passer(pB.left, pB.top, "lefttop", passerSettings));
-    passerArray.push(new Passer(pB.right, pB.top, "righttop", passerSettings));
-    passerArray.push(new Passer(pB.left, pB.bottom, "leftbottom", passerSettings));
-    passerArray.push(new Passer(pB.right, pB.bottom, "rightbottom", passerSettings));
+    if (passerLayout == "links-rechts") {
+        passerArray.push(new Passer(pB.left, pB.top, "left-center", passerSettings));
+        passerArray.push(new Passer(pB.right, pB.top, "right-center", passerSettings));
+    } else {
+        passerArray.push(new Passer(pB.left, pB.top, "lefttop", passerSettings));
+        passerArray.push(new Passer(pB.right, pB.top, "righttop", passerSettings));
+        passerArray.push(new Passer(pB.left, pB.bottom, "leftbottom", passerSettings));
+        passerArray.push(new Passer(pB.right, pB.bottom, "rightbottom", passerSettings));
+    }
 
     return passerArray;
 }
@@ -132,12 +148,7 @@ function draw_passer(passer) {
         strokeWeight: pS.stroke2,
         fillColor: noColor,
         strokeColor: regColor,
-        geometricBounds: [
-            y - pS.circle / 2,
-            x - pS.circle / 2,
-            y + pS.circle / 2,
-            x + pS.circle / 2
-        ]
+        geometricBounds: [y - pS.circle / 2, x - pS.circle / 2, y + pS.circle / 2, x + pS.circle / 2]
     });
     var gLH = myPage.graphicLines.add(myLayer, undefined, undefined, {
         strokeWeight: pS.stroke2,
@@ -202,6 +213,9 @@ exports.add_passer = function () {
     switch (dialogResult) {
         case "center":
             passerArray = initPasserCenter(centerPasserSettings);
+            break;
+        case "links-rechts":
+            passerArray = initSidePasser("links-rechts", sidePasserSettings);
             break;
         case "hoch":
             passerArray = initSidePasser("hoch", sidePasserSettings);
