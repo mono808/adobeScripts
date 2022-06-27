@@ -9,7 +9,7 @@ function main() {
     var print = require("print");
     var BaseDoc = require("BaseDoc");
 
-    var jobNfo = job.get_jobNfo_from_doc(app.activeDocument);
+    var jobNfo = job.get_jobNfo(app.activeDocument);
     var printNfo = print.get_printNfo(jobNfo.file);
     paths.set_nfo(jobNfo);
     paths.set_nfo(printNfo);

@@ -123,6 +123,11 @@ function MonoGraphic(myGraphic) {
             return monoTextil.get_active_layer(textil);
         },
 
+        /**
+         * Gets the layer names of currently active layers.
+         * @param {string} title - The title of the book.
+         * @param {string} author - The author of the book.
+         */
         get_graphicLayerNames: function (opts) {
             // get ref to the parent object, otherwise the script will fuckup ...
             var graphicLayers = myGraphic.graphicLayerOptions.graphicLayers;
@@ -237,34 +242,49 @@ function MonoGraphic(myGraphic) {
                 skipHiddenLayers: true
             });
 
+            if (monoPrint.film) {
+                var monoFilm = new MonoFilm(monoPrint.film);
+                var spotNames = monoFilm.get_spotNames(longNames);
+                monoFilm.filmDoc.close(SaveOptions.NO);
+                return spotNames;
+            }
+
             switch (monoPrint.tech.toUpperCase()) {
                 case "SD":
-                    if (monoPrint.film) {
-                        var monoFilm = new MonoFilm(monoPrint.film);
-                        var spotNames = monoFilm.get_spotNames(longNames);
-                        monoFilm.filmDoc.close(SaveOptions.NO);
-                        return spotNames;
+                    switch (fileExtension) {
+                        case ".ai":
+                            var docInfos = bridgeTalker.send_script("illustrator", {
+                                module: "ai_get-doc-infos",
+                                file: new File(monoPrint.print),
+                                activeLayers: ["Motiv"]
+                            });
+                            return docInfos.colors;
+                        case ".psd":
+                        case ".tif":
+                            var docInfos = bridgeTalker.send_script("photoshop-120.064", {
+                                module: "ps_get-doc-infos",
+                                file: new File(monoPrint.print),
+                                activeLayers: activeLayers
+                            });
+                            return docInfos.colors;
                     }
                     break;
 
                 case "FLO":
                 case "FLX":
-                    return bridgeTalker("illustrator", new File(ADOBESCRIPTS + "/illustrator/get-doc-colors.js"), {
+                case "STK":
+                    var docInfos = bridgeTalker.send_script("illustrator", {
+                        module: "ai_get-doc-infos",
                         file: new File(monoPrint.print),
-                        layers: activeLayers
+                        activeLayers: ["Motiv"]
                     });
+                    return docInfos.colors;
 
                 case "SUB":
                     return ["CYMK"];
 
                 case "DTG":
                     return ["CMYK"];
-
-                case "STK":
-                    return bridgeTalker("illustrator", new File(ADOBESCRIPTS + "/illustrator/get-doc-colors.js"), {
-                        file: new File(monoPrint.print),
-                        layers: activeLayers
-                    });
 
                 default:
                     return ["nach Abbildung"];
@@ -278,6 +298,13 @@ function MonoGraphic(myGraphic) {
             if (!monoPrint) monoPrint = new MonoPrint(myFile, jobFolder);
 
             if (!monoPrint.tech) monoPrint.tech = "default";
+
+            var activeLayers = this.get_graphicLayerNames({
+                skipFixedLayers: true,
+                fixedLayerNames: ["Hilfsebene"],
+                skipHiddenLayers: true
+            });
+
             switch (monoPrint.tech.toLowerCase()) {
                 case "sd":
                     if (monoPrint.film) {
@@ -289,12 +316,17 @@ function MonoGraphic(myGraphic) {
                 case "default":
                     switch (fileExtension) {
                         case ".psd":
-                        case ".tif":
-                            result = bridgeTalker("photoshop-120.064", new File(ADOBESCRIPTS + "/photoshop/get-doc-infos.js"), new File(monoPrint.print));
-                            break;
+                            var docInfos = bridgeTalker("photoshop-120.064", new File(ADOBESCRIPTS + "/libs/ps_get-doc-infos.js"), {
+                                file: new File(monoPrint.print),
+                                layers: activeLayers
+                            });
+                            return docInfos;
                         case ".ai":
-                            result = bridgeTalker("illustrator", new File(ADOBESCRIPTS + "/illustrator/get-doc-infos.js"), new File(monoPrint.print));
-                            break;
+                            var docInfos = bridgeTalker("illustrator", new File(ADOBESCRIPTS + "/libs/ai_get-doc-infos.js"), {
+                                file: new File(monoPrint.print),
+                                layers: activeLayers
+                            });
+                            return docInfos;
                     }
             }
 
