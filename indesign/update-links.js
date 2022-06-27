@@ -30,6 +30,11 @@ function create_path_msg(aFile) {
 }
 
 var doc = app.activeDocument;
+
+if(!doc.saved) {
+    var filePath = doc.filePath
+    doc.save(File(doc.filePath + '/' + doc.name).saveDlg());
+}
 var startFile = doc.fullName;
 var docFolder = app.activeDocument.filePath;
 

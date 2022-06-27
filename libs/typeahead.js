@@ -6,17 +6,10 @@
     return arr;
 }
 
-exports.show_dialog = function (
-    inputElements,
-    propertyToList,
-    multiselect,
-    dialogTitle,
-    listAlways
-) {
+exports.show_dialog = function (inputElements, propertyToList, multiselect, dialogTitle, listAlways) {
     var names;
     if (propertyToList) {
-        if (inputElements.constructor.name != "Array")
-            inputElements = arrayify(inputElements);
+        if (inputElements.constructor.name != "Array") inputElements = arrayify(inputElements);
 
         names = inputElements.map(function (elem) {
             return elem[propertyToList];
@@ -26,7 +19,6 @@ exports.show_dialog = function (
     }
 
     var tempList;
-    var keyCount = 0;
 
     var w = new Window('dialog {alignChildren: "fill"}');
     w.text = dialogTitle || "Quick select";
@@ -39,11 +31,8 @@ exports.show_dialog = function (
     w.add('button {text: "Ok"}');
 
     entry.onChanging = function () {
-        keyCount++;
-        if (keyCount < 4 || entry.text.length < 4) return;
-        var regString = listAlways
-            ? "^(" + entry.text + "|" + listAlways + ')'
-            : entry.text;
+        if (entry.text.length < 3) return;
+        var regString = listAlways ? "^(" + entry.text + "|" + listAlways + ")" : entry.text;
         w.text = regString;
         var tempRegExp = new RegExp(regString, "i");
         var tempArray = [];

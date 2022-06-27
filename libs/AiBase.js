@@ -71,9 +71,7 @@ AiBase.fit_artboard_to_selection = function (myDoc, arrayOfPageItems, padding) {
     var selBounds = arrayOfPageItems[i].visibleBounds; //use first pageItem to init the Bounds
 
     do {
-        vB =
-            arrayOfPageItems[i]
-                .visibleBounds; /*bounds = [left,top,right,bottom]*/
+        vB = arrayOfPageItems[i].visibleBounds; /*bounds = [left,top,right,bottom]*/
         selBounds[0] = vB[0] < selBounds[0] ? vB[0] : selBounds[0];
         selBounds[1] = vB[1] > selBounds[1] ? vB[1] : selBounds[1];
         selBounds[2] = vB[2] > selBounds[2] ? vB[2] : selBounds[2];
@@ -82,14 +80,12 @@ AiBase.fit_artboard_to_selection = function (myDoc, arrayOfPageItems, padding) {
 
     var myBorder = padding;
     var myBorderInput = -1;
-    while (myBorder < 0 || myBorder > 100 || isNaN(myBorder)) {
-        myBorderInput = prompt(
-            "Size of padding around image, in points (0-100)",
-            "20",
-            "Padding Size"
-        );
+    while (myBorder < 0 || myBorder > 100) {
+        myBorderInput = prompt("Size of padding around image, in points (0-100)", "20", "Padding Size");
         myBorder = parseInt(myBorderInput);
     }
+
+    if (isNaN(myBorder)) return;
 
     selBounds[0] -= myBorder;
     selBounds[1] += myBorder;

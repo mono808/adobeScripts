@@ -37,6 +37,16 @@
         }
     };
 
+    if(!aFile || !aFile.exists) {
+        alert();
+        // File.openDlg (prompt, filter, multiSelect)
+        aFile = File(baseFolder).openDlg (aFile + " does not exist. Kuggst Du selber wo ist Datei!", undefined, false);
+    }
+
+    if (!aFile || !aFile.exists) {
+        throw "non existing monoprint file provided";
+    }
+
     var parentFolder = aFile.parent,
         printsFolder;
     if (parentFolder.name.indexOf("Druckdaten") != -1) {

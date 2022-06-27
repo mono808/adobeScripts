@@ -60,6 +60,7 @@ function calc_new_resolution(userDimension, selBounds, resolution) {
 
     var userDimension = get_user_input();
 
+    if(!userDimension) return;
     var originalUnit = app.preferences.rulerUnits;
     app.preferences.rulerUnits = Units.CM;
 
